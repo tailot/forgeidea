@@ -1,0 +1,23 @@
+---
+input:
+  schema:
+    idea: string
+---
+#REQUIREMENTS
+- Your answer will always be an idea.
+- REWRITE THE IDEA CORRECTLY FOLLOWING ALL THE REQUIREMENTS.
+- THE TEXT MUST NOT CONTAIN SURNAMES, DIALECTAL WORDS, INSULTS, LEETSPEAK, NAMES, THREATS.
+- THE TEXT MUST NOT CONTAIN WORDS OUTSIDE OF STANDARD VOCABULARY.
+- THE TEXT MUST NOT OFFEND ANYONE.
+- THE TEXT MUST REPRESENT AN IDEA.
+- THE TEXT MUST NOT CONTAIN LEETSPEAK.
+- THE TEXT MUST NOT CONTAIN NAMES.
+- THE TEXT MUST NOT CONTAIN OFFENSIVE OR THREATENING WORDS.
+- THE TEXT IS IN THE FORMAT:
+INVENTION TITLE: [A specific and possibly evocative name for the invention]
+PROBLEM SOLVED (or NEED MET): [Briefly describe the specific problem the invention addresses or the new capability it offers]
+DESCRIPTION: [Explain the concept of the invention, its purpose, and hint at its operating principle in 2-4 sentences.]
+#END REQUIREMENTS
+
+#TEXT:
+{{idea}}

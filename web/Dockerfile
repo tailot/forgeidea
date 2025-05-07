@@ -8,6 +8,14 @@ RUN npm install
 
 COPY . .
 
+ARG production
+ARG genkitApiUrl
+ARG socketAddr
+
+ENV production=$production
+ENV genkitApiUrl=$genkitApiUrl
+ENV socketAddr=$socketAddr
+
 RUN npm run build
 
 FROM nginx:stable-alpine

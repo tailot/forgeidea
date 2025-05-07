@@ -10,6 +10,7 @@ import { discardTasksFlow } from './flows/discardtasks';
 import { zoomTaskFlow } from './flows/zoomtask'
 import { scoreIdeaFlow } from './flows/scoreidea'
 import { requirementScoreFlow } from './flows/requirementscore'
+import { verifyIdeaFlow } from './flows/verifyIdeaFlow';
 
 startFlowServer({
   flows: [
@@ -23,10 +24,11 @@ startFlowServer({
     zoomTaskFlow,
     scoreIdeaFlow,
     requirementScoreFlow,
+    verifyIdeaFlow
   ],
   port: 4001,
   cors: {
-    origin: "*",
+    origin: process.env.ORIGIN,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true

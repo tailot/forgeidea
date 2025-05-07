@@ -81,7 +81,6 @@ export interface GenkitFlowResponse<T> {
 export class GenkitService {
 
   private apiUrlBase = environment.genkitApiUrl;
-  private apiKey = environment.genkitApiKey;
   private requestTimeout = 60000;
 
   private cache = new Map<string, Observable<any>>();
@@ -89,9 +88,6 @@ export class GenkitService {
   constructor(private http: HttpClient) {
     if (!this.apiUrlBase) {
       console.error("CRITICAL ERROR: Genkit API URL not configured in environment.ts!");
-    }
-    if (this.apiKey === 'CACATUA' && environment.production) {
-      console.error("SECURITY ERROR: Do not use dummy or real API Keys directly in production code!");
     }
   }
 
@@ -101,10 +97,6 @@ export class GenkitService {
       'Accept': 'application/json'
     });
 
-    if (this.apiKey && this.apiKey !== 'CACATUA') {
-      headers = headers.set('Authorization', `Bearer ${this.apiKey}`);
-      console.warn('GenkitService: API Key inserted in Authorization header (OK ONLY FOR DEVELOPMENT/LOCAL TESTING)');
-    }
     return headers;
   }
   private handleError(error: HttpErrorResponse, flowName: string): Observable<never> {

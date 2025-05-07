@@ -30,5 +30,10 @@ export const routes: Routes = [
         path: 'settings',
         loadComponent: () => import('./settings/settings.component').then(m => m.SettingsComponent),
         title: 'forge IDEA'
+    },
+    {
+        path: 'shared',
+        loadComponent: () => import('./sharedidea/sharedidea.component').then(m => m.SharedIdeaComponent),
+        title: 'forge IDEA'
     }
 ];

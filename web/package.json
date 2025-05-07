@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration production",
+    "build": "npx tsc setenv.ts && node setenv.js && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "tar": "tar -czvf ../forgeIdeaFront.tar.gz --exclude='node_modules' --exclude='.angular/cache' --exclude='dist' --exclude='.vscode'  .[^.]* *"
@@ -23,6 +23,7 @@
     "@angular/router": "^19.2.0",
     "dexie": "^4.0.11",
     "rxjs": "~7.8.0",
+    "socket.io-client": "^4.8.1",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
@@ -37,7 +38,6 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "serve": "^14.2.4",
     "typescript": "~5.7.2"
   }
 }
