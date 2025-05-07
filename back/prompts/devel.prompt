@@ -1,0 +1,17 @@
+---
+input:
+  schema:
+    language: string
+    text: string
+  default:
+    language: english
+---
+Write a bulleted list of the steps to take to develop:
+{{text}}
+
+#Warnings
+    - the response must contain only the bulleted list.
+    - the response must not contain considerations before or after the bulleted list
+
+
+Write the response in the {{language}} language

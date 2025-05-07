@@ -1,0 +1,128 @@
+$search-bar-height: 76px
+$bottom-nav-height: 56px
+$paginator-height: 56px
+$bottom-content-spacing: 20px
+$content-max-width: 1200px
+$container-horizontal-padding: 20px
+$fixed-elements-background: var(--app-background-color, white)
+$search-bar-height: 35px
+
+.search-bar-wrapper
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  z-index: 100
+  background-color: $fixed-elements-background
+  padding: 12px $container-horizontal-padding
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)
+  box-sizing: border-box
+
+  .search-field // Occupa tutta la larghezza del wrapper (che ha padding)
+    width: 100%
+    margin: 0
+    display: block
+
+.idea-list-container
+  max-width: $content-max-width
+  margin: 0 auto
+  padding-left: $container-horizontal-padding
+  padding-right: $container-horizontal-padding
+  padding-top: $search-bar-height + 16px
+  padding-bottom: $paginator-height + $bottom-nav-height + $bottom-content-spacing
+
+// Stili Comuni per Indicatori di Caricamento, Messaggi di Errore, Nessuna Idea
+.loading-indicator,
+.error-message,
+.no-ideas
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  min-height: 200px
+  text-align: center
+  padding: 20px 0
+
+  p
+    margin-top: 15px
+    color: var(--app-text-secondary-color, grey)
+
+.error-message
+  mat-card
+    width: 90%
+    max-width: 500px
+    padding: 16px
+
+    mat-card-content
+      display: flex
+      flex-direction: column
+      align-items: center
+      gap: 10px
+
+      p
+        margin: 0
+
+      button
+        margin-top: 10px
+
+// Stili Specifici per il messaggio "Nessuna Idea" e i suoi figli
+.no-ideas
+  mat-icon
+    font-size: 48px
+    height: 48px
+    width: 48px
+    color: var(--app-text-secondary-color, grey)
+
+  p
+    small
+      color: var(--app-text-tertiary-color, #888)
+      display: block
+      margin-top: 5px
+      font-style: italic
+
+  button
+    margin-top: 20px
+
+.idea-cards-grid
+  display: grid
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr))
+  gap: 16px
+  margin-top: $search-bar-height !important
+
+.idea-summary-card
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23ffffff'/%3E%3Cpath d='M0 0L20 20M20 0L0 20M20 0L40 20M40 0L20 20M0 20L20 40M20 20L0 40M20 20L40 40M40 20L20 40' stroke-width='0.5' stroke='%23000000'/%3E%3Ccircle cx='20' cy='20' r='2' fill='%23000000'/%3E%3C/svg%3E")
+  border: 1px solid;
+  height: 480px
+  display: flex
+  flex-direction: column
+  border-radius: 8px
+  overflow: hidden
+
+  app-card-idea
+    display: flex
+    flex-direction: column
+    flex-grow: 1
+
+// Stili per il Paginatore Fisso
+mat-paginator
+  position: fixed
+  bottom: $bottom-nav-height
+  left: 0
+  right: 0
+  background-color: $fixed-elements-background
+  border-top: 1px solid var(--app-divider-color, rgba(0, 0, 0, 0.12))
+  z-index: 100
+
+  ::ng-deep
+    .mat-mdc-paginator-container
+      max-width: $content-max-width
+      margin: 0 auto
+      padding: 0 $container-horizontal-padding
+
+    .mat-mdc-paginator-range-label,
+    .mat-mdc-paginator-page-size-label,
+    .mat-mdc-select-value
+      color: var(--app-text-secondary-color, rgba(0, 0, 0, 0.6))
+
+    .mat-mdc-icon-button .mat-icon
+      color: var(--app-icon-color, rgba(0, 0, 0, 0.54))

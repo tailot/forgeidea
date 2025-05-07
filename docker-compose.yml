@@ -1,0 +1,17 @@
+services:
+  backend:
+    build:
+      context: ../forgeidea/back
+      dockerfile: Dockerfile
+    ports:
+      - "4001:4001"
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL}
+
+  frontend:
+    build:
+      context: ../forgeidea/front
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"

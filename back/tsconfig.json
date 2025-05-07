@@ -1,0 +1,16 @@
+// tsconfig.json
+{
+    "compilerOptions": {
+      "target": "ES2020", // O più recente
+      "module": "CommonJS", // O ESNext se configuri package.json per ESM
+      "outDir": "./dist",
+      "rootDir": "./src", // Creeremo una cartella src
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "moduleResolution": "node" // Aggiunto per risolvere potenziali problemi
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist"]
+  }

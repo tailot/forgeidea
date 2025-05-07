@@ -1,0 +1,7 @@
+<div class="global-spinner-overlay" *ngIf="loadingService.isLoading$ | async">
+  <mat-spinner diameter="50"></mat-spinner>
+</div>
+<div class="content-wrapper">
+  <router-outlet></router-outlet>
+</div>
+<app-bottom-nav></app-bottom-nav>

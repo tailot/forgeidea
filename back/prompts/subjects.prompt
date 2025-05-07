@@ -1,0 +1,19 @@
+---
+input:
+  schema:
+    language: string
+    text: string
+  default:
+    language: english
+---
+Text:
+{{text}}
+
+# ISTRUZIONI
+Provide a list of the main topics covered in the text, classifying them with standard taxonomy names. Return the response EXCLUSIVELY as a valid JavaScript array (e.g., ["topic1", "topic2"]), without additional text or markdown delimiters.
+        
+**Absolute Requirement:** Your response must be *exclusively* a valid JSON array containing strings representing the topics and in the {{language}} language.
+**NOT INCLUDE:**
+    - Introductory or explanatory text (e.g., "Here is the list:")
+    - Blocchi di codice Markdown (json, javascript, o simili)
+    - Any other character before '[' or after ']'.

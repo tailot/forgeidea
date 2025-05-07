@@ -1,0 +1,38 @@
+<div class="jobcard-container">
+  <div>
+    <app-card-idea *ngIf="ideaid" [tasksButton]="!tasks" [evaluateScore]="true" (tasksOn)="showTasks($event)"
+      [ideaUuid]="ideaid"></app-card-idea>
+    <p *ngIf="!ideaid">No Idea UUID found in route.</p>
+  </div>
+  <div class="tasks-container">
+    <div *ngIf="selectedTasks && selectedTasks.length > 0" class="confirm-button-container">
+      <mat-button-toggle-group #toggleGroup="matButtonToggleGroup" aria-label="Azioni sui task selezionati">
+        <mat-button-toggle value="discard" (click)="discardTask()" aria-label="Scarta Task Selezionati">
+          <mat-icon>delete_sweep</mat-icon></mat-button-toggle>
+        <mat-button-toggle *ngIf="selectedTasks.length == 1" value="zoom" (click)="zoomTask()" aria-label="Dettaglio Task">
+          <mat-icon>list_alt</mat-icon></mat-button-toggle>
+        <mat-button-toggle value="deselect" (click)="deselectAllTasks()" aria-label="Deseleziona Tutti i Task">
+          <mat-icon>deselect</mat-icon></mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+    <div *ngIf="tasks && tasks.length > 0" class="task-list-container">
+      <mat-chip-listbox multiple aria-label="Task list" [(ngModel)]="selectedTasks">
+        <mat-chip-option *ngFor="let task of tasks">
+          <span [innerHTML]="formatTaskText(task)"></span>
+        </mat-chip-option>
+      </mat-chip-listbox>
+    </div>
+    <p *ngIf="tasks && tasks.length === 0">No tasks found for this idea.</p>
+    <div *ngIf="zoomedTaskResult" class="zoomed-task-result-wrapper">
+      <button mat-icon-button *ngIf="selectedTasks.length == 1 && tasks && tasks.indexOf(selectedTasks[0]) >= 1" (click)="selectPreviousTask()" class="nav-button left-nav" aria-label="Azione precedente">
+          <mat-icon>navigate_before</mat-icon>
+      </button>
+      <div class="zoomed-task-result">
+          <pre>{{ zoomedTaskResult }}</pre>
+      </div>
+      <button mat-icon-button *ngIf="selectedTasks.length == 1 && tasks && tasks.indexOf(selectedTasks[0]) < tasks.length - 1" (click)="selectNextTask()" class="nav-button right-nav" aria-label="Azione successiva">
+          <mat-icon>navigate_next</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

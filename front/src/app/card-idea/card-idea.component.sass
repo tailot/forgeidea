@@ -1,0 +1,69 @@
+$card-max-width: 600px
+$container-padding: 20px
+$element-spacing: 15px
+$error-color: #f44336
+
+.card-container
+  padding: $container-padding
+  max-width: $card-max-width
+  margin: $container-padding auto
+
+.loading-indicator, .error-message
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  padding: 40px
+  text-align: center
+
+  p
+    margin-top: $element-spacing
+
+.error-message
+  mat-card
+    border-color: $error-color
+    mat-card-title
+      color: $error-color
+
+.idea-card
+  margin-top: $element-spacing
+  // Imposta un bordo di base trasparente e una transizione
+  border: 9px solid transparent
+  transition: border-color 0.3s ease-in-out
+
+
+  mat-card-content
+    .idea-text
+      white-space: pre-wrap
+      margin-bottom: 20px
+
+    h4
+      margin-top: $element-spacing
+      margin-bottom: 5px
+
+    ul
+      margin-top: 0
+      padding-left: 20px
+
+    small
+      display: block
+      margin-top: 10px
+      color: grey
+      font-style: italic
+
+  // Stili per i bordi colorati in base al punteggio
+  &.score-low
+    border-color: red // Rosso Material
+
+  &.score-medium
+    border-color: orange // Arancione
+
+  &.score-high
+    border-color: green // Verde
+
+  // Opzionale: Stile per lo spinner se vuoi posizionarlo diversamente
+  mat-card-actions mat-spinner
+    margin-left: 8px // Aggiunge un po' di spazio a sinistra dello spinner
+
+.redoOperation
+  color: red

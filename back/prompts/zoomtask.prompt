@@ -1,0 +1,21 @@
+---
+input:
+  schema:
+    language: string
+    text: string
+    task: string
+  default:
+    language: english
+---
+Given the idea:
+{{text}}
+
+#Deep Dive
+I am interested in delving deeper into one of the aspects concerning the achievement of the objective:
+{{task}}
+
+#ISTRUZIONI
+#INSTRUCTIONS
+    - Draft a complete document full of details and insights.
+    - Adhere to drafting the document professionally, avoiding adding comments or introductions.
+    - Write the response in the {{language}} language.

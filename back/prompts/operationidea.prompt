@@ -1,0 +1,25 @@
+---
+input:
+  schema:
+    language: string
+    idea1: string
+    idea2: string
+    operation: string
+  default:
+    language: english
+---
+#OPERATIONS ON IDEAS
+- Combination: Unite or merge two ideas to create a new, more complex, or original one. This is the basis of creativity and innovation. Examples include joining concepts from different fields to solve a problem.
+- Integration: Similar to combination, but often involves incorporating one idea within another, or creating a unified framework that encompasses both.
+- Opposition/Contrast: Examine two ideas that are in conflict or mutually exclusive. This can lead to a greater understanding of the limits of each or the synthesis of a new idea that overcomes the conflict (dialectic).
+- Analogy: Use one idea as a model or reference point to better understand the other, or to draw insights from one domain to another.
+- Length: The answer must be approximately 800 characters.
+
+#REQUEST
+{{operation}} the two ideas, present the new idea in the same format as they are composed. Write the response in the {{language}} language without adding any sentences before or after the response schema.
+
+#IDEA 1:
+{{idea1}}
+
+#IDEA 2
+{{idea2}}

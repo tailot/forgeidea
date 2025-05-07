@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForgeIDEA - Dai vita alle tue intuizioni</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden; /* Previene lo scroll orizzontale */
+        }
+        /* Animazione per l'apparizione graduale */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        /* Stile per l'icona della lampadina */
+        .lightbulb-icon {
+            filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.7)); /* Ombra gialla luminosa */
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        .lightbulb-icon:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 25px rgba(250, 204, 21, 1)); /* Ombra più intensa al passaggio del mouse */
+        }
+        /* Stile per le card delle idee */
+        .idea-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .idea-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Gradient background per la hero section */
+        .hero-gradient {
+             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+         /* Stile per il pulsante CTA */
+        .cta-button {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-2xl font-bold text-indigo-600">
+                <span class="inline-block mr-2 align-middle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lightbulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                </span>
+                forgeIDEA
+            </div>
+            <div class="space-x-4">
+                <a href="#features" class="text-gray-600 hover:text-indigo-600">Caratteristiche</a>
+                <a href="#devel" class="text-gray-600 hover:text-indigo-600">Sviluppo</a>
+                <a href="generate" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg cta-button">Inizia Ora</a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero-gradient text-white py-20 md:py-32">
+        <div class="container mx-auto px-6 text-center fade-in">
+             <div class="flex justify-center mb-8">
+                 <svg id="hero-lightbulb" xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-300 lightbulb-icon cursor-pointer">
+                    <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>
+                 </svg>
+             </div>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">Dove Nascono le Grandi <span class="text-yellow-300">IDEE</span>.</h1>
+            <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">Trasforma le tue intuizioni in realtà. Esplora, sviluppa e lancia le tue idee con la nostra piattaforma innovativa.</p>
+            <a href="#devel" class="bg-yellow-400 hover:bg-yellow-500 text-indigo-800 font-bold py-3 px-8 rounded-lg text-lg cta-button">Dai Vita alla Tua Idea</a>
+        </div>
+    </section>
+
+    <section id="features" class="py-16 md:py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">Il Potere di un'IDEA</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center p-6 border border-gray-200 rounded-lg idea-card fade-in" style="animation-delay: 0.2s;">
+                    <div class="flex justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain-circuit text-indigo-500"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 1 0-2.496 8.63"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 1 1 2.496 8.63"/><path d="M15 13a4 4 0 1 1-6 0 4 4 0 0 1 6 0Z"/><path d="M12 13h.01"/><path d="M12 17a2 2 0 0 0-1.414.586A2 2 0 0 0 9.172 21H14.83a2 2 0 0 0 1.414-3.414A2 2 0 0 0 14.829 17A2 2 0 0 0 12 17Z"/><path d="M12 9a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h.01"/><path d="M15 9.5a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h.01"/><path d="M9 9.5a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h.01"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Ispirazione</h3>
+                    <p class="text-gray-600">Cattura le scintille di genialità nel momento in cui arrivano. Non lasciare che nessuna idea vada persa.</p>
+                </div>
+                <div class="text-center p-6 border border-gray-200 rounded-lg idea-card fade-in" style="animation-delay: 0.4s;">
+                     <div class="flex justify-center mb-4">
+                       <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flask-conical text-indigo-500"><path d="M10 2v7.31"/><path d="M14 9.31V2"/><path d="M4 12.31C4 17.5 8 22 12 22s8-4.5 8-9.69V12H4Z"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Sviluppo</h3>
+                    <p class="text-gray-600">Dai forma alle tue idee. Collabora, itera e trasforma concetti astratti in progetti concreti.</p>
+                </div>
+                <div class="text-center p-6 border border-gray-200 rounded-lg idea-card fade-in" style="animation-delay: 0.6s;">
+                     <div class="flex justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rocket text-indigo-500"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Lancio</h3>
+                    <p class="text-gray-600">Porta la tua idea nel mondo. Condividi la tua visione e realizza il suo potenziale impatto.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="devel" class="py-16 md:py-24 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">Sviluppo dell'IDEA</h2>
+            <div class="relative wrap overflow-hidden p-10 h-full">
+                 <div class="border-2-2 absolute border-opacity-20 border-gray-700 h-full border" style="left: 50%"></div>
+
+                <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                    <div class="order-1 w-5/12"></div>
+                    <div class="z-20 flex items-center order-1 bg-indigo-500 shadow-xl w-12 h-12 rounded-full">
+                        <h1 class="mx-auto font-semibold text-lg text-white">1</h1>
+                    </div>
+                    <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in">
+                        <h3 class="font-bold text-gray-800 text-xl mb-1">Scoperta</h3>
+                        <p class="text-sm leading-snug tracking-wide text-gray-600 text-opacity-100">Il momento iniziale, l'intuizione improvvisa o il problema da risolvere.</p>
+                    </div>
+                </div>
+
+                <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                    <div class="order-1 w-5/12"></div>
+                    <div class="z-20 flex items-center order-1 bg-indigo-500 shadow-xl w-12 h-12 rounded-full">
+                        <h1 class="mx-auto text-white font-semibold text-lg">2</h1>
+                    </div>
+                    <div class="order-1 bg-indigo-100 rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in" style="animation-delay: 0.3s;">
+                        <h3 class="font-bold text-indigo-800 text-xl mb-1">Esplorazione</h3>
+                        <p class="text-sm leading-snug tracking-wide text-indigo-700 text-opacity-100">Ricerca, brainstorming, validazione del concetto e definizione.</p>
+                    </div>
+                </div>
+
+                <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                    <div class="order-1 w-5/12"></div>
+                    <div class="z-20 flex items-center order-1 bg-indigo-500 shadow-xl w-12 h-12 rounded-full">
+                        <h1 class="mx-auto font-semibold text-lg text-white">3</h1>
+                    </div>
+                    <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in" style="animation-delay: 0.6s;">
+                        <h3 class="font-bold text-gray-800 text-xl mb-1">Sviluppo</h3>
+                        <p class="text-sm leading-snug tracking-wide text-gray-600 text-opacity-100">Prototipazione, design, codifica e test iterativi.</p>
+                    </div>
+                </div>
+
+                 <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                    <div class="order-1 w-5/12"></div>
+                    <div class="z-20 flex items-center order-1 bg-indigo-500 shadow-xl w-12 h-12 rounded-full">
+                        <h1 class="mx-auto text-white font-semibold text-lg">4</h1>
+                    </div>
+                    <div class="order-1 bg-indigo-100 rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in" style="animation-delay: 0.9s;">
+                        <h3 class="font-bold text-indigo-800 text-xl mb-1">Realizzazione</h3>
+                        <p class="text-sm leading-snug tracking-wide text-indigo-700 text-opacity-100">Lancio sul mercato, raccolta di feedback e crescita.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="cta" class="py-16 md:py-24 bg-indigo-700 text-white">
+        <div class="container mx-auto px-6 text-center fade-in">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">Hai un'IDEA che Aspetta di Brillare?</h2>
+            <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">Non lasciarla nel cassetto. Inizia oggi il percorso per trasformarla in qualcosa di straordinario.</p>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-gray-400 py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 IDEA Platform. Tutti i diritti riservati.</p>
+            <p class="text-sm mt-2">Realizzato con passione per le idee innovative.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Script per l'interattività semplice
+
+        // 1. Animazione all'apparizione degli elementi con classe 'fade-in'
+        const fadeInElements = document.querySelectorAll('.fade-in');
+        const observerOptions = {
+            root: null, // rispetto al viewport
+            rootMargin: '0px',
+            threshold: 0.1 // trigger quando il 10% dell'elemento è visibile
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in-visible'); // Aggiungi una classe per stile CSS se necessario
+                    // Rimuovi l'osservatore una volta che l'animazione è partita (opzionale)
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        fadeInElements.forEach(el => {
+            observer.observe(el);
+            // Nascondi inizialmente per l'effetto fade-in (puoi farlo anche con CSS)
+            el.style.opacity = '0';
+        });
+
+         // Aggiungere stile CSS per .fade-in-visible se non si usa l'animazione direttamente
+         const styleSheet = document.createElement("style");
+         styleSheet.type = "text/css";
+         styleSheet.innerText = `.fade-in-visible { animation: fadeIn 0.8s ease-out forwards; }`;
+         document.head.appendChild(styleSheet);
+
+
+        // 2. Interazione con la lampadina nella Hero section
+        const lightbulb = document.getElementById('hero-lightbulb');
+        if (lightbulb) {
+            lightbulb.addEventListener('click', () => {
+                // Esempio: cambia leggermente colore o aggiungi un effetto
+                lightbulb.classList.toggle('text-yellow-400'); // Cambia intensità del giallo
+                 // Aggiungi un piccolo "pop" all'icona
+                lightbulb.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                     lightbulb.style.transform = 'scale(1)';
+                }, 150); // Resetta la scala dopo 150ms
+            });
+        }
+
+        // 4. Adattamento della timeline su schermi piccoli (opzionale ma consigliato)
+        // Questo richiederebbe logica più complessa per cambiare la struttura HTML/CSS
+        // o semplicemente nascondere la linea e impilare i blocchi verticalmente.
+         function adjustTimelineLayout() {
+            const timelineElements = document.querySelectorAll('.left-timeline, .right-timeline');
+            const timelineLine = document.querySelector('.relative.wrap > div[style*="left: 50%"]'); // Selettore più specifico
+
+            if (window.innerWidth < 768) { // md breakpoint di Tailwind
+                if(timelineLine) timelineLine.style.display = 'none'; // Nasconde la linea centrale
+                timelineElements.forEach(el => {
+                    el.classList.remove('right-timeline', 'left-timeline');
+                    el.classList.add('timeline-stacked'); // Aggiungi una classe per lo stile mobile
+                    // Rimuovi stili specifici del layout desktop se necessario
+                    const contentDiv = el.querySelector('.w-5\/12.px-6.py-4');
+                    if(contentDiv) contentDiv.classList.replace('w-5/12', 'w-full'); // Rendi il contenuto a larghezza piena
+                     const spacerDiv = el.querySelector('.order-1.w-5\/12');
+                     if(spacerDiv) spacerDiv.style.display = 'none'; // Nasconde il div spaziatore
+                     el.style.justifyContent = 'center'; // Centra il contenuto
+                     el.style.marginBottom = '1.5rem'; // Aggiunge spazio sotto ogni blocco
+                });
+            } else {
+                 if(timelineLine) timelineLine.style.display = 'block'; // Mostra la linea su desktop
+                 timelineElements.forEach(el => {
+                     el.classList.remove('timeline-stacked');
+                     // Ripristina le classi originali se necessario (più complesso)
+                     // Sarebbe meglio gestire questo con le classi responsive di Tailwind direttamente nell'HTML
+                 });
+            }
+        }
+
+        // Aggiungere stile per .timeline-stacked
+        const timelineStyleSheet = document.createElement("style");
+        timelineStyleSheet.type = "text/css";
+        timelineStyleSheet.innerText = `
+            @media (max-width: 767px) {
+                .timeline-stacked .order-1.bg-white,
+                .timeline-stacked .order-1.bg-indigo-100 {
+                    width: 100%; /* Larghezza piena su mobile */
+                    margin-left: 0;
+                    margin-right: 0;
+                    text-align: center; /* Centra testo se necessario */
+                }
+                 .timeline-stacked .z-20 { /* Icona numerica */
+                     margin-bottom: 0.5rem; /* Spazio tra icona e testo */
+                     order: 0; /* Metti l'icona sopra */
+                 }
+                 .timeline-stacked {
+                     flex-direction: column; /* Impila verticalmente */
+                     align-items: center; /* Centra gli elementi */
+                 }
+
+            }
+        `;
+        document.head.appendChild(timelineStyleSheet);
+
+
+        // Esegui l'aggiustamento al caricamento e al ridimensionamento
+        window.addEventListener('load', adjustTimelineLayout);
+        window.addEventListener('resize', adjustTimelineLayout);
+
+
+    </script>
+
+</body>
+</html>

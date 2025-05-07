@@ -1,0 +1,13 @@
+---
+input:
+  schema:
+    evaluatedideascore: string
+    evaluatedpromptidea: string
+    maxscore: number
+    language: string
+  default:
+    language: english
+---
+{{evaluatedpromptidea}}
+# REQUIREMENT: THE RESPONSE IN {{language}} LANGUAGE MUST RECEIVE A SCORE GREATER THAN OR EQUAL TO {{maxscore}} FOR THE FOLLOWING PROMPT:
+{{evaluatedideascore}}

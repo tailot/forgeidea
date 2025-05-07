@@ -1,0 +1,18 @@
+---
+input:
+  schema:
+    language: string
+    textidea: string
+  default:
+    language: english
+---
+Draw up a bulleted list of potential competitors for the idea, adding company names if possible:
+{{textidea}}
+
+
+#Warnings
+    - the response must contain only the bulleted list.
+    - the response must not contain considerations before or after the bulleted list
+
+
+Write the response in the {{language}} language

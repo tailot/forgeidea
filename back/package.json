@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "@genkit-ai/express": "^1.8.0",
+    "@genkit-ai/googleai": "^1.8.0",
+    "dotenv": "^16.5.0",
+    "genkit": "^1.8.0",
+    "genkitx-ollama": "^1.8.0",
+    "zod": "^3.24.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.2",
+    "genkit-cli": "^1.8.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "npx genkit start -- npx tsx --watch src/index.ts",
+    "dist": "node dist/index.js",
+    "tar": "tar -czvf ../forgeIDEABack.tar.gz --exclude='node_modules' --exclude='dist' --exclude='.genkit' .[^.]* *"
+  }
+}

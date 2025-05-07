@@ -1,0 +1,49 @@
+
+$bottom-nav-height: 56px
+$bottom-nav-z-index: 1050
+$active-nav-color: #ffc107
+$icon-size: 24px
+$label-font-size: 0.7rem
+
+
+:host
+  position: fixed
+  bottom: 0
+  left: 0
+  right: 0
+  z-index: $bottom-nav-z-index
+  box-shadow: 0 -2px 5px rgba(0,0,0, 0.1)
+
+.bottom-nav-toolbar
+  display: flex
+  justify-content: space-around
+  align-items: center
+  padding: 0 5px
+  height: $bottom-nav-height
+
+  button
+    display: flex
+    flex-direction: column
+    align-items: center
+    justify-content: center
+    color: inherit
+    padding: 4px 0
+    min-width: 56px
+    font-size: $label-font-size
+    line-height: 1.2
+    background: none
+    border: none
+    cursor: pointer
+
+    mat-icon
+      margin-bottom: 2px
+      font-size: $icon-size
+      width: $icon-size
+      height: $icon-size
+
+    &.active-nav-link
+      color: $active-nav-color
+
+    &:hover
+      background-color: rgba(255, 255, 255, 0.05)
+      border-radius: 4px
