@@ -35,5 +35,10 @@ export const routes: Routes = [
         path: 'shared',
         loadComponent: () => import('./sharedidea/sharedidea.component').then(m => m.SharedIdeaComponent),
         title: 'forge IDEA'
+    },
+    {
+        path: 'privacy-policy',
+        loadComponent: () => import('./privacy-policy-component/privacy-policy-component.component').then(m => m.PrivacyPolicyComponentComponent),
+        title: 'Privacy Policy - forge IDEA'
     }
 ];
