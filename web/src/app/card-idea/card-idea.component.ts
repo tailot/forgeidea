@@ -1,16 +1,18 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { io, Socket as SocketIoClientSocket } from 'socket.io-client'; // Alias per chiarezza
 
 import { StorageService } from '../services/storage.service';
 import { Idea, GenkitService, GenerateTasksRequestData, ScoreIdeaRequestData, OperationRequestData } from '../services/genkit.service';
 import { LanguageService } from '../services/language.service';
+import { environment } from '../../environments/environment';
 
 export interface CardIdeaEmitData {
   tasks: { text: string[] } | string[];
@@ -32,14 +34,15 @@ export interface CardIdeaEmitData {
   templateUrl: './card-idea.component.html',
   styleUrls: ['./card-idea.component.sass']
 })
-export class CardIdeaComponent implements OnInit, OnChanges {
+export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() idea: Idea | null = null;
   @Input() showActions: boolean = true;
   @Input() ideaUuid: string | null = null; // UUID dell'idea se non viene passata direttamente
   @Input() evaluateScore: boolean = false;
-
   @Input() tasksButton = false;
+  @Input() sharedButton = false;
+
   @Output() tasksOn = new EventEmitter<CardIdeaEmitData>();
 
   ideaScore: number | null = null;
@@ -50,14 +53,21 @@ export class CardIdeaComponent implements OnInit, OnChanges {
   isOperating: boolean = false; // <-- Stato di caricamento per l'operazione
   operationData: Idea | null = null;
   mergiable: boolean = true; // Default to true (button enabled)
+  
+  private socket: SocketIoClientSocket;
 
   constructor(
     private route: ActivatedRoute,
     private storageService: StorageService,
     private router: Router,
     private genkitService: GenkitService,
-    private languageService: LanguageService
-  ) { }
+    private languageService: LanguageService,
+    private snackBar: MatSnackBar
+  ) {
+    this.socket = io(environment.socketAddr, {
+      transports: ['websocket']
+    });
+  }
 
   private async checkOperationState(): Promise<void> {
     if (!this.idea || !this.idea.id) return; // Need an idea with an ID
@@ -144,6 +154,21 @@ export class CardIdeaComponent implements OnInit, OnChanges {
     } catch (error) {
       console.error(`Error accessing or setting storage for key '${operationKey}':`, error);
       this.errorMessage = `Errore durante l'operazione di storage: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`;
+    }
+  }
+  async shareCurrentIdea(cardIdea: Idea): Promise<void> {
+    this.sharedButton = false;
+
+    if (cardIdea && cardIdea.text) {
+      const payload = { text: cardIdea.text };
+      
+      this.socket.emit('idea', payload); // Emetti l'evento 'idea' con il payload
+      console.log(`Idea "${cardIdea.text}" inviata al server.`);
+      this.snackBar.open(`Idea "${cardIdea.text.substring(0, 30)}..." condivisa!`, 'OK', {
+        duration: 3000,
+      });
+    } else {
+      console.warn('Nessun testo dell\'idea da condividere o idea non definita.');
     }
   }
   async tasksEmiter(idea: Idea): Promise<void> {
@@ -339,5 +364,11 @@ export class CardIdeaComponent implements OnInit, OnChanges {
       return 'score-high';
     }
     return '';
+  }
+
+  ngOnDestroy(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
   }
 }

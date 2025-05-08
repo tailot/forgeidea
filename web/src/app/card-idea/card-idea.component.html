@@ -17,20 +17,26 @@
   </div>
 
   <div *ngIf="idea && !isLoading && !errorMessage">
-    <mat-card class="idea-card"
-              [ngClass]="!isScoring && ideaScore !== null ? getScoreColorClass(ideaScore) : ''"
-              matTooltipPosition="above">
+    <mat-card class="idea-card" [ngClass]="!isScoring && ideaScore !== null ? getScoreColorClass(ideaScore) : ''"
+      matTooltipPosition="above">
       <mat-card-content>
         <p class="idea-text">{{ idea.text }}</p>
       </mat-card-content>
       <mat-card-actions align="end">
-        <button *ngIf="tasksButton" mat-icon-button color="warn" aria-label="Tasks per idea" (click)="tasksEmiter(idea);">
+        <button *ngIf="sharedButton" mat-icon-button color="warn" aria-label="Share"
+          (click)="shareCurrentIdea(idea);$event.stopPropagation()">
+          <mat-icon>share</mat-icon>
+        </button>
+        <button *ngIf="tasksButton" mat-icon-button color="warn" aria-label="Tasks per idea"
+          (click)="tasksEmiter(idea);">
           <mat-icon>list_alt</mat-icon>
         </button>
-        <button *ngIf="mergiable" mat-icon-button color="primary" aria-label="Join right operation" (click)="operation(); $event.stopPropagation()">
+        <button *ngIf="mergiable" mat-icon-button color="primary" aria-label="Join right operation"
+          (click)="operation(); $event.stopPropagation()">
           <mat-icon>join_right</mat-icon>
         </button>
-        <button class="redoOperation" *ngIf="!mergiable" mat-icon-button color="warn" aria-label="Annulla operazione" (click)="clearOperation(); $event.stopPropagation()">
+        <button class="redoOperation" *ngIf="!mergiable" mat-icon-button color="warn" aria-label="Annulla operazione"
+          (click)="clearOperation(); $event.stopPropagation()">
           <mat-icon>join_right</mat-icon>
         </button>
         <button *ngIf="idea.id" mat-icon-button color="warn" aria-label="Cancella idea" (click)="deleteIdea(idea.id);">

@@ -1,25 +1,37 @@
 <div *ngIf="currentIdea" class="idea-container">
-    <div class="idea-content">
-      <p><strong>ID:</strong> {{ currentIdea.id }}</p>
-      <p>{{ currentIdea.content }}</p>
-      <!-- Aggiungi qui altri campi dell'idea, se presenti -->
-    </div>
+  <div class="idea-content">
+    <p>{{ currentIdea.result }}</p>
+  </div>
+  <!--
     <p class="timer-info">
       <i>{{ timeLeftSeconds }}</i>
     </p>
+    -->
+  <div class="progress-bar-container">
+    <div class="progress-bar" [style.width.%]="(timeLeftMs / IDEA_DISPLAY_DURATION_MS_FOR_TEMPLATE) * 100"></div>
+  </div>
+</div>
+
+<div *ngIf="ideasQueue.length > 0" class="upcoming-ideas-section">
+  <div *ngFor="let queuedItem of ideasQueue.slice(0, currentIdea ? 4 : 5)" class="idea-container">
+    <div class="idea-content">
+      <p>{{ queuedItem.idea.result }}</p>
+    </div>
+    <!--
+    <p class="timer-info">
+      <i>{{ getCeilSeconds(queuedItem.timeLeftMs) }}</i>
+    </p>
+    -->
     <div class="progress-bar-container">
-      <div class="progress-bar" [style.width.%]="(timeLeftMs / IDEA_DISPLAY_DURATION_MS_FOR_TEMPLATE) * 100"></div>
+      <div class="progress-bar" [style.width.%]="(queuedItem.timeLeftMs / IDEA_DISPLAY_DURATION_MS_FOR_TEMPLATE) * 100">
+      </div>
     </div>
   </div>
-  
-  <div *ngIf="!currentIdea && ideasQueue.length === 0" class="status-message">
-    <p>...</p>
-  </div>
-  
-  <div *ngIf="!currentIdea && ideasQueue.length > 0" class="status-message">
-    <p>...</p>
-  </div>
-  
-  <div class="queue-status">
-    <p>{{ ideasQueue.length }} / {{ MAX_QUEUE_SIZE_FOR_TEMPLATE }}</p>
-  </div>
+</div>
+<div *ngIf="!currentIdea && ideasQueue.length === 0" class="status-message">
+  <p>😢</p>
+</div>
+
+<div class="queue-status">
+  <p>{{ ideasQueue.length }} / {{ MAX_QUEUE_SIZE_FOR_TEMPLATE }}</p>
+</div>

@@ -26,7 +26,13 @@ app.get('/', (req: Request, res: Response) => {
 
 io.on('connection', (socket: Socket) => {
 
+  const MAX_IDEA_LENGTH = 1000;
+
   socket.on('idea', async (idea: IdeaPayload) => {
+
+    if (idea.text.length > MAX_IDEA_LENGTH) {
+      return;
+    }
 
     try {
       const verifyFlowUrl = process.env.GENKIT_BASE_URL + '/verifyIdeaFlow';
@@ -36,13 +42,14 @@ io.on('connection', (socket: Socket) => {
           idea: idea.text,
         },
       };
-
       const response = await axios.post(verifyFlowUrl, requestBody, {
         headers: { 'Content-Type': 'application/json' },
       });
 
       const verificationResult = response.data;
-      io.emit('newsIdea', verificationResult);
+
+      io.emit('newIdea', verificationResult);
+      
 
     } catch (error) {
       console.error('error verifyIdeaFlow:', error instanceof Error ? error.message : String(error));
