@@ -2,7 +2,6 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
@@ -22,7 +21,6 @@ interface KeyValueItem {
     CommonModule,
     MatCardModule,
     MatButtonModule,
-    MatSnackBarModule,
     MatProgressSpinnerModule,
     MatIconModule,
     MatDividerModule,
@@ -40,8 +38,7 @@ export class SettingsComponent {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   constructor(
-    private storageService: StorageService,
-    private snackBar: MatSnackBar
+    private storageService: StorageService
   ) { }
 
   ngOnInit(): void {
@@ -81,12 +78,10 @@ export class SettingsComponent {
   }
   async backupDatabase(): Promise<void> {
     this.isBackingUp = true;
-    this.showSnackbar('Starting database backup...');
     try {
       const backupData: KeyValueItem[] = await this.storageService.backupDatabase();
 
       if (backupData.length === 0) {
-        this.showSnackbar('Database is empty. No backup created.', 'info');
         this.isBackingUp = false;
         return;
       }
@@ -105,11 +100,9 @@ export class SettingsComponent {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      this.showSnackbar(`Backup completed (${backupData.length} items). File downloaded.`, 'success');
-
+      console.log(`Backup completed (${backupData.length} items). File downloaded.`);
     } catch (error) {
       console.error('Error during backup:', error);
-      this.showSnackbar(`Error during backup: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
     } finally {
       this.isBackingUp = false;
     }
@@ -131,24 +124,12 @@ export class SettingsComponent {
 
     const file = input.files[0];
     if (file.type !== 'application/json') {
-      this.showSnackbar('Invalid file format. Please select a .json file.', 'error');
-      input.value = '';
-      return;
-    }
-
-    const confirmation = window.confirm(
-      'WARNING: Restoring will erase all current data in the database. Are you sure you want to continue?'
-    );
-
-    if (!confirmation) {
-      this.showSnackbar('Restore cancelled by user.', 'info');
+      console.error('Invalid file format. Please select a .json file.');
       input.value = '';
       return;
     }
 
     this.isRestoring = true;
-    this.showSnackbar('Starting restore from file...');
-
     const reader = new FileReader();
 
     reader.onload = async (e) => {
@@ -162,11 +143,9 @@ export class SettingsComponent {
 
         await this.storageService.restoreDatabase(backupData);
 
-        this.showSnackbar(`Restore completed (${backupData.length} items).`, 'success');
-
+        console.log(`Restore completed (${backupData.length} items).`);
       } catch (error) {
         console.error('Error during restore:', error);
-        this.showSnackbar(`Error during restore: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
       } finally {
         this.isRestoring = false;
       }
@@ -174,18 +153,9 @@ export class SettingsComponent {
 
     reader.onerror = (e) => {
       console.error('Error reading file:', e);
-      this.showSnackbar('Error reading file.', 'error');
       this.isRestoring = false;
     };
 
     reader.readAsText(file);
-  }
-  private showSnackbar(message: string, type: 'info' | 'success' | 'error' = 'info'): void {
-    this.snackBar.open(message, 'Close', {
-      duration: type === 'info' ? 3000 : 5000,
-      panelClass: type === 'error' ? ['snackbar-error'] : type === 'success' ? ['snackbar-success'] : [],
-      verticalPosition: 'bottom',
-      horizontalPosition: 'center'
-    });
   }
 }

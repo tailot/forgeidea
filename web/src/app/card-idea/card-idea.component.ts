@@ -43,12 +43,14 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
   @Input() tasksButton = false;
   @Input() sharedButton = false;
   @Input() fusionButton = false;
+  @Input() addIdeaButton : boolean | null = false;
+
 
   @Output() tasksOn = new EventEmitter<CardIdeaEmitData>();
+
   ideaScore: number | null = null;
   isScoring: boolean = false; 
   isLoading: boolean = true;
-  errorMessage: string | null = null;
   isGeneratingTasks: boolean = false;
   isOperating: boolean = false; // <-- Stato di caricamento per l'operazione
   operationData: Idea | null = null;
@@ -76,11 +78,10 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
       const operationKey = 'operation';
       const existingOperationData = await this.storageService.getItem<Idea>(operationKey);
       if (existingOperationData && existingOperationData.id === this.idea.id) {
-        // console.log(`CardIdeaComponent: Operation key contains the current idea (${this.idea.id}). Disabling merge button.`);
         this.mergiable = false;
       }
     } catch (error) {
-      // console.error(`CardIdeaComponent: Error checking operation state in storage:`, error);
+      console.error(`CardIdeaComponent: Error checking operation state in storage:`, error);
     }
   }
   
@@ -92,12 +93,10 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
   async operation(): Promise<void> {
     if (!this.idea) {
       console.error('Cannot perform operation: Current idea is missing.');
-      this.errorMessage = 'Idea corrente non disponibile per l\'operazione.'; // TODO: i18n
       return;
     }
 
     const operationKey = 'operation';
-    this.errorMessage = null; 
     this.isOperating = true; 
     // console.log(`Checking storage for key: ${operationKey}`);
 
@@ -126,23 +125,17 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
 
         this.genkitService.callOperation(requestData, true).subscribe({ 
           next: async (newIdeaText: string) => {
-            // console.log('Operation successful. New idea text:', newIdeaText);
             const newIdeaUuid = crypto.randomUUID();
-            const newIdea: Idea = {
-              id: newIdeaUuid,
-              text: newIdeaText,
-              
-              language: requestData.language 
-            };
-            await this.storageService.setItem(newIdeaUuid, newIdea);
-            console.log(`New idea saved with UUID: ${newIdeaUuid}`);
-            await this.storageService.removeItem(operationKey); // Clean up the operation key
-            console.log(`Removed operation key: ${operationKey}`);
-            this.router.navigate(['/jobcard', newIdeaUuid]); // Navigate to the new idea's page
+            await this.createIdea(newIdeaUuid,newIdeaText,requestData.language).then(newIdea => {
+              this.storageService.setItem(newIdeaUuid, newIdea);
+              this.storageService.removeItem(operationKey);
+              this.router.navigate(['/jobcard', newIdeaUuid]);
+            })
+
           },
           error: (error) => {
             console.error('Error during idea operation:', error);
-            this.errorMessage = `Error during idea operation: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`; // TODO: i18n
+            // TODO: Handle error, e.g., show a snackbar
             this.isOperating = false; 
           }
         });
@@ -151,7 +144,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
       }
     } catch (error) {
       console.error(`Error accessing or setting storage for key '${operationKey}':`, error);
-      this.errorMessage = `Error accessing or setting storage: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`; // TODO: i18n
+      // TODO: Handle error, e.g., show a snackbar
     }
   }
   async shareCurrentIdea(cardIdea: Idea): Promise<void> {
@@ -173,12 +166,10 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
     }
     if (!idea || !idea.id) {
       console.error('Cannot check/generate tasks: Idea or idea ID is missing.');
-      this.errorMessage = 'Cannot check/generate tasks: Idea or idea ID is missing.'; // TODO: i18n
       return;
     }
 
     const tasksKey = `tasks_${idea.id}`;
-    this.errorMessage = null;
 
     try {
       // console.log(`Checking storage for tasks with key: ${tasksKey}`);
@@ -193,7 +184,6 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
       // console.log(`Tasks not found for key ${tasksKey}. Proceeding to generate.`);
       if (!idea.text) {
         console.error('Cannot generate tasks: Idea text is missing.');
-        this.errorMessage = 'Cannot generate tasks: Idea text is missing.'; // TODO: i18n
         return;
       }
 
@@ -213,7 +203,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
             })
             .catch(saveError => {
               console.error(`Error saving generated tasks with key ${tasksKey}:`, saveError);
-              this.errorMessage = `Error saving generated tasks: ${saveError instanceof Error ? saveError.message : 'Errore sconosciuto'}`; // TODO: i18n
+              // TODO: Handle error, e.g., show a snackbar
             })
             .finally(() => {
               this.isGeneratingTasks = false;
@@ -221,16 +211,26 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
         },
         error: (error) => {
           // console.error('Error generating tasks:', error);
-          this.errorMessage = `Errore durante la generazione dei task: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`; // TODO: i18n
+          // TODO: Handle error, e.g., show a snackbar
           this.isGeneratingTasks = false;
         }
       });
 
     } catch (storageError) {
       console.error(`Error accessing storage for key ${tasksKey}:`, storageError);
-      this.errorMessage = `Error accessing storage: ${storageError instanceof Error ? storageError.message : 'Errore sconosciuto'}`;
+      // TODO: Handle error, e.g., show a snackbar
       this.isGeneratingTasks = false; // TODO: i18n
     }
+  }
+
+  async createIdea(uuid: string,text: string, language?: string): Promise<Idea> {
+    const newIdeaUuid = crypto.randomUUID();
+    const newIdea: Idea = {
+      id: uuid,
+      text: text,
+      language: language
+    };
+    return newIdea
   }
 
   async deleteIdea(uuid: string): Promise<void> {
@@ -255,7 +255,11 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
       console.error(`Error deleting idea with uuid ${uuid} or its tasks:`, error);
     }
   }
-
+  addIdea(idea: Idea){
+    const newIdeaUuid = crypto.randomUUID();
+    this.storageService.setItem(newIdeaUuid, idea);
+    this.addIdeaButton = false;
+  }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['evaluateScore'] && changes['evaluateScore'].currentValue === true && this.idea) {
       // console.log(`CardIdeaComponent: evaluateScore triggered for idea ${this.idea.id}`);
@@ -265,7 +269,6 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit(): void {
     this.isLoading = true;
-    this.errorMessage = null;
 
     if (!!this.idea) {
       // console.log('CardIdeaComponent: Using pre-populated idea input.');
@@ -285,7 +288,6 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
 
   private async loadIdeaData(uuid: string): Promise<void> {
     this.isLoading = true;
-    this.errorMessage = null; // TODO: i18n
     // console.log(`CardIdeaComponent: Loading idea data for UUID: ${uuid}`);
     try {
       const retrievedIdea = await this.storageService.getItem<any>(uuid);
@@ -307,11 +309,11 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
         this.checkOperationState(); 
       } else {
         // console.warn(`CardIdeaComponent: No idea found in storage for UUID: ${uuid}`);
-        this.errorMessage = `Idea not found in storage for UUID: ${uuid}.`; // TODO: i18n
+        // TODO: Handle error, e.g., show a snackbar or navigate away
       }
     } catch (error) {
       // console.error(`CardIdeaComponent: Error loading idea data for UUID ${uuid}:`, error);
-      this.errorMessage = `Error loading idea ${error instanceof Error ? error.message : ''}`; // TODO: i18n
+      // TODO: Handle error, e.g., show a snackbar
     } finally {
       this.isLoading = false;
     }

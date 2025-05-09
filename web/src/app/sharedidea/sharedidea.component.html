@@ -1,7 +1,7 @@
 <div *ngIf="ideasQueue.length > 0" class="upcoming-ideas-section">
   <div *ngFor="let queuedItem of ideasQueue.slice(0, 5)" class="idea-container">
     <div class="idea-content">
-      <app-card-idea [idea]="queuedItem.idea" [showActions]="false"></app-card-idea>
+      <app-card-idea [addIdeaButton]="true" [idea]="queuedItem.idea" [showActions]="false"></app-card-idea>
     </div>
     <div class="progress-bar-container">
       <div class="progress-bar" [style.width.%]="(queuedItem.timeLeftMs / IDEA_DISPLAY_DURATION_MS) * 100">

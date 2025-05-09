@@ -18,10 +18,13 @@ $search-bar-height: 35px
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)
   box-sizing: border-box
 
-  .search-field // Occupa tutta la larghezza del wrapper (che ha padding)
+  .search-field
     width: 100%
     margin: 0
     display: block
+
+    ::ng-deep .mat-mdc-input-element
+      color: rgba(0, 0, 0, 0.87)
 
 .idea-list-container
   max-width: $content-max-width
@@ -31,7 +34,6 @@ $search-bar-height: 35px
   padding-top: $search-bar-height + 16px
   padding-bottom: $paginator-height + $bottom-nav-height + $bottom-content-spacing
 
-// Stili Comuni per Indicatori di Caricamento, Messaggi di Errore, Nessuna Idea
 .loading-indicator,
 .error-message,
 .no-ideas
@@ -65,7 +67,6 @@ $search-bar-height: 35px
       button
         margin-top: 10px
 
-// Stili Specifici per il messaggio "Nessuna Idea" e i suoi figli
 .no-ideas
   mat-icon
     font-size: 48px
@@ -98,6 +99,10 @@ $search-bar-height: 35px
   border-radius: 8px
   overflow: hidden
 
+@media (max-width: 767px)
+  .idea-summary-card
+    height: 600px;
+  
   app-card-idea
     display: flex
     flex-direction: column

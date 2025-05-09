@@ -16,7 +16,7 @@
         <button mat-stroked-button color="accent" (click)="triggerRestore()" [disabled]="isRestoring || isBackingUp">
           <mat-icon *ngIf="!isRestoring">restore</mat-icon>
           <mat-spinner *ngIf="isRestoring" diameter="20" class="button-spinner"></mat-spinner>
-          {{ isRestoring ? 'Ripristino...' : '' }}
+          {{ isRestoring ? '...' : '' }}
         </button>
         <input type="file" #fileInput hidden accept=".json" (change)="handleRestoreFile($event)">
       </div>
