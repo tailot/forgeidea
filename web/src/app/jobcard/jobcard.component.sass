@@ -7,71 +7,71 @@
     text-align: left
 
 .zoomed-task-result
-  border: 1px solid #ccc // Bordo grigio chiaro
-  border-radius: 8px     // Angoli arrotondati
-  padding: 16px          // Spaziatura interna
-  margin: 20px auto      // Margine sopra/sotto di 20px, centrato orizzontalmente
-  max-width: 93.6%         // Larghezza massima per evitare che sia troppo largo
-  width: fit-content     // Adatta la larghezza al contenuto, ma non oltre max-width
-  min-width: 300px       // Larghezza minima per leggibilità
-  background-color: #f8f8f8 // Sfondo leggermente diverso per distinguerlo
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1) // Ombra leggera per dare profondità
-  text-align: left       // Assicura che il testo interno sia allineato a sinistra
+  border: 1px solid #ccc
+  border-radius: 8px
+  padding: 16px
+  margin: 20px auto
+  max-width: 93.6%
+  width: fit-content
+  min-width: 300px
+  background-color: #f8f8f8
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1)
+  text-align: left
 
   pre
-    white-space: pre-wrap  // Permette al testo di andare a capo
-    word-wrap: break-word  // Rompe le parole lunghe se necessario
-    margin: 0              // Rimuove il margine di default del tag <pre>
-    font-family: monospace // Mantiene un font monospace, tipico per <pre>
-    font-size: 0.9em       // Dimensione font leggermente ridotta
+    white-space: pre-wrap
+    word-wrap: break-word
+    margin: 0
+    font-family: monospace
+    font-size: 0.9em
 
 .zoomed-task-result-wrapper
-  position: relative // Necessario per posizionare i pulsanti in modo assoluto rispetto a questo wrapper
+  position: relative
   padding-top: 1em
   padding-bottom: 1em
-  // Non serve padding orizzontale qui, i pulsanti sono assoluti
 
 .zoomed-task-result
-  background-color: #f8f9fa // Sfondo leggero per distinguere l'area testo
-  padding: 1em 45px // Padding interno, lascia spazio visivo per i pulsanti ai lati
+  background-color: #f8f9fa
+  padding: 1em 45px
   border-radius: 4px
-  overflow-x: auto    // Scroll orizzontale se il testo è largo
-  margin: 0 5px       // Margine per non far toccare il testo ai pulsanti (opzionale)
+  overflow-x: auto
+  margin: 0 5px
 
   pre
-    margin: 0             // Rimuove margini di default
-    white-space: pre-wrap // Permette al testo di andare a capo
-    word-wrap: break-word // Rompe le parole lunghe
+    margin: 0
+    white-space: pre-wrap
+    word-wrap: break-word
 
 .nav-button
-  position: absolute // Posizionamento assoluto rispetto al wrapper
-  top: 50%           // Allineamento verticale al centro
-  transform: translateY(-50%) // Centratura verticale precisa
-  z-index: 10        // Assicura che i pulsanti siano sopra il testo
-  background-color: rgba(255, 255, 255, 0.8) // Sfondo semi-trasparente
-  border-radius: 50% // Pulsante circolare
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2) // Ombra leggera
+  position: absolute
+  top: 50%
+  transform: translateY(-50%)
+  z-index: 10
+  background-color: rgba(255, 255, 255, 0.8)
+  border-radius: 50%
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2)
 
   &:hover
-    background-color: rgba(230, 230, 230, 0.95) // Leggero cambio su hover
+    background-color: rgba(230, 230, 230, 0.95)
 
-  // Stile per l'icona dentro il bottone (assicura centratura)
   mat-icon
     display: flex
     align-items: center
     justify-content: center
 
 .left-nav
-  left: 0px // Posiziona il pulsante sinistro vicino al bordo sinistro del wrapper
+  left: 0px
 
 .right-nav
-  right: 0px // Posiziona il pulsante destro vicino al bordo destro del wrapper
+  right: 0px
 
 .task-list-container
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 50px;
-    margin-left: 7px;
-    max-width: 93%;
-    background-color: #f8f8f8;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  mat-chip-option
+    height: auto;
+    min-height: 32px; 
+    span
+      white-space: normal;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      display: inline-block;
+      max-width: 100%;

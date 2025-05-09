@@ -1,6 +1,6 @@
-$card-max-width: 600px
-$container-padding: 20px
-$element-spacing: 15px
+$card-max-width: 400px
+$container-padding: 5px
+$element-spacing: 1px
 $error-color: #f44336
 
 .card-container
@@ -27,7 +27,6 @@ $error-color: #f44336
 
 .idea-card
   margin-top: $element-spacing
-  // Imposta un bordo di base trasparente e una transizione
   border: 9px solid transparent
   transition: border-color 0.3s ease-in-out
 
@@ -51,19 +50,17 @@ $error-color: #f44336
       color: grey
       font-style: italic
 
-  // Stili per i bordi colorati in base al punteggio
   &.score-low
-    border-color: red // Rosso Material
+    border-color: red
 
   &.score-medium
-    border-color: orange // Arancione
+    border-color: orange
 
   &.score-high
-    border-color: green // Verde
+    border-color: green
 
-  // Opzionale: Stile per lo spinner se vuoi posizionarlo diversamente
   mat-card-actions mat-spinner
-    margin-left: 8px // Aggiunge un po' di spazio a sinistra dello spinner
+    margin-left: 8px
 
 .redoOperation
   color: red

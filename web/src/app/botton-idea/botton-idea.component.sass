@@ -11,7 +11,8 @@ $total-fixed-bottom-height: $local-bottom-nav-height + $local-paginator-height
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23ffffff'/%3E%3Cpath d='M0 0L20 20M20 0L0 20M20 0L40 20M40 0L20 20M0 20L20 40M20 20L0 40M20 20L40 40M40 20L20 40' stroke-width='0.5' stroke='%23000000'/%3E%3Ccircle cx='20' cy='20' r='2' fill='%23000000'/%3E%3C/svg%3E")
   border: 1px solid
   border-radius: 8px
-  width: 100vh
+  width: 90vw     // Usa il 90% della larghezza del viewport per una migliore responsività
+  max-width: 450px // Limita la larghezza massima. 450px è scelto per contenere .centered-card (max-width: 400px) e mostrare un po' del bordo/sfondo del card-container.
   height: 50vh
 
   position: absolute
@@ -21,7 +22,6 @@ $total-fixed-bottom-height: $local-bottom-nav-height + $local-paginator-height
 
 .centered-card
   max-width: 400px
-  width: 100%
 
 .card-content-center
   display: flex

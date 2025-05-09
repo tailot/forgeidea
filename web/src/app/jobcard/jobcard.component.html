@@ -18,11 +18,11 @@
     <div *ngIf="tasks && tasks.length > 0" class="task-list-container">
       <mat-chip-listbox multiple aria-label="Task list" [(ngModel)]="selectedTasks">
         <mat-chip-option *ngFor="let task of tasks">
-          <span [innerHTML]="formatTaskText(task)"></span>
+          <span [innerHTML]="task"></span>
         </mat-chip-option>
       </mat-chip-listbox>
     </div>
-    <p *ngIf="tasks && tasks.length === 0">No tasks found for this idea.</p>
+    <p *ngIf="tasks && tasks.length === 0"><mat-icon>counter_0</mat-icon></p>
     <div *ngIf="zoomedTaskResult" class="zoomed-task-result-wrapper">
       <button mat-icon-button *ngIf="selectedTasks.length == 1 && tasks && tasks.indexOf(selectedTasks[0]) >= 1" (click)="selectPreviousTask()" class="nav-button left-nav" aria-label="Azione precedente">
           <mat-icon>navigate_before</mat-icon>
