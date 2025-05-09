@@ -1,9 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 import { io, Socket } from 'socket.io-client';
 import { Subscription, interval, timer, takeWhile } from 'rxjs';
+import { CardIdeaComponent } from '../card-idea/card-idea.component';
 import { environment } from '../../environments/environment';
+import { Idea } from '../services/genkit.service';
 
 interface IdeaSocketResponse {
   id: string;
@@ -14,20 +17,17 @@ interface IdeaSocketResponse {
   selector: 'app-shared-idea',
   templateUrl: './sharedidea.component.html',
   styleUrls: ['./sharedidea.component.sass'],
-  standalone: true, imports: [CommonModule]
+  standalone: true, imports: [CommonModule, MatIconModule, CardIdeaComponent]
 
 })
 export class SharedIdeaComponent implements OnInit, OnDestroy {
   private socket: Socket;
-  ideasQueue: { idea: IdeaSocketResponse, timeLeftMs: number }[] = [];
-  currentIdea: IdeaSocketResponse | null = null;
+  ideasQueue: { idea: Idea, timeLeftMs: number }[] = [];
 
   private readonly MAX_QUEUE_SIZE = 5;
-  private readonly IDEA_DISPLAY_DURATION_MS = 2 * 60 * 1000;
+  public readonly IDEA_DISPLAY_DURATION_MS = 2 * 60 * 1000;
   private readonly MASTER_TICK_INTERVAL_MS = 1000;
-  private discardTimerSubscription: Subscription | null = null;
   private countdownSubscription: Subscription | null = null;
-  timeLeftMs: number = 0;
   public get MAX_QUEUE_SIZE_FOR_TEMPLATE(): number {
     return this.MAX_QUEUE_SIZE;
   }
@@ -44,7 +44,6 @@ export class SharedIdeaComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.socket.on('connect', () => { });
     this.socket.on('newIdea', (idea: IdeaSocketResponse) => {
-      console.log(idea)
       this.handleNewIdea(idea);
     });
 
@@ -55,94 +54,67 @@ export class SharedIdeaComponent implements OnInit, OnDestroy {
     });
 
     this.ensureMasterCountdownIsRunning();
-    this.processNextIdea();
   }
 
-  private handleNewIdea(idea: IdeaSocketResponse): void {
+  private handleNewIdea(ideaSR: IdeaSocketResponse): void {
     if (this.ideasQueue.length < this.MAX_QUEUE_SIZE) {
+      const idea: Idea = { id: ideaSR.id, text: ideaSR.result };
       this.ideasQueue.push({ idea, timeLeftMs: this.IDEA_DISPLAY_DURATION_MS });
-      if (!this.currentIdea) {
-        this.processNextIdea();
-      }
       this.ensureMasterCountdownIsRunning();
     }
   }
 
   private ensureMasterCountdownIsRunning(): void {
-    if (this.countdownSubscription && !this.countdownSubscription.closed) {
-      return;
-    }
-    this.countdownSubscription?.unsubscribe();
-
-    this.countdownSubscription = interval(this.MASTER_TICK_INTERVAL_MS).subscribe(() => {
-      let activityDetected = false;
-      if (this.currentIdea && this.timeLeftMs > 0) {
-        this.timeLeftMs -= this.MASTER_TICK_INTERVAL_MS;
-        if (this.timeLeftMs < 0) {
-          this.timeLeftMs = 0;
-        }
-        activityDetected = true;
-      }
-
-      this.ideasQueue.forEach(queuedItem => {
-        if (queuedItem.timeLeftMs > 0) {
-          queuedItem.timeLeftMs -= this.MASTER_TICK_INTERVAL_MS;
-          if (queuedItem.timeLeftMs < 0) {
-            queuedItem.timeLeftMs = 0;
-          }
-          activityDetected = true;
-        }
-      });
-    });
-  }
-
-  private processNextIdea(): void {
-    this.discardTimerSubscription?.unsubscribe();
-
-    if (this.currentIdea) {
-      this.ideasQueue.push({ idea: this.currentIdea, timeLeftMs: 0 });
-      this.currentIdea = null;
-      this.timeLeftMs = 0;
-    }
-
     if (this.ideasQueue.length > 0) {
-      this.ideasQueue.sort((a, b) => a.timeLeftMs - b.timeLeftMs);
-      const nextQueuedItem = this.ideasQueue.shift()!;
-      this.currentIdea = nextQueuedItem.idea;
-      this.timeLeftMs = nextQueuedItem.timeLeftMs > 0 ? nextQueuedItem.timeLeftMs : this.IDEA_DISPLAY_DURATION_MS;
+      if (!this.countdownSubscription || this.countdownSubscription.closed) {
+        this.countdownSubscription = interval(this.MASTER_TICK_INTERVAL_MS).subscribe(() => {
+          if (this.ideasQueue.length === 0) {
+            this.countdownSubscription?.unsubscribe();
+            this.countdownSubscription = null;
+            return;
+          }
+          for (const queuedItem of this.ideasQueue) {
+            if (queuedItem.timeLeftMs > 0) {
+              queuedItem.timeLeftMs -= this.MASTER_TICK_INTERVAL_MS;
+              if (queuedItem.timeLeftMs < 0) {
+                queuedItem.timeLeftMs = 0;
+              }
+            }
+          }
 
-      this.discardTimerSubscription = timer(this.timeLeftMs).subscribe(() => {
-        this.discardCurrentIdea();
-      });
+          while (this.ideasQueue.length > 0 && this.ideasQueue[0].timeLeftMs <= 0) {
+            this.ideasQueue.shift();
+          }
 
-      this.ensureMasterCountdownIsRunning();
+          if (this.ideasQueue.length === 0) {
+            this.countdownSubscription?.unsubscribe();
+            this.countdownSubscription = null;
+          }
+        });
+      }
     } else {
-      this.currentIdea = null;
-      this.timeLeftMs = 0;
+      if (this.countdownSubscription && !this.countdownSubscription.closed) {
+        this.countdownSubscription.unsubscribe();
+        this.countdownSubscription = null;
+      }
     }
-  }
-
-  private discardCurrentIdea(): void {
-    this.currentIdea = null;
-    this.processNextIdea();
   }
 
   private clearTimers(): void {
-    this.discardTimerSubscription?.unsubscribe();
     this.countdownSubscription?.unsubscribe();
-    this.timeLeftMs = 0;
+    this.countdownSubscription = null;
   }
-  /*
-  getCeilSeconds(milliseconds: number): number {
-    return Math.ceil(milliseconds / 1000);
-  }
-  */
+
   ngOnDestroy(): void {
     this.clearTimers();
     this.socket?.disconnect();
   }
 
   get timeLeftSeconds(): number {
-    return Math.ceil(this.timeLeftMs / 1000);
+    if (this.ideasQueue.length > 0) {
+      return Math.ceil(this.ideasQueue[0].timeLeftMs / 1000);
+    }
+    return 0;
   }
+
 }

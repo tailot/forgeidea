@@ -64,7 +64,6 @@ export interface Idea {
   category?: string;
   text: string;
   language?: string;
-  result?: any;
 }
 
 

@@ -1,37 +1,18 @@
-<div *ngIf="currentIdea" class="idea-container">
-  <div class="idea-content">
-    <p>{{ currentIdea.result }}</p>
-  </div>
-  <!--
-    <p class="timer-info">
-      <i>{{ timeLeftSeconds }}</i>
-    </p>
-    -->
-  <div class="progress-bar-container">
-    <div class="progress-bar" [style.width.%]="(timeLeftMs / IDEA_DISPLAY_DURATION_MS_FOR_TEMPLATE) * 100"></div>
-  </div>
-</div>
-
 <div *ngIf="ideasQueue.length > 0" class="upcoming-ideas-section">
-  <div *ngFor="let queuedItem of ideasQueue.slice(0, currentIdea ? 4 : 5)" class="idea-container">
+  <div *ngFor="let queuedItem of ideasQueue.slice(0, 5)" class="idea-container">
     <div class="idea-content">
-      <p>{{ queuedItem.idea.result }}</p>
+      <app-card-idea [idea]="queuedItem.idea" [showActions]="false"></app-card-idea>
     </div>
-    <!--
-    <p class="timer-info">
-      <i>{{ getCeilSeconds(queuedItem.timeLeftMs) }}</i>
-    </p>
-    -->
     <div class="progress-bar-container">
-      <div class="progress-bar" [style.width.%]="(queuedItem.timeLeftMs / IDEA_DISPLAY_DURATION_MS_FOR_TEMPLATE) * 100">
+      <div class="progress-bar" [style.width.%]="(queuedItem.timeLeftMs / IDEA_DISPLAY_DURATION_MS) * 100">
       </div>
     </div>
   </div>
 </div>
-<div *ngIf="!currentIdea && ideasQueue.length === 0" class="status-message">
-  <p>😢</p>
+<div *ngIf="ideasQueue.length === 0" class="status-message">
+  <mat-icon>web_asset_off</mat-icon>
 </div>
 
 <div class="queue-status">
-  <p>{{ ideasQueue.length }} / {{ MAX_QUEUE_SIZE_FOR_TEMPLATE }}</p>
+  <p>{{ this.ideasQueue.length }} / {{ MAX_QUEUE_SIZE_FOR_TEMPLATE }}</p>
 </div>
