@@ -76,8 +76,8 @@
 <body class="bg-gray-50 text-gray-800">
 
     <header class="bg-white shadow-md sticky top-0 z-50">
-        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <div class="text-2xl font-bold text-indigo-600">
+        <nav class="container mx-auto px-6 py-3 flex flex-col sm:flex-row sm:justify-between items-center">
+            <div class="text-2xl font-bold text-indigo-600 hidden sm:flex items-center">
                 <span class="inline-block mr-2 align-middle">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -90,7 +90,8 @@
                 </span>
                 forgeIDEA
             </div>
-            <div class="space-x-4">
+
+            <div class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4 items-center w-full sm:w-auto mt-2 sm:mt-0">
                 <a href="#features" class="text-gray-600 hover:text-indigo-600">Caratteristiche</a>
                 <a href="#devel" class="text-gray-600 hover:text-indigo-600">Sviluppo</a>
                 <a href="privacy-policy" class="text-gray-600 hover:text-indigo-600">[Privacy Policy]</a>
@@ -324,7 +325,7 @@
                     el.classList.add('timeline-stacked'); // Aggiungi una classe per lo stile mobile
                     // Rimuovi stili specifici del layout desktop se necessario
                     const contentDiv = el.querySelector('.w-5\/12.px-6.py-4');
-                    if (contentDiv) contentDiv.classList.replace('w-5/12', 'w-full'); // Rendi il contenuto a larghezza piena
+                    if (contentDiv) contentDiv.classList.replace('w-5\/12', 'w-full'); // Rendi il contenuto a larghezza piena
                     const spacerDiv = el.querySelector('.order-1.w-5\/12');
                     if (spacerDiv) spacerDiv.style.display = 'none'; // Nasconde il div spaziatore
                     el.style.justifyContent = 'center'; // Centra il contenuto

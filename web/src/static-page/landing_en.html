@@ -76,8 +76,8 @@
 <body class="bg-gray-50 text-gray-800">
 
     <header class="bg-white shadow-md sticky top-0 z-50">
-        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <div class="text-2xl font-bold text-indigo-600">
+        <nav class="container mx-auto px-6 py-3 flex flex-col sm:flex-row sm:justify-between items-center">
+            <div class="text-2xl font-bold text-indigo-600 hidden sm:flex items-center">
                 <span class="inline-block mr-2 align-middle">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -90,10 +90,11 @@
                 </span>
                 forgeIDEA
             </div>
-            <div class="space-x-4">
-                <a href="#features" class="text-gray-600 hover:text-indigo-600">Features</a> <a href="#devel"
-                    class="text-gray-600 hover:text-indigo-600">Development</a> <a href="privacy-policy"
-                    class="text-gray-600 hover:text-indigo-600">[Privacy Policy]</a>
+
+            <div class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4 items-center w-full sm:w-auto mt-2 sm:mt-0">
+                <a href="#features" class="text-gray-600 hover:text-indigo-600">Features</a>
+                <a href="#devel" class="text-gray-600 hover:text-indigo-600">Development</a>
+                <a href="privacy-policy" class="text-gray-600 hover:text-indigo-600">[Privacy Policy]</a>
                 <a href="generate"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg cta-button">Get
                     Started</a>
@@ -336,9 +337,19 @@
                     // Restore original classes if needed (more complex)
                     // Better handled with Tailwind responsive classes directly in HTML
                     const contentDiv = el.querySelector('.w-full.px-6.py-4');
-                    if (contentDiv) contentDiv.classList.replace('w-full', 'w-5/12'); // Restore width
-                    const spacerDiv = el.querySelector('.order-1[style*="display: none"]'); // Find hidden spacer
+                    if (contentDiv && !contentDiv.classList.contains('w-5/12')) { // Check to avoid multiple replace
+                         contentDiv.classList.remove('w-full');
+                         contentDiv.classList.add('w-5/12');
+                    }
+                    const spacerDiv = el.querySelector('.order-1.w-5\\/12[style*="display: none"]'); // Find hidden spacer
                     if (spacerDiv) spacerDiv.style.display = ''; // Show spacer div
+
+                    // Check if the element had w-5/12 originally before trying to add it back
+                    const originalSpacerDiv = el.querySelector('.order-1.w-5\\/12');
+                    if(originalSpacerDiv && originalSpacerDiv.style.display === 'none') {
+                        originalSpacerDiv.style.display = '';
+                    }
+
                     el.style.justifyContent = ''; // Reset justification
                 });
             }
@@ -365,10 +376,9 @@
                      flex-direction: column; /* Stack vertically */
                      align-items: center; /* Center items */
                  }
-                 .timeline-stacked > .order-1:first-child { /* Hide spacer div */
-                    display: none;
+                 .timeline-stacked > .order-1.w-5\\/12:first-child { /* Hide spacer div more reliably */
+                    display: none !important;
                  }
-
             }
         `;
         document.head.appendChild(timelineStyleSheet);
