@@ -3,14 +3,14 @@
     [privacy policy]
   </button>
 
-  <button mat-icon-button routerLink="/generate" routerLinkActive="active-nav-link"
+  <button *ngIf="isOnline$ | async" mat-icon-button routerLink="/generate" routerLinkActive="active-nav-link"
     [routerLinkActiveOptions]="{exact: true}" aria-label="IDEA">
     <mat-icon>lightbulb</mat-icon>
   </button>
-  <button mat-icon-button routerLink="/generateCategory" routerLinkActive="active-nav-link" aria-label="New idea">
+  <button *ngIf="isOnline$ | async" mat-icon-button routerLink="/generateCategory" routerLinkActive="active-nav-link" aria-label="New idea">
     <mat-icon>list</mat-icon>
   </button>
-  <button mat-icon-button routerLink="/shared" routerLinkActive="active-nav-link" aria-label="New idea">
+  <button *ngIf="isOnline$ | async" mat-icon-button routerLink="/shared" routerLinkActive="active-nav-link" aria-label="New idea">
     <mat-icon>groups_2</mat-icon>
   </button>
   <button mat-icon-button routerLink="/list" routerLinkActive="active-nav-link" aria-label="IDEAS">

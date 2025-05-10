@@ -28,20 +28,7 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
-              },
-              {
-                "glob": "landing.html",
-                "input": "src/static-page",
-                "output": "/"
-              },{
-                "glob": "landing_en.html",
-                "input": "src/static-page",
-                "output": "/"
-              },{
-                "glob": "favicon.ico",
-                "input": "src/static-page",
-                "output": "/"
+                "input": "src/static-assets"
               }
             ],
             "styles": [
@@ -70,7 +57,8 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "optimization": false,
