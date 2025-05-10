@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatChipsModule } from '@angular/material/chips';
@@ -11,6 +11,7 @@ import { CardIdeaComponent, CardIdeaEmitData } from '../card-idea/card-idea.comp
 import { GenkitService, DiscardTasksRequestData, ZoomTaskRequestData, Idea } from '../services/genkit.service';
 import { LanguageService } from '../services/language.service';
 import { StorageService } from '../services/storage.service';
+import { TexttospeechService } from '../services/texttospeech.service';
 
 
 @Component({
@@ -28,7 +29,7 @@ import { StorageService } from '../services/storage.service';
     MatButtonToggleModule,
     CardIdeaComponent]
 })
-export class JobcardComponent implements OnInit {
+export class JobcardComponent implements OnInit, OnDestroy {
   selectedTasks: string[] = [];
   ideaid: string | null = null;
   tasks: string[] | null = null;
@@ -41,7 +42,8 @@ export class JobcardComponent implements OnInit {
   constructor(private route: ActivatedRoute,
     private genkitService: GenkitService,
     private languageService: LanguageService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private textToSpeechService: TexttospeechService
   ) { }
 
   ngOnInit(): void {
@@ -204,5 +206,35 @@ export class JobcardComponent implements OnInit {
         this.isDiscarding = false;
       }
     });
+  }
+
+  playTask(): void {
+    if (this.textToSpeechService.isSpeaking()) {
+      this.textToSpeechService.stop();
+      return;
+    }
+
+    if (this.zoomedTaskResult) {
+      const textToSpeak = this.zoomedTaskResult;
+      if (textToSpeak.trim()) {
+        const lang = this.languageService.getCurrentLanguageBcp47Tag();
+        console.log(`JobcardComponent: Attempting to speak task in ${lang}: "${textToSpeak.substring(0, 50)}..."`);
+        this.textToSpeechService.speak(textToSpeak, lang);
+      } else {
+        console.warn('JobcardComponent: No text content to speak after stripping HTML from zoomedTaskResult.');
+      }
+    } else {
+      console.warn('JobcardComponent: No zoomed task result available to play.');
+    }
+  }
+
+  stopPlayback(): void {
+    console.log('JobcardComponent: Stopping playback.');
+    this.textToSpeechService.stop();
+  }
+
+  ngOnDestroy(): void {
+    console.log('JobcardComponent: Destroyed. Stopping any ongoing playback.');
+    this.textToSpeechService.stop();
   }
 }
