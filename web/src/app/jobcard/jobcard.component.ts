@@ -75,25 +75,6 @@ export class JobcardComponent implements OnInit {
     this.selectedTasks = [];
   }
 
-  formatTaskText(text: string, wordsPerLine: number = 20): string {
-    if (!text) {
-      return '';
-    }
-    const words = text.split(/\s+/); // Divide per uno o più spazi
-    let formattedText = '';
-    for (let i = 0; i < words.length; i++) {
-      formattedText += words[i];
-      // Aggiungi <br> dopo ogni `wordsPerLine` parole, ma non dopo l'ultima parola
-      if ((i + 1) % wordsPerLine === 0 && i < words.length - 1) {
-        formattedText += '<br>';
-      } else if (i < words.length - 1) {
-        // Aggiungi uno spazio se non è la fine di una riga e non è l'ultima parola
-        formattedText += ' ';
-      }
-    }
-    return formattedText;
-  }
-
   zoomTask(): void {
     this.errorMessage = null;
     this.zoomedTaskResult = null; // Clear previous result

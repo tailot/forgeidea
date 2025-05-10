@@ -43,6 +43,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
   @Input() tasksButton = false;
   @Input() sharedButton = false;
   @Input() fusionButton = false;
+  @Input() trashButton = true;
   @Input() addIdeaButton : boolean | null = false;
 
 

@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 
+import { OnlineStatusService } from '../services/onlinestatus.service';
 import { StorageService } from '../services/storage.service';
 import { Idea } from '../services/genkit.service';
 import { CardIdeaComponent } from '../card-idea/card-idea.component';
@@ -40,6 +41,7 @@ export class IdeaListComponent implements OnInit {
   allIdeas: Idea[] = [];
   filteredIdeas: Idea[] = [];
   displayedIdeas: Idea[] = [];
+  ifIsOnline: boolean = false;
   isLoading = true;
   errorMessage: string | null = null;
 
@@ -52,14 +54,19 @@ export class IdeaListComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   private uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
+  
 
   constructor(
+    private onlineStatusService: OnlineStatusService,
     private storageService: StorageService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
     this.loadValidIdeas();
+    this.onlineStatusService.isOnline$.subscribe((isOnline) => {
+      this.ifIsOnline = isOnline;
+    });
   }
 
   private isValidUuid(key: string): boolean {
@@ -74,7 +81,7 @@ export class IdeaListComponent implements OnInit {
     try {
       const allKeys = await this.storageService.getAllKeys();
       const validUuidKeys = allKeys.filter(key => this.isValidUuid(key));
-      console.log(`Trovate ${validUuidKeys.length} chiavi UUID valide su ${allKeys.length} totali.`);
+      console.log(`Found ${validUuidKeys.length} valid UUID keys out of ${allKeys.length} total.`);
 
       const ideaPromises = validUuidKeys.map(async (uuid) => {
         try {
@@ -93,12 +100,12 @@ export class IdeaListComponent implements OnInit {
             };
             return idea;
           } else {
-            console.warn(`Nessun dato trovato per UUID valido: ${uuid}`);
+            console.warn(`No data found for valid UUID: ${uuid}`);
             return null;
           }
         } catch (itemError) {
-          console.error(`Errore nel recuperare o processare l'item per UUID ${uuid}:`, itemError);
-          return null; // Ignora questo item in caso di errore
+          console.error(`Error retrieving or processing item for UUID ${uuid}:`, itemError);
+          return null;
         }
       });
 
@@ -107,8 +114,8 @@ export class IdeaListComponent implements OnInit {
       this.applyFilterAndPaginate();
 
     } catch (error) {
-      console.error('Errore durante il caricamento delle chiavi o delle idee:', error);
-      this.errorMessage = `Impossibile caricare l'elenco delle idee. ${error instanceof Error ? error.message : ''}`;
+      console.error('Error loading keys or ideas:', error);
+      this.errorMessage = `Unable to load the list of ideas. ${error instanceof Error ? error.message : ''}`;
       this.allIdeas = [];
       this.filteredIdeas = [];
       this.totalIdeas = 0;
@@ -117,7 +124,6 @@ export class IdeaListComponent implements OnInit {
     }
   }
 
-  /** Filtra le idee basate su searchTerm e aggiorna la paginazione */
   applyFilterAndPaginate(): void {
     const filterValue = this.searchTerm.trim().toLowerCase();
 
@@ -162,8 +168,12 @@ export class IdeaListComponent implements OnInit {
   }
 
   viewIdeaDetails(ideaId: string | number | undefined): void {
+    if (!this.ifIsOnline) {
+      console.warn('Navigation offline.');
+      return;
+    }
     if (!ideaId) {
-      console.warn('Tentativo di navigare senza un ID idea valido.');
+      console.warn('Navigation without ID.');
       return;
     }
     this.router.navigate(['/jobcard', ideaId]);

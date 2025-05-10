@@ -20,8 +20,8 @@ export const appConfig: ApplicationConfig = {
       useClass: LoadingInterceptor,
       multi: true,
     }, provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          })
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    })
   ]
 };

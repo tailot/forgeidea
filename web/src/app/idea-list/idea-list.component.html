@@ -36,8 +36,9 @@
            <app-card-idea
              [idea]="idea"
              [showActions]="false"
-             [sharedButton]="true"
-             [fusionButton]="true"
+             [sharedButton]="ifIsOnline"
+             [fusionButton]="ifIsOnline"
+             [trashButton]="ifIsOnline"
              (click)="viewIdeaDetails(idea.id)"
              matRipple>
            </app-card-idea>

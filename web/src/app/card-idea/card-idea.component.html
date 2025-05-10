@@ -12,27 +12,27 @@
         <p class="idea-text">{{ idea.text }}</p>
       </mat-card-content>
       <mat-card-actions align="end">
-        <button *ngIf="addIdeaButton" mat-icon-button color="primary" aria-label="Share"
+        <button *ngIf="addIdeaButton" mat-icon-button color="primary"
           (click)="addIdea(idea);$event.stopPropagation()">
           <mat-icon>add</mat-icon>
         </button>
-        <button *ngIf="sharedButton" mat-icon-button color="primary" aria-label="Share"
+        <button *ngIf="sharedButton" mat-icon-button color="primary"
           (click)="shareCurrentIdea(idea);$event.stopPropagation()">
           <mat-icon>share</mat-icon>
         </button>
-        <button *ngIf="tasksButton" mat-icon-button color="primary" aria-label="Tasks per idea"
+        <button *ngIf="tasksButton" mat-icon-button color="primary"
           (click)="tasksEmiter(idea);">
           <mat-icon>list_alt</mat-icon>
         </button>
-        <button *ngIf="mergiable && fusionButton" mat-icon-button color="primary" aria-label="Join right operation"
+        <button *ngIf="mergiable && fusionButton" mat-icon-button color="primary"
           (click)="operation(); $event.stopPropagation()">
           <mat-icon>join_right</mat-icon>
         </button>
-        <button class="redoOperation" *ngIf="!mergiable" mat-icon-button color="primary" aria-label="Annulla operazione"
+        <button class="redoOperation" *ngIf="!mergiable" mat-icon-button color="primary"
           (click)="clearOperation(); $event.stopPropagation()">
           <mat-icon>join_right</mat-icon>
         </button>
-        <button *ngIf="idea.id" mat-icon-button color="primary" aria-label="Cancella idea" (click)="deleteIdea(idea.id);">
+        <button *ngIf="idea.id && trashButton" mat-icon-button color="primary" (click)="deleteIdea(idea.id);">
           <mat-icon>delete</mat-icon>
         </button>
       </mat-card-actions>

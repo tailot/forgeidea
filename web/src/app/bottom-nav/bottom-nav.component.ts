@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 
 import { OnlineStatusService } from '../services/onlinestatus.service';
@@ -16,9 +16,26 @@ import { OnlineStatusService } from '../services/onlinestatus.service';
   templateUrl: './bottom-nav.component.html',
   styleUrl: './bottom-nav.component.sass'
 })
-export class BottomNavComponent {
+export class BottomNavComponent implements OnInit, OnDestroy {
   isOnline$: Observable<boolean>;
-  constructor(public onlineStatusService: OnlineStatusService) {
+  private onlineStatusSubscription: Subscription | undefined;
+
+  constructor(
+    public onlineStatusService: OnlineStatusService,
+    private router: Router
+  ) {
     this.isOnline$ = this.onlineStatusService.isOnline$;
+  }
+
+  ngOnInit(): void {
+    this.onlineStatusSubscription = this.onlineStatusService.isOnline$.subscribe(isOnline => {
+      if (!isOnline) {
+        this.router.navigate(['/list']);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.onlineStatusSubscription?.unsubscribe();
   }
 }
