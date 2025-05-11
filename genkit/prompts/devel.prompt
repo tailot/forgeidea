@@ -6,7 +6,7 @@ input:
   default:
     language: english
 ---
-Write a bulleted list of the steps to take to develop:
+Write a bulleted list of the steps to take to realize:
 {{text}}
 
 #Warnings

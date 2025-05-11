@@ -20,6 +20,10 @@
           (click)="shareCurrentIdea(idea);$event.stopPropagation()">
           <mat-icon>share</mat-icon>
         </button>
+        <button *ngIf="documentsButton" mat-icon-button color="primary"
+          (click)="documentsEmiter(idea);">
+          <mat-icon>archive</mat-icon>
+        </button>
         <button *ngIf="tasksButton" mat-icon-button color="primary"
           (click)="tasksEmiter(idea);">
           <mat-icon>list_alt</mat-icon>

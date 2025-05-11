@@ -60,11 +60,19 @@ export interface OperationRequestData {
   language?: string;
 }
 
+export interface IdeaDocument {
+  key: string;
+  name?: string;
+  content: string;
+  createdAt: number;
+}
+
 export interface Idea {
-  id?: string;
-  category?: string;
+  id: string;
   text: string;
+  category?: string;
   language?: string;
+  documents?: IdeaDocument[]
 }
 
 

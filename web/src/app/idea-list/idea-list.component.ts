@@ -85,20 +85,9 @@ export class IdeaListComponent implements OnInit {
 
       const ideaPromises = validUuidKeys.map(async (uuid) => {
         try {
-          const retrievedData = await this.storageService.getItem<any>(uuid);
-
+          const retrievedData = await this.storageService.getItem<Idea>(uuid);
           if (retrievedData) {
-            if (!!retrievedData) {
-              delete retrievedData.language
-              delete retrievedData.category
-              delete retrievedData.id
-            }
-
-            const idea: Idea = {
-              id: uuid,
-              text: Object.values(retrievedData).join('')
-            };
-            return idea;
+            return retrievedData;
           } else {
             console.warn(`No data found for valid UUID: ${uuid}`);
             return null;

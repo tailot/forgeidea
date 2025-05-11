@@ -10,12 +10,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { io, Socket as SocketIoClientSocket } from 'socket.io-client';
 
 import { StorageService } from '../services/storage.service';
-import { Idea, GenkitService, GenerateTasksRequestData, ScoreIdeaRequestData, OperationRequestData } from '../services/genkit.service';
+import { Idea, GenkitService, GenerateTasksRequestData, ScoreIdeaRequestData, OperationRequestData, IdeaDocument } from '../services/genkit.service';
 import { LanguageService } from '../services/language.service';
 import { environment } from '../../environments/environment';
 
 export interface CardIdeaEmitData {
-  tasks: { text: string[] } | string[];
+  tasks: { text: string[] };
   idea: Idea;
 }
 
@@ -42,12 +42,14 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
   @Input() evaluateScore: boolean = false;
   @Input() tasksButton = false;
   @Input() sharedButton = false;
+  @Input() documentsButton = false;
   @Input() fusionButton = false;
   @Input() trashButton = true;
   @Input() addIdeaButton : boolean | null = false;
 
 
   @Output() tasksOn = new EventEmitter<CardIdeaEmitData>();
+  @Output() documentsOn = new EventEmitter<Idea>();
 
   ideaScore: number | null = null;
   isScoring: boolean = false; 
@@ -160,6 +162,11 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
       console.warn('No text to share.');
     }
   }
+
+  async documentsEmiter(idea: Idea): Promise<void> {
+    this.documentsOn.emit(idea);
+  }
+  
   async tasksEmiter(idea: Idea): Promise<void> {
     if (this.isOperating) {
       console.log("Operation in progress, tasks generation skipped.");
@@ -195,12 +202,12 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
       this.genkitService.callGenerateTasks(requestData, false).subscribe({
         next: (tasksResult: any) => {
           // console.log('Tasks generated:', tasksResult);
-          // console.log(`Saving generated tasks to storage with key: ${tasksKey}`);
-
-          this.storageService.setItem(tasksKey, tasksResult)
+          // tasksResult is string[] from callGenerateTasks
+          const tasksToStore = { text: tasksResult as string[] }; // Ensure tasks are stored in {text: string[]} format
+          this.storageService.setItem(tasksKey, tasksToStore)
             .then(() => {
               // console.log('Generated tasks saved successfully.');
-              this.tasksOn.emit({ tasks: tasksResult, idea: idea });
+              this.tasksOn.emit({ tasks: tasksToStore, idea: idea }); // Emit consistently
             })
             .catch(saveError => {
               console.error(`Error saving generated tasks with key ${tasksKey}:`, saveError);
@@ -240,9 +247,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    // console.log(`Attempting to delete idea with uuid: ${uuid}`);
     const tasksKey = `tasks_${uuid}`;
-    // console.log(`Also attempting to delete associated tasks with key: ${tasksKey}`);
 
     try {
       await Promise.all([
@@ -250,7 +255,6 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
         this.storageService.removeItem(tasksKey)
       ]);
 
-      // console.log(`Successfully deleted idea ${uuid} and tasks ${tasksKey}`);
       this.router.navigate(['/list']);
     } catch (error) {
       console.error(`Error deleting idea with uuid ${uuid} or its tasks:`, error);
@@ -263,7 +267,6 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['evaluateScore'] && changes['evaluateScore'].currentValue === true && this.idea) {
-      // console.log(`CardIdeaComponent: evaluateScore triggered for idea ${this.idea.id}`);
       this.evaluateIdeaScore(this.idea);
     }
   }
@@ -272,7 +275,6 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
     this.isLoading = true;
 
     if (!!this.idea) {
-      // console.log('CardIdeaComponent: Using pre-populated idea input.');
       this.isLoading = false;
       if (this.evaluateScore) {
         this.evaluateIdeaScore(this.idea);
@@ -289,32 +291,17 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
 
   private async loadIdeaData(uuid: string): Promise<void> {
     this.isLoading = true;
-    // console.log(`CardIdeaComponent: Loading idea data for UUID: ${uuid}`);
     try {
-      const retrievedIdea = await this.storageService.getItem<any>(uuid);
-      
-      if (retrievedIdea) {
-        delete retrievedIdea.language;
-        delete retrievedIdea.category;
-        delete retrievedIdea.id;
-
-        this.idea = {
-          id: uuid,
-          text: Object.values(retrievedIdea).join('')
-        };
-        // console.log('CardIdeaComponent: Idea data loaded successfully:', this.idea);
-        if (this.evaluateScore) {
-          // console.log(`CardIdeaComponent: evaluateScore is true, evaluating loaded idea ${this.idea.id}`);
-          this.evaluateIdeaScore(this.idea);
+      const retrievedIdea = await this.storageService.getItem<Idea>(uuid).then(idea => {
+        if(idea){
+          idea.id = uuid;
+          this.idea = idea;
+          if (this.evaluateScore) {
+            this.evaluateIdeaScore(this.idea);
+          }
+          this.checkOperationState(); 
         }
-        this.checkOperationState(); 
-      } else {
-        // console.warn(`CardIdeaComponent: No idea found in storage for UUID: ${uuid}`);
-        // TODO: Handle error, e.g., show a snackbar or navigate away
-      }
-    } catch (error) {
-      // console.error(`CardIdeaComponent: Error loading idea data for UUID ${uuid}:`, error);
-      // TODO: Handle error, e.g., show a snackbar
+      })
     } finally {
       this.isLoading = false;
     }
@@ -326,25 +313,19 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    // console.log(`CardIdeaComponent: Evaluating score for idea ${idea.id}`);
     this.isScoring = true;
     this.ideaScore = null;
     const requestData: ScoreIdeaRequestData = { idea: idea.text };
 
     this.genkitService.callScoreIdea(requestData, false, true).subscribe({
       next: (scoreResult: number) => {
-        // console.log(`Score received for idea ${idea.id}:`, scoreResult);
         if (scoreResult && typeof scoreResult === 'number') {
           this.ideaScore = scoreResult;
 
-        } else {
-          // console.warn(`Invalid score format received for idea ${idea.id}:`, scoreResult);
         }
         this.isScoring = false;
       },
-      error: (error) => {
-        // console.error(`Error evaluating score for idea ${idea.id}:`, error);
-        
+      error: (error) => {        
         this.isScoring = false;
       }
     });

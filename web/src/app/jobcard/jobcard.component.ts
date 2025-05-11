@@ -7,12 +7,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { CardIdeaComponent, CardIdeaEmitData } from '../card-idea/card-idea.component';
-import { GenkitService, DiscardTasksRequestData, ZoomTaskRequestData, Idea } from '../services/genkit.service';
+import { Idea, IdeaDocument, GenkitService, DiscardTasksRequestData, ZoomTaskRequestData } from '../services/genkit.service';
 import { LanguageService } from '../services/language.service';
 import { StorageService } from '../services/storage.service';
 import { TexttospeechService } from '../services/texttospeech.service';
-
 
 @Component({
   selector: 'app-jobcard',
@@ -27,6 +27,7 @@ import { TexttospeechService } from '../services/texttospeech.service';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatButtonToggleModule,
+    MatExpansionModule,
     CardIdeaComponent]
 })
 export class JobcardComponent implements OnInit, OnDestroy {
@@ -35,6 +36,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
   tasks: string[] | null = null;
   currentIdea: Idea | null = null;
   isDiscarding: boolean = false;
+  documents: IdeaDocument[] | null = [];
 
   zoomedTaskResult: string | null = null;
   errorMessage: string | null = null;
@@ -50,13 +52,19 @@ export class JobcardComponent implements OnInit, OnDestroy {
     this.ideaid = this.route.snapshot.paramMap.get('uuid');
   }
 
+  showDocuments(idea: Idea){
+    console.log('Received an idea from CardIdeaComponent');
+    if(idea){
+      this.currentIdea = idea;
+    }
+  }
+
   showTasks(tasksAndIdea: CardIdeaEmitData): void {
     console.log('Received data in Jobcard:', tasksAndIdea);
     this.errorMessage = null;
     this.currentIdea = tasksAndIdea.idea;
-
-    if (Array.isArray(tasksAndIdea.tasks)) {
-      this.tasks = tasksAndIdea.tasks;
+    if (Array.isArray(tasksAndIdea.tasks.text)) {
+      this.tasks = tasksAndIdea.tasks.text;
       console.log('Tasks updated:', this.tasks);
     } else {
       console.warn('Received tasks data is not in the expected format { text: string[] } or is missing. Data:', tasksAndIdea.tasks);
@@ -77,9 +85,32 @@ export class JobcardComponent implements OnInit, OnDestroy {
     this.selectedTasks = [];
   }
 
+  async deleteDocument(docToDelete: IdeaDocument): Promise<void> {
+    if (!this.currentIdea || !this.currentIdea.documents || !this.ideaid) {
+      console.log(this.currentIdea)
+      console.error('Cannot delete document: Current idea, documents, or idea ID is missing.');
+      this.errorMessage = 'Cannot delete document: Essential data is missing.';
+      return;
+    }
+
+    try {
+      // Rimuovi il documento dall'array dei documenti dell'idea corrente
+      this.currentIdea.documents = this.currentIdea.documents.filter(doc => doc.key !== docToDelete.key);
+
+      // Aggiorna l'idea nello storage
+      await this.storageService.setItem(this.ideaid, this.currentIdea);
+
+      console.log(`Document with key ${docToDelete.key} deleted successfully.`);
+      this.errorMessage = null; // Pulisci eventuali messaggi di errore precedenti
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      this.errorMessage = `Error deleting document: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    }
+  }
+
   zoomTask(): void {
     this.errorMessage = null;
-    this.zoomedTaskResult = null; // Clear previous result
+    this.zoomedTaskResult = null;
 
     if (!this.currentIdea || !this.currentIdea.text) {
       this.errorMessage = 'Idea information is missing.';
@@ -96,11 +127,10 @@ export class JobcardComponent implements OnInit, OnDestroy {
       language: language
     };
 
-    console.log('Calling callZoomTask with data:', requestData);
     this.genkitService.callZoomTask(requestData, false).subscribe({
       next: (result: string) => {
-        console.log('Received zoomed task result:', result);
-        this.zoomedTaskResult = result; // Store the result (assuming it's HTML or plain text)
+        console.log('Received zoomed task result.');
+        this.zoomedTaskResult = result;
       },
       error: (error) => {
         console.error('Error calling callZoomTask:', error);
@@ -112,40 +142,34 @@ export class JobcardComponent implements OnInit, OnDestroy {
   selectNextTask(): void {
     if (!this.tasks || this.tasks.length < 2) {
       console.warn("Cannot select next task: Not enough tasks available.");
-      return; // Need at least two tasks to navigate
+      return;
     }
 
     const currentTask = this.selectedTasks.length > 0 ? this.selectedTasks[0] : null;
     let currentIndex = currentTask ? this.tasks.indexOf(currentTask) : -1;
 
-    // Calculate next index with wrap-around
     let nextIndex = (currentIndex + 1) % this.tasks.length;
 
-    // Update selected tasks
     this.selectedTasks = [this.tasks[nextIndex]];
     console.log("Selected next task:", this.selectedTasks[0]);
 
-    // Call zoomTask
     this.zoomTask();
   }
 
   selectPreviousTask(): void {
     if (!this.tasks || this.tasks.length < 2) {
       console.warn("Cannot select previous task: Not enough tasks available.");
-      return; // Need at least two tasks to navigate
+      return;
     }
 
     const currentTask = this.selectedTasks.length > 0 ? this.selectedTasks[0] : null;
     let currentIndex = currentTask ? this.tasks.indexOf(currentTask) : 0; // Default to 0 if none selected
 
-    // Calculate previous index with wrap-around
     let previousIndex = (currentIndex - 1 + this.tasks.length) % this.tasks.length;
 
-    // Update selected tasks
     this.selectedTasks = [this.tasks[previousIndex]];
     console.log("Selected previous task:", this.selectedTasks[0]);
 
-    // Call zoomTask
     this.zoomTask();
   }
 
@@ -194,7 +218,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
           })
           .catch(saveError => {
             console.error(`Error saving updated tasks with key ${storageKey}:`, saveError);
-            this.errorMessage = `Errore durante il salvataggio dei task aggiornati: ${saveError instanceof Error ? saveError.message : 'Errore sconosciuto'}`;
+            this.errorMessage = `Error saving updated tasks: ${saveError instanceof Error ? saveError.message : 'Unknown error'}`;
           })
           .finally(() => {
             this.isDiscarding = false;
@@ -208,14 +232,59 @@ export class JobcardComponent implements OnInit, OnDestroy {
     });
   }
 
-  playTask(): void {
+  async saveDocument(): Promise<void> {
+    if (!this.ideaid) {
+      console.error('Error: Idea ID missing.');
+      return;
+    }
+    if (!this.zoomedTaskResult) {
+      console.error('Error: No content to save.');
+      return;
+    }
+    if (!this.selectedTasks || this.selectedTasks.length !== 1) {
+      console.error('Error: Select exactly one task to save the result.');
+      return;
+    }
+
+    const currentTaskName = this.selectedTasks[0];
+    try {
+      const idea = await this.storageService.getItem<Idea>(this.ideaid);
+
+      if (!idea) {
+        console.error(`Error: Idea with ID ${this.ideaid} not found.`);
+        return;
+      }
+
+      if (!idea.documents) {
+        idea.documents =  [];
+      }
+
+      const newDocument: IdeaDocument = {
+        key: crypto.randomUUID(),
+        name: currentTaskName,
+        content: this.zoomedTaskResult,
+        createdAt: Date.now()
+      };
+
+      idea.documents.push(newDocument);
+      await this.storageService.setItem(this.ideaid,idea);
+      this.currentIdea = idea;
+
+      console.log('Document saved successfully!');
+
+    } catch (error) {
+      console.error('Error saving document:', error);
+    }
+  }
+
+  playTask(text: string): void {
     if (this.textToSpeechService.isSpeaking()) {
       this.textToSpeechService.stop();
       return;
     }
 
-    if (this.zoomedTaskResult) {
-      const textToSpeak = this.zoomedTaskResult;
+    if (text) {
+      const textToSpeak = text;
       if (textToSpeak.trim()) {
         const lang = this.languageService.getCurrentLanguageBcp47Tag();
         console.log(`JobcardComponent: Attempting to speak task in ${lang}: "${textToSpeak.substring(0, 50)}..."`);

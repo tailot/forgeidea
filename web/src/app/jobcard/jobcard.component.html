@@ -1,15 +1,16 @@
 <div class="jobcard-container">
   <div>
-    <app-card-idea *ngIf="ideaid" [tasksButton]="!tasks" [evaluateScore]="true" (tasksOn)="showTasks($event)"
-      [ideaUuid]="ideaid"></app-card-idea>
+    <app-card-idea *ngIf="ideaid"
+      [documentsButton]="!currentIdea || !currentIdea.documents || currentIdea.documents.length === 0" [tasksButton]="!tasks" [evaluateScore]="true"
+      (documentsOn)="showDocuments($event)" (tasksOn)="showTasks($event)" [ideaUuid]="ideaid"></app-card-idea>
     <p *ngIf="!ideaid">No Idea UUID found in route.</p>
   </div>
+
   <div class="tasks-container">
     <div *ngIf="selectedTasks && selectedTasks.length > 0" class="confirm-button-container">
       <mat-button-toggle-group #toggleGroup="matButtonToggleGroup">
         <mat-button-toggle value="discard" (click)="discardTask()">
           <mat-icon>delete_sweep</mat-icon></mat-button-toggle>
-
         <mat-button-toggle *ngIf="selectedTasks.length == 1" value="zoom" (click)="zoomTask()">
           <mat-icon>list_alt</mat-icon></mat-button-toggle>
         <mat-button-toggle value="deselect" (click)="deselectAllTasks()">
@@ -25,8 +26,14 @@
     </div>
     <p *ngIf="tasks && tasks.length === 0"><mat-icon>counter_0</mat-icon></p>
     <div *ngIf="zoomedTaskResult" class="zoomed-task-result-wrapper">
-      <mat-button-toggle value="zoom" (click)="playTask()">
-        <mat-icon>play_arrow</mat-icon></mat-button-toggle>
+      <mat-button-toggle-group #zoomedTaskActionsGroup="matButtonToggleGroup">
+        <mat-button-toggle value="play" (click)="playTask(zoomedTaskResult)">
+          <mat-icon>play_arrow</mat-icon></mat-button-toggle>
+        <mat-button-toggle value="save" (click)="saveDocument()">
+          <mat-icon>save</mat-icon></mat-button-toggle>
+        <mat-button-toggle value="close" (click)="zoomedTaskResult=''">
+            <mat-icon>close</mat-icon></mat-button-toggle>
+      </mat-button-toggle-group>
       <button mat-icon-button *ngIf="selectedTasks.length == 1 && tasks && tasks.indexOf(selectedTasks[0]) >= 1"
         (click)="selectPreviousTask()" class="nav-button left-nav">
         <mat-icon>navigate_before</mat-icon>
@@ -40,5 +47,22 @@
         <mat-icon>navigate_next</mat-icon>
       </button>
     </div>
+  </div>
+  <div *ngIf="currentIdea &&currentIdea.documents && currentIdea.documents.length > 0" class="documents-section">
+    <mat-accordion multi>
+      <mat-expansion-panel *ngFor="let doc of currentIdea.documents; let i = index">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-button-toggle value="zoom" (click)="playTask(doc.content); $event.stopPropagation()">
+              <mat-icon>play_arrow</mat-icon></mat-button-toggle>
+            <button mat-icon-button color="warn" (click)="deleteDocument(doc); $event.stopPropagation()">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-panel-title>
+          {{ doc.name || ('Document ' + (i + 1)) }} 
+        </mat-expansion-panel-header>
+        <pre [innerHTML]="doc.content"></pre>
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
 </div>
