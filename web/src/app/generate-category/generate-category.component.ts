@@ -3,7 +3,12 @@ import { CommonModule } from '@angular/common';
 import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 import { Observable, of, firstValueFrom } from 'rxjs';
+
 import { catchError } from 'rxjs/operators';
 
 import { GenkitService, Idea } from '../services/genkit.service';
@@ -15,7 +20,11 @@ import { StorageService } from '../services/storage.service';
   imports: [
     CommonModule,
     MatChipsModule,
-    FormsModule
+    MatIconModule,
+    FormsModule,
+    MatFormFieldModule, // Aggiunto per mat-form-field
+    MatInputModule,     // Aggiunto per matInput
+    MatButtonModule     // Aggiunto per mat-button e mat-icon-button
   ],
   templateUrl: './generate-category.component.html',
   styleUrl: './generate-category.component.sass'
@@ -32,10 +41,11 @@ export class GenerateCategoryComponent implements OnInit {
   selectedCategory: string | null = null;
   isGenerating: boolean = false;
   scoreThreshold: number = 0;
+  searchTerm: string = '';
+
 
   async ngOnInit(): Promise<void> {
     this.loadCategories();
-
     try {
       const storedScore = await this.storageService.getItem<number>('score');
       if (storedScore !== null && typeof storedScore === 'number') {
@@ -49,7 +59,7 @@ export class GenerateCategoryComponent implements OnInit {
     }
   }
 
-  loadCategories(): void {
+  loadCategories(context = ""): void {
     this.errorMessage = null; // Reset error message
     this.isGenerating = false;
     const currentLanguageCode = this.languageService.getCurrentLanguageCode();
@@ -57,12 +67,12 @@ export class GenerateCategoryComponent implements OnInit {
 
     console.log(`GenerateCategoryComponent: Loading categories for language code: ${currentLanguageCode} (Backend: ${currentLanguageBackendName})`);
 
-    this.categories$ = this.genkitService.callGenerateIdeaCategories({ count: 35, language: currentLanguageBackendName })
+    this.categories$ = this.genkitService.callGenerateIdeaCategories({context: context, count: 35, language: currentLanguageBackendName })
       .pipe(
         catchError(error => {
           console.error('Error loading categories:', error);
           this.errorMessage = error instanceof Error ? error.message : 'Failed to load categories. Please try again later.';
-          return of([]); // Return an empty array observable on error to prevent breaking the async pipe
+          return of([]);
         })
       );
   }
@@ -92,7 +102,7 @@ export class GenerateCategoryComponent implements OnInit {
 
     try {
       let ideaText: string;
-      let generatedIdeaCategory = this.selectedCategory; // Default to selected category
+      let generatedIdeaCategory = this.selectedCategory;
 
       if (this.scoreThreshold > 0) {
         console.log(`GenerateCategoryComponent: scoreThreshold is ${this.scoreThreshold}, calling callRequirementScore.`);

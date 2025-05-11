@@ -12,6 +12,7 @@ export interface ScoreIdeaRequestData {
 export interface GenerateIdeaCategoriesRequestData {
   count?: number,
   language?: string;
+  context?: string;
 }
 
 export interface GenerateIdeaRequestData {
