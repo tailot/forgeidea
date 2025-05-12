@@ -16,6 +16,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "npx genkit start -- npx tsx --watch src/index.ts",
+    "devMining": "npx genkit start -- npx tsx --watch src/mining/data_mining.ts",
     "dist": "node dist/index.js",
     "tar": "tar -czvf ../forgeIDEABack.tar.gz --exclude='node_modules' --exclude='dist' --exclude='.genkit' .[^.]* *"
   }
