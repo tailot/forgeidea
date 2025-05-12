@@ -1,0 +1,31 @@
+services:
+  genkit:
+    build:
+      context: ../forgeidea/genkit
+      dockerfile: Dockerfile
+    environment:
+      GEMINI_API_KEY: KEYKUAKEY
+      CUSTOM_MODEL: googleai/gemini-2.0-flash
+      ORIGIN: '*'
+    ports:
+        - "4001:4001"
+  web:
+    build:
+      context: ../forgeidea/web
+      dockerfile: Dockerfile
+      args:
+        production: true
+        genkitApiUrl: 'http://localhost:4001'
+        socketAddr: 'http://localhost:3001'
+    ports:
+      - "80:80"
+  socket:
+    build:
+      context: ../forgeidea/socket.io
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      ORIGIN: '*'
+      GENKIT_BASE_URL: 'http://localhost:4001'
+      REDIS_URL: 'redis://0.0.0.0/redis2:6379'
