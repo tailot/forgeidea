@@ -2,17 +2,18 @@
 input:
   schema:
     language: string
-    text: string
-    goals: string
+    idea: string
+    task: string
   default:
     language: english
 ---
 My idea is:
-{{text}}
+{{idea}}
 
 #Help me develop the following goals
-{{goals}}
+{{task}}
 
-#Operational Instructions
-Draft a document that is as complete as possible and relevant to achieving the goals.
-Write the response in the {{language}} language
+#INSTRUCTIONS
+    - Draft a complete document full of details and insights.
+    - Adhere to drafting the document professionally, avoiding adding comments or introductions.
+    - Write the response in the {{language}} language.

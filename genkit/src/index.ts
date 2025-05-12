@@ -11,6 +11,7 @@ import { zoomTaskFlow } from './flows/zoomtask'
 import { scoreIdeaFlow } from './flows/scoreidea'
 import { requirementScoreFlow } from './flows/requirementscore'
 import { verifyIdeaFlow } from './flows/verifyIdeaFlow';
+import { helpTaskFlow } from './flows/help';
 
 startFlowServer({
   flows: [
@@ -21,10 +22,11 @@ startFlowServer({
     generateTasksFlow,
     discardTasksFlow,
     operationFlow,
-    zoomTaskFlow,
+//    zoomTaskFlow,
     scoreIdeaFlow,
     requirementScoreFlow,
-    verifyIdeaFlow
+    verifyIdeaFlow,
+    helpTaskFlow
   ],
   port: 4001,
   cors: {

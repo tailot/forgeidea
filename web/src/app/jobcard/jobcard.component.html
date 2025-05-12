@@ -17,8 +17,8 @@
       <mat-button-toggle-group #toggleGroup="matButtonToggleGroup">
         <mat-button-toggle value="discard" (click)="discardTask()">
           <mat-icon>delete_sweep</mat-icon></mat-button-toggle>
-        <mat-button-toggle *ngIf="selectedTasks.length == 1" value="zoom" (click)="zoomTask()">
-          <mat-icon>list_alt</mat-icon></mat-button-toggle>
+          <mat-button-toggle *ngIf="selectedTasks.length == 1" value="zoom" (click)="helpTask()">
+            <mat-icon>info</mat-icon></mat-button-toggle>
         <mat-button-toggle value="deselect" (click)="deselectAllTasks()">
           <mat-icon>deselect</mat-icon></mat-button-toggle>
       </mat-button-toggle-group>

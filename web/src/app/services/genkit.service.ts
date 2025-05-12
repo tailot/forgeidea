@@ -41,11 +41,13 @@ export interface DiscardTasksRequestData {
   language?: string;
 }
 
+/*
 export interface ZoomTaskRequestData {
   idea: string;
   task: string;
   language?: string;
 }
+*/
 
 export interface RequirementScoreRequestData {
   category: string;
@@ -57,6 +59,12 @@ export interface OperationRequestData {
   idea1: string;
   idea2?: string;
   operation: "Combine" | "Integrate";
+  language?: string;
+}
+
+export interface HelpTaskRequestData {
+  idea: string;
+  task: string;
   language?: string;
 }
 
@@ -411,7 +419,7 @@ export class GenkitService {
     this.cache.set(cacheKey, request$);
     return request$;
   }
-
+/*
   callZoomTask(
     data: ZoomTaskRequestData,
     bypassCache = false,
@@ -446,6 +454,7 @@ export class GenkitService {
     this.cache.set(cacheKey, request$);
     return request$;
   }
+  */
   callScoreIdea(
     data: ScoreIdeaRequestData,
     bypassCache = false,
@@ -530,7 +539,41 @@ export class GenkitService {
     this.cache.set(cacheKey, request$);
     return request$;
   }
-  
+
+  callHelpTask(
+    data: HelpTaskRequestData,
+    bypassCache = false,
+    noLoading: boolean = false
+  ): Observable<string> {
+    const flowName = 'helpTaskFlow';
+    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
+    const headers = this.createHeaders();
+    const body = { data };
+    const cacheKey = this.generateCacheKey(flowName, data);
+    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
+
+    if (!bypassCache && this.cache.has(cacheKey)) {
+      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
+      return this.cache.get(cacheKey)!;
+    }
+
+    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
+    const request$ = this.http.post<GenkitFlowResponse<string>>(endpointUrl, body, { headers, context })
+      .pipe(
+        timeout(this.requestTimeout),
+        retry(1),
+        map(response => this.extractResult(response, flowName)),
+        catchError(error => {
+          this.cache.delete(cacheKey);
+          return this.handleError(error, flowName);
+        }),
+        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+
+    this.cache.set(cacheKey, request$);
+    return request$;
+  }
   clearCache(): void {
     this.cache.clear();
     console.log('GenkitService: Cache cleared.');

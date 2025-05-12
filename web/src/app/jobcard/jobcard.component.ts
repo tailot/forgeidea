@@ -11,7 +11,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { Observable } from 'rxjs';
 
 import { CardIdeaComponent, CardIdeaEmitData } from '../card-idea/card-idea.component';
-import { Idea, IdeaDocument, GenkitService, DiscardTasksRequestData, ZoomTaskRequestData } from '../services/genkit.service';
+import { Idea, IdeaDocument, GenkitService, DiscardTasksRequestData, HelpTaskRequestData } from '../services/genkit.service';
 import { LanguageService } from '../services/language.service';
 import { StorageService } from '../services/storage.service';
 import { TexttospeechService } from '../services/texttospeech.service';
@@ -52,7 +52,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
     private textToSpeechService: TexttospeechService,
     private networkStatusService: OnlineStatusService,
     private router: Router
-  ) { 
+  ) {
     this.isOnline$ = this.networkStatusService.isOnline$; // Assegna l'observable
   }
 
@@ -60,9 +60,9 @@ export class JobcardComponent implements OnInit, OnDestroy {
     this.ideaid = this.route.snapshot.paramMap.get('uuid');
   }
 
-  showDocuments(idea: Idea){
+  showDocuments(idea: Idea) {
     console.log('Received an idea from CardIdeaComponent');
-    if(idea){
+    if (idea) {
       this.currentIdea = idea;
     }
   }
@@ -116,7 +116,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
     }
   }
 
-  zoomTask(): void {
+  helpTask(): void {
     this.errorMessage = null;
     this.zoomedTaskResult = null;
 
@@ -129,13 +129,12 @@ export class JobcardComponent implements OnInit, OnDestroy {
     const taskToZoom = this.selectedTasks[0];
     const language = this.languageService.getCurrentLanguageBackendName();
 
-    const requestData: ZoomTaskRequestData = {
+    const requestData: HelpTaskRequestData = {
       idea: this.currentIdea.text,
       task: taskToZoom,
       language: language
     };
-
-    this.genkitService.callZoomTask(requestData, false).subscribe({
+    this.genkitService.callHelpTask(requestData, false).subscribe({
       next: (result: string) => {
         console.log('Received zoomed task result.');
         this.zoomedTaskResult = result;
@@ -145,6 +144,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
         this.errorMessage = `Error zooming into task: ${error.message || 'Unknown error'}`;
       }
     });
+
   }
 
   selectNextTask(): void {
@@ -161,7 +161,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
     this.selectedTasks = [this.tasks[nextIndex]];
     console.log("Selected next task:", this.selectedTasks[0]);
 
-    this.zoomTask();
+    this.helpTask();
   }
 
   selectPreviousTask(): void {
@@ -178,7 +178,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
     this.selectedTasks = [this.tasks[previousIndex]];
     console.log("Selected previous task:", this.selectedTasks[0]);
 
-    this.zoomTask();
+    this.helpTask();
   }
 
   discardTask(): void {
@@ -240,7 +240,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
     });
   }
 
-  updateCardIdea(uuid: string){
+  updateCardIdea(uuid: string) {
     this.router.navigate(['/list']);
   }
 
@@ -268,7 +268,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
       }
 
       if (!idea.documents) {
-        idea.documents =  [];
+        idea.documents = [];
       }
 
       const newDocument: IdeaDocument = {
@@ -279,7 +279,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
       };
 
       idea.documents.push(newDocument);
-      await this.storageService.setItem(this.ideaid,idea);
+      await this.storageService.setItem(this.ideaid, idea);
       this.currentIdea = idea;
 
       console.log('Document saved successfully!');
