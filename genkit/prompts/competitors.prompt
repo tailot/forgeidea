@@ -1,0 +1,11 @@
+input:
+  schema:
+    idea: string
+---
+Provide a JavaScript array of JSON objects containing the company name and website of potential competitors for the idea: {{idea}}
+
+#Warnings
+    - the response must be EXCLUSIVELY a valid JavaScript array of JSON objects (e.g., [{"name": "Company One", "website": "www.companyone.com"}, {"name": "Company Two", "website": "www.companytwo.com"}]).
+    - do not include introductory or explanatory text.
+    - do not include Markdown code blocks.
+    - do not include any other characters outside the array.
