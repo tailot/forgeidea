@@ -38,7 +38,8 @@
              [showActions]="false"
              [sharedButton]="ifIsOnline"
              [fusionButton]="ifIsOnline"
-             [trashButton]="ifIsOnline"
+             [trashButton]="true"
+             (isDeleted)="updateCardIdea($event)"
              (click)="viewIdeaDetails(idea.id)"
              matRipple>
            </app-card-idea>

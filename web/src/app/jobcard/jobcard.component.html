@@ -1,8 +1,14 @@
 <div class="jobcard-container">
   <div>
     <app-card-idea *ngIf="ideaid"
-      [documentsButton]="!currentIdea || !currentIdea.documents || currentIdea.documents.length === 0" [tasksButton]="!tasks" [evaluateScore]="true"
-      (documentsOn)="showDocuments($event)" (tasksOn)="showTasks($event)" [ideaUuid]="ideaid"></app-card-idea>
+      [documentsButton]="!currentIdea"
+      [tasksButton]="!tasks && ((isOnline$ | async) ?? false)" 
+      [evaluateScore]="true"
+      [ideaUuid]="ideaid"
+      (isDeleted)="updateCardIdea($event)"
+      (documentsOn)="showDocuments($event)"
+      (tasksOn)="showTasks($event)">
+    </app-card-idea>
     <p *ngIf="!ideaid">No Idea UUID found in route.</p>
   </div>
 
@@ -30,7 +36,7 @@
         <mat-button-toggle value="play" (click)="playTask(zoomedTaskResult)">
           <mat-icon>play_arrow</mat-icon></mat-button-toggle>
         <mat-button-toggle value="save" (click)="saveDocument()">
-          <mat-icon>save</mat-icon></mat-button-toggle>
+          <mat-icon>archive</mat-icon></mat-button-toggle>
         <mat-button-toggle value="close" (click)="zoomedTaskResult=''">
             <mat-icon>close</mat-icon></mat-button-toggle>
       </mat-button-toggle-group>
@@ -56,7 +62,7 @@
             <mat-button-toggle value="zoom" (click)="playTask(doc.content); $event.stopPropagation()">
               <mat-icon>play_arrow</mat-icon></mat-button-toggle>
             <button mat-icon-button color="warn" (click)="deleteDocument(doc); $event.stopPropagation()">
-              <mat-icon>delete</mat-icon>
+              <mat-icon>unarchive</mat-icon>
             </button>
           </mat-panel-title>
           {{ doc.name || ('Document ' + (i + 1)) }} 
@@ -64,5 +70,10 @@
         <pre [innerHTML]="doc.content"></pre>
       </mat-expansion-panel>
     </mat-accordion>
+  </div>
+  <div *ngIf="currentIdea && (!currentIdea.documents || currentIdea.documents.length == 0)" class="no-documents-placeholder">
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; height: 100%;">
+      <mat-icon>folder_off</mat-icon>
+    </div>
   </div>
 </div>

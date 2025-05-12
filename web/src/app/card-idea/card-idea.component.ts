@@ -50,16 +50,17 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
 
   @Output() tasksOn = new EventEmitter<CardIdeaEmitData>();
   @Output() documentsOn = new EventEmitter<Idea>();
+  @Output() isDeleted = new EventEmitter<string>();
 
   ideaScore: number | null = null;
   isScoring: boolean = false; 
   isLoading: boolean = true;
   isGeneratingTasks: boolean = false;
-  isOperating: boolean = false; // <-- Stato di caricamento per l'operazione
+  isOperating: boolean = false;
   operationData: Idea | null = null;
-  mergiable: boolean = true; // Default to true (button enabled)
-  
-  private socket: SocketIoClientSocket; // Alias per chiarezza
+  mergiable: boolean = true;
+
+  private socket: SocketIoClientSocket;
 
   constructor(
     private route: ActivatedRoute,
@@ -103,7 +104,6 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
     this.isOperating = true; 
     // console.log(`Checking storage for key: ${operationKey}`);
 
-
     try {
       const existingOperationData = await this.storageService.getItem<Idea>(operationKey);
 
@@ -113,8 +113,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
 
         await this.storageService.setItem(operationKey, this.idea);
         // console.log(`Successfully stored data under key '${operationKey}'.`);
-        
-        
+          
         this.mergiable = false;
       } else if (existingOperationData && existingOperationData.id && existingOperationData.id !== this.idea.id) {
         // console.log(`Found existing operation data with a different idea ID. Proceeding with operation: Combine`);
@@ -180,16 +179,13 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
     const tasksKey = `tasks_${idea.id}`;
 
     try {
-      // console.log(`Checking storage for tasks with key: ${tasksKey}`);
       const existingTasks = await this.storageService.getItem<{ text: string[] }>(tasksKey);
 
       if (existingTasks) {
-        // console.log('Tasks found in storage. Emitting existing tasks:', existingTasks);
         this.tasksOn.emit({ tasks: existingTasks, idea: idea });
         return;
       }
 
-      // console.log(`Tasks not found for key ${tasksKey}. Proceeding to generate.`);
       if (!idea.text) {
         console.error('Cannot generate tasks: Idea text is missing.');
         return;
@@ -201,33 +197,27 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
       const requestData: GenerateTasksRequestData = { idea: idea.text, language: language };
       this.genkitService.callGenerateTasks(requestData, false).subscribe({
         next: (tasksResult: any) => {
-          // console.log('Tasks generated:', tasksResult);
-          // tasksResult is string[] from callGenerateTasks
+
           const tasksToStore = { text: tasksResult as string[] }; // Ensure tasks are stored in {text: string[]} format
           this.storageService.setItem(tasksKey, tasksToStore)
             .then(() => {
-              // console.log('Generated tasks saved successfully.');
               this.tasksOn.emit({ tasks: tasksToStore, idea: idea }); // Emit consistently
             })
             .catch(saveError => {
               console.error(`Error saving generated tasks with key ${tasksKey}:`, saveError);
-              // TODO: Handle error, e.g., show a snackbar
             })
             .finally(() => {
               this.isGeneratingTasks = false;
             });
         },
         error: (error) => {
-          // console.error('Error generating tasks:', error);
-          // TODO: Handle error, e.g., show a snackbar
           this.isGeneratingTasks = false;
         }
       });
 
     } catch (storageError) {
       console.error(`Error accessing storage for key ${tasksKey}:`, storageError);
-      // TODO: Handle error, e.g., show a snackbar
-      this.isGeneratingTasks = false; // TODO: i18n
+      this.isGeneratingTasks = false;
     }
   }
 
@@ -254,8 +244,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
         this.storageService.removeItem(uuid),
         this.storageService.removeItem(tasksKey)
       ]);
-
-      this.router.navigate(['/list']);
+      this.isDeleted.emit(uuid);
     } catch (error) {
       console.error(`Error deleting idea with uuid ${uuid} or its tasks:`, error);
     }
@@ -274,7 +263,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
   ngOnInit(): void {
     this.isLoading = true;
 
-    if (!!this.idea) {
+    if (this.idea) {
       this.isLoading = false;
       if (this.evaluateScore) {
         this.evaluateIdeaScore(this.idea);
@@ -284,7 +273,6 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     if (this.ideaUuid) {
-      // console.log(`CardIdeaComponent: Using provided input UUID: ${this.ideaUuid}`);
       this.loadIdeaData(this.ideaUuid);
     }
   }

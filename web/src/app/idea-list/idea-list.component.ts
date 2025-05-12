@@ -10,6 +10,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { OnlineStatusService } from '../services/onlinestatus.service';
 import { StorageService } from '../services/storage.service';
@@ -36,7 +38,7 @@ import { CardIdeaComponent } from '../card-idea/card-idea.component';
   templateUrl: './idea-list.component.html',
   styleUrls: ['./idea-list.component.sass']
 })
-export class IdeaListComponent implements OnInit {
+export class IdeaListComponent implements OnInit, OnDestroy {
 
   allIdeas: Idea[] = [];
   filteredIdeas: Idea[] = [];
@@ -54,6 +56,7 @@ export class IdeaListComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   private uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
+  private destroy$ = new Subject<void>();
   
 
   constructor(
@@ -64,9 +67,16 @@ export class IdeaListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadValidIdeas();
-    this.onlineStatusService.isOnline$.subscribe((isOnline) => {
-      this.ifIsOnline = isOnline;
-    });
+    this.onlineStatusService.isOnline$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isOnline) => {
+        this.ifIsOnline = isOnline;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private isValidUuid(key: string): boolean {
@@ -87,6 +97,8 @@ export class IdeaListComponent implements OnInit {
         try {
           const retrievedData = await this.storageService.getItem<Idea>(uuid);
           if (retrievedData) {
+            // Assicuriamoci che l'ID dell'idea sia impostato con la chiave UUID
+            retrievedData.id = uuid;
             return retrievedData;
           } else {
             console.warn(`No data found for valid UUID: ${uuid}`);
@@ -157,14 +169,29 @@ export class IdeaListComponent implements OnInit {
   }
 
   viewIdeaDetails(ideaId: string | number | undefined): void {
-    if (!this.ifIsOnline) {
-      console.warn('Navigation offline.');
-      return;
-    }
     if (!ideaId) {
       console.warn('Navigation without ID.');
       return;
     }
     this.router.navigate(['/jobcard', ideaId]);
+  }
+
+  updateCardIdea(deletedIdeaId: string): void {
+    if (!deletedIdeaId) {
+      console.warn('updateCardIdea called without a deletedIdeaId.');
+      return;
+    }
+
+    const initialCount = this.allIdeas.length;
+    this.allIdeas = this.allIdeas.filter(idea => idea.id !== deletedIdeaId);
+
+    if (this.allIdeas.length === initialCount) {
+      console.warn(`Idea with ID ${deletedIdeaId} not found in allIdeas. List not updated.`);
+      // Non è necessario chiamare applyFilterAndPaginate se nessuna idea è stata rimossa.
+      return;
+    }
+
+    // Ora che allIdeas è aggiornato, rinfresca la lista filtrata e la paginazione
+    this.applyFilterAndPaginate();
   }
 }

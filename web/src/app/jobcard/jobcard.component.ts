@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
@@ -8,11 +8,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { Observable } from 'rxjs';
+
 import { CardIdeaComponent, CardIdeaEmitData } from '../card-idea/card-idea.component';
 import { Idea, IdeaDocument, GenkitService, DiscardTasksRequestData, ZoomTaskRequestData } from '../services/genkit.service';
 import { LanguageService } from '../services/language.service';
 import { StorageService } from '../services/storage.service';
 import { TexttospeechService } from '../services/texttospeech.service';
+import { OnlineStatusService } from '../services/onlinestatus.service';
 
 @Component({
   selector: 'app-jobcard',
@@ -31,6 +34,7 @@ import { TexttospeechService } from '../services/texttospeech.service';
     CardIdeaComponent]
 })
 export class JobcardComponent implements OnInit, OnDestroy {
+  isOnline$: Observable<boolean>;
   selectedTasks: string[] = [];
   ideaid: string | null = null;
   tasks: string[] | null = null;
@@ -45,8 +49,12 @@ export class JobcardComponent implements OnInit, OnDestroy {
     private genkitService: GenkitService,
     private languageService: LanguageService,
     private storageService: StorageService,
-    private textToSpeechService: TexttospeechService
-  ) { }
+    private textToSpeechService: TexttospeechService,
+    private networkStatusService: OnlineStatusService,
+    private router: Router
+  ) { 
+    this.isOnline$ = this.networkStatusService.isOnline$; // Assegna l'observable
+  }
 
   ngOnInit(): void {
     this.ideaid = this.route.snapshot.paramMap.get('uuid');
@@ -230,6 +238,10 @@ export class JobcardComponent implements OnInit, OnDestroy {
         this.isDiscarding = false;
       }
     });
+  }
+
+  updateCardIdea(uuid: string){
+    this.router.navigate(['/list']);
   }
 
   async saveDocument(): Promise<void> {

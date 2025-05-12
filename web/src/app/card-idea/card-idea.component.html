@@ -36,7 +36,7 @@
           (click)="clearOperation(); $event.stopPropagation()">
           <mat-icon>join_right</mat-icon>
         </button>
-        <button *ngIf="idea.id && trashButton" mat-icon-button color="primary" (click)="deleteIdea(idea.id);">
+        <button *ngIf="idea.id && trashButton" mat-icon-button color="primary" (click)="deleteIdea(idea.id);$event.stopPropagation()">
           <mat-icon>delete</mat-icon>
         </button>
       </mat-card-actions>
