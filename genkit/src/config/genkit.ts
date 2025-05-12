@@ -6,14 +6,19 @@ import { ollama } from 'genkitx-ollama';
 dotenv.config();
 
 export const ai = genkit({
-  plugins: [
-    googleAI({ apiKey: process.env.GEMINI_API_KEY }),
-    ollama({
-      models: [
-        { name: 'gemma3:4b' }
-      ],
-      serverAddress: 'http://127.0.0.1:11434',
-    }),
-  ],
+  plugins: getArrayConf(),
   promptDir: './prompts',
 });
+
+function getArrayConf(){
+  let arrayConf = []
+  if (process.env.GEMINI_API_KEY){
+    arrayConf.push(googleAI({ apiKey: process.env.GEMINI_API_KEY }));
+    console.log("Configuration googleAI is pushed")  
+  }
+  if (process.env.CUSTOM_MODEL && process.env.MODELOLLAMA){
+    arrayConf.push(ollama({models: [{ name: process.env.MODELOLLAMA as string }],serverAddress: 'http://127.0.0.1:11434'}));
+    console.log("Configuration "+process.env.CUSTOM_MODEL+" is pushed")
+  }
+  return arrayConf;
+}

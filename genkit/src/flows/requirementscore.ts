@@ -72,7 +72,7 @@ export const requirementScoreFlow = ai.defineFlow(
             throw new Error("The final 'result' prompt is empty or undefined.");
         }
 
-        const modelToUse = process.env.GEMINI_MODEL || 'ollama/gemma3:4b';
+        const modelToUse = process.env.CUSTOM_MODEL;
 
         const response = await generate(ai.registry, {
             prompt: promptToRun,

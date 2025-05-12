@@ -17,7 +17,7 @@ export const operationFlow = ai.defineFlow(
   },
   async (input) => {
     const ideaOperationPrompt = ai.prompt('operationidea');
-    const modelToUse = process.env.GEMINI_MODEL || 'ollama/gemma3:4b';
+    const modelToUse = process.env.CUSTOM_MODEL;
 
     const result = await ideaOperationPrompt(
       input, {

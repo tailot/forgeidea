@@ -7,7 +7,6 @@ import { subjectFlow } from './flows/getsubject';
 import { generateTasksFlow } from './flows/gettasks';
 import { operationFlow } from './flows/operationFlow'
 import { discardTasksFlow } from './flows/discardtasks';
-import { zoomTaskFlow } from './flows/zoomtask'
 import { scoreIdeaFlow } from './flows/scoreidea'
 import { requirementScoreFlow } from './flows/requirementscore'
 import { verifyIdeaFlow } from './flows/verifyIdeaFlow';

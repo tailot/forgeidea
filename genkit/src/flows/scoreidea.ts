@@ -15,7 +15,7 @@ export const scoreIdeaFlow = ai.defineFlow(
   },
   async (input) => {
     const develPrompt = ai.prompt('ideascore');
-    const modelToUse = process.env.GEMINI_MODEL || 'ollama/gemma3:4b';
+    const modelToUse = process.env.CUSTOM_MODEL;
     const result = await develPrompt(
       input, {
       model: modelToUse

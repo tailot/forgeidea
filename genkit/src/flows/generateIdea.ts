@@ -14,7 +14,7 @@ export const generateIdeaFlow = ai.defineFlow(
     console.log(`Generating idea for category: ${params.category}`);
     try {
       const ideaPromptFunction = ai.prompt('idea');
-      const modelToUse = process.env.GEMINI_MODEL || 'ollama/gemma3:4b';
+      const modelToUse = process.env.CUSTOM_MODEL;
 
       const result = await ideaPromptFunction(
         params,

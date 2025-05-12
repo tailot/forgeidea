@@ -13,7 +13,7 @@ export const generateIdeaCategoriesFlow = ai.defineFlow(
   },
   async (input) => {
     const categoriesFlow = ai.prompt('categories');
-    const modelToUse = process.env.GEMINI_MODEL || 'ollama/gemma3:4b';
+    const modelToUse = process.env.CUSTOM_MODEL;
     const result = await categoriesFlow(
       input,
       {

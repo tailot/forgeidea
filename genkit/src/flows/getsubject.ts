@@ -12,7 +12,7 @@ export const subjectFlow = ai.defineFlow(
   },
   async (input) => {
     const subjectFlow = ai.prompt('subjects');
-    const modelToUse = process.env.GEMINI_MODEL || 'ollama/gemma3:4b';
+    const modelToUse = process.env.CUSTOM_MODEL;
     const result = await subjectFlow(
       input,
       {
