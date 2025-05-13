@@ -21,7 +21,6 @@ startFlowServer({
     generateTasksFlow,
     discardTasksFlow,
     operationFlow,
-//    zoomTaskFlow,
     scoreIdeaFlow,
     requirementScoreFlow,
     verifyIdeaFlow,
@@ -29,11 +28,8 @@ startFlowServer({
   ],
   port: 4001,
   cors: {
-    origin: process.env.ORIGIN,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: "Content-Type,Authorization",
-    credentials: true
+    origin: process.env.ORIGIN
   }
 });
 
-//curl -X POST "http://127.0.0.1:3400/randomIdeaFlow" -H "Content-Type: application/json" -d '{ "data":{"language": "italiano"}}'
+//curl -X POST "http://127.0.0.1:4001/randomIdeaFlow" -H "Content-Type: application/json" -d '{ "data":{"language": "italiano"}}'
