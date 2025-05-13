@@ -26,7 +26,7 @@
     <div *ngIf="tasks && tasks.length > 0" class="task-list-container">
       <mat-chip-listbox multiple [(ngModel)]="selectedTasks">
         <mat-chip-option *ngFor="let task of tasks">
-          <span [innerHTML]="task"></span>
+          <span [innerHTML]="task" (click)="zoomedTaskResult=''"></span>
         </mat-chip-option>
       </mat-chip-listbox>
     </div>
@@ -44,7 +44,7 @@
         (click)="selectPreviousTask()" class="nav-button left-nav">
         <mat-icon>navigate_before</mat-icon>
       </button>
-      <div class="zoomed-task-result">
+      <div class="zoomed-task-result" id="document">
         <pre>{{ zoomedTaskResult }}</pre>
       </div>
       <button mat-icon-button

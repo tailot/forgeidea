@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, ViewportScroller } from '@angular/common';
 import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -46,6 +46,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
 
   constructor(private route: ActivatedRoute,
+    private viewportScroller: ViewportScroller,
     private genkitService: GenkitService,
     private languageService: LanguageService,
     private storageService: StorageService,
@@ -53,7 +54,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
     private networkStatusService: OnlineStatusService,
     private router: Router
   ) {
-    this.isOnline$ = this.networkStatusService.isOnline$; // Assegna l'observable
+    this.isOnline$ = this.networkStatusService.isOnline$;
   }
 
   ngOnInit(): void {
@@ -138,6 +139,16 @@ export class JobcardComponent implements OnInit, OnDestroy {
       next: (result: string) => {
         console.log('Received zoomed task result.');
         this.zoomedTaskResult = result;
+        // Ensure the DOM has updated before trying to scroll
+        requestAnimationFrame(() => {
+          const targetElement = document.getElementById('document');
+          if (targetElement) {
+            console.log('Scrolling to anchor "document".');
+            this.viewportScroller.scrollToAnchor('document');
+          } else {
+            console.warn('Anchor "document" not found in the DOM. Cannot scroll.');
+          }
+        });
       },
       error: (error) => {
         console.error('Error calling callZoomTask:', error);
