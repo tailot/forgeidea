@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PrivacyPolicyComponentComponent } from './privacy-policy-component.component';
+import { PrivacyPolicyComponent } from './privacy-policy.component';
 
 describe('PrivacyPolicyComponentComponent', () => {
-  let component: PrivacyPolicyComponentComponent;
-  let fixture: ComponentFixture<PrivacyPolicyComponentComponent>;
+  let component: PrivacyPolicyComponent;
+  let fixture: ComponentFixture<PrivacyPolicyComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PrivacyPolicyComponentComponent]
+      imports: [PrivacyPolicyComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(PrivacyPolicyComponentComponent);
+    fixture = TestBed.createComponent(PrivacyPolicyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

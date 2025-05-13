@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { LandingComponentComponent } from './landing-component/landing-component.component';
+import { LandingComponent } from './landing/landing.component';
 
 export const routes: Routes = [
     {
         path: '',
-        component: LandingComponentComponent
+        component: LandingComponent
     },
     {
         path: 'generate',
@@ -38,7 +38,12 @@ export const routes: Routes = [
     },
     {
         path: 'privacy-policy',
-        loadComponent: () => import('./privacy-policy-component/privacy-policy-component.component').then(m => m.PrivacyPolicyComponentComponent),
+        loadComponent: () => import('./privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent),
         title: 'Privacy Policy - forge IDEA'
+    },
+    {
+        path: 'tos',
+        loadComponent: () => import('./tos/tos.component').then(m => m.TosComponent),
+        title: 'Terms of service - forge IDEA'
     }
 ];

@@ -1,7 +1,12 @@
 <mat-toolbar color="primary" class="bottom-nav-toolbar">
-  <button mat-icon-button routerLink="/privacy-policy" routerLinkActive="active-nav-link" aria-label="New idea">
-    [privacy policy]
-  </button>
+  <div style="display: flex; flex-direction: column; align-items: flex-start;">
+    <button mat-button routerLink="/privacy-policy" routerLinkActive="active-nav-link" aria-label="Privacy Policy">
+      [privacy policy]
+    </button>
+    <button mat-button routerLink="/tos" routerLinkActive="active-nav-link" aria-label="Terms of Service">
+      [terms of service]
+    </button>
+  </div>
 
   <button *ngIf="isOnline$ | async" mat-icon-button routerLink="/generate" routerLinkActive="active-nav-link"
     [routerLinkActiveOptions]="{exact: true}" aria-label="IDEA">

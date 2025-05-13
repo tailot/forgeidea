@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ForgeIDEA - Dai vita alle tue intuizioni</title>
+    <title>ForgeIDEA - Bring Your Insights to Life</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,10 +14,10 @@
         body {
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
-            /* Previene lo scroll orizzontale */
+            /* Prevents horizontal scrolling */
         }
 
-        /* Animazione per l'apparizione graduale */
+        /* Animation for gradual appearance */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -34,20 +34,20 @@
             animation: fadeIn 0.8s ease-out forwards;
         }
 
-        /* Stile per l'icona della lampadina */
+        /* Style for the lightbulb icon */
         .lightbulb-icon {
             filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.7));
-            /* Ombra gialla luminosa */
+            /* Bright yellow shadow */
             transition: transform 0.3s ease, filter 0.3s ease;
         }
 
         .lightbulb-icon:hover {
             transform: scale(1.1);
             filter: drop-shadow(0 0 25px rgba(250, 204, 21, 1));
-            /* Ombra più intensa al passaggio del mouse */
+            /* More intense shadow on hover */
         }
 
-        /* Stile per le card delle idee */
+        /* Style for idea cards */
         .idea-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -57,12 +57,12 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
-        /* Gradient background per la hero section */
+        /* Gradient background for the hero section */
         .hero-gradient {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
-        /* Stile per il pulsante CTA */
+        /* Style for the CTA button */
         .cta-button {
             transition: background-color 0.3s ease, transform 0.3s ease;
         }
@@ -92,12 +92,13 @@
             </div>
 
             <div class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4 items-center w-full sm:w-auto mt-2 sm:mt-0">
-                <a href="#features" class="text-gray-600 hover:text-indigo-600">Caratteristiche</a>
-                <a href="#devel" class="text-gray-600 hover:text-indigo-600">Sviluppo</a>
+                <a href="#features" class="text-gray-600 hover:text-indigo-600">Features</a>
+                <a href="#devel" class="text-gray-600 hover:text-indigo-600">Development</a>
+                <a href="tos" class="text-gray-600 hover:text-indigo-600">[Terms of Service]</a>
                 <a href="privacy-policy" class="text-gray-600 hover:text-indigo-600">[Privacy Policy]</a>
                 <a href="generate"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg cta-button">Inizia
-                    Ora</a>
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg cta-button">Get
+                    Started</a>
             </div>
         </nav>
     </header>
@@ -114,19 +115,18 @@
                     <path d="M10 22h4" />
                 </svg>
             </div>
-            <h1 class="text-4xl md:text-6xl font-bold mb-4">Dove Nascono le Grandi <span
-                    class="text-yellow-300">IDEE</span>.</h1>
-            <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">Trasforma le tue intuizioni in realtà. Esplora,
-                sviluppa e lancia le tue idee con la nostra piattaforma innovativa.</p>
-            <a href="#devel"
-                class="bg-yellow-400 hover:bg-yellow-500 text-indigo-800 font-bold py-3 px-8 rounded-lg text-lg cta-button">Dai
-                Vita alla Tua Idea</a>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">Where Great <span class="text-yellow-300">IDEAS</span> Are
+                Born.</h1>
+            <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">Transform your insights into reality. Explore, develop,
+                and launch your ideas with our innovative platform.</p> <a href="#devel"
+                class="bg-yellow-400 hover:bg-yellow-500 text-indigo-800 font-bold py-3 px-8 rounded-lg text-lg cta-button">Bring
+                Your Idea to Life</a>
         </div>
     </section>
 
     <section id="features" class="py-16 md:py-24 bg-white">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">Il Potere di un'IDEA</h2>
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">The Power of an IDEA</h2>
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="text-center p-6 border border-gray-200 rounded-lg idea-card fade-in"
                     style="animation-delay: 0.2s;">
@@ -145,9 +145,9 @@
                             <path d="M9 9.5a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h.01" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Ispirazione</h3>
-                    <p class="text-gray-600">Cattura le scintille di genialità nel momento in cui arrivano. Non lasciare
-                        che nessuna idea vada persa.</p>
+                    <h3 class="text-xl font-semibold mb-2">Inspiration</h3>
+                    <p class="text-gray-600">Capture sparks of genius the moment they arrive. Don't let any idea go to
+                        waste.</p>
                 </div>
                 <div class="text-center p-6 border border-gray-200 rounded-lg idea-card fade-in"
                     style="animation-delay: 0.4s;">
@@ -160,9 +160,9 @@
                             <path d="M4 12.31C4 17.5 8 22 12 22s8-4.5 8-9.69V12H4Z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Sviluppo</h3>
-                    <p class="text-gray-600">Dai forma alle tue idee. Collabora, itera e trasforma concetti astratti in
-                        progetti concreti.</p>
+                    <h3 class="text-xl font-semibold mb-2">Development</h3>
+                    <p class="text-gray-600">Shape your ideas. Collaborate, iterate, and transform abstract concepts
+                        into concrete projects.</p>
                 </div>
                 <div class="text-center p-6 border border-gray-200 rounded-lg idea-card fade-in"
                     style="animation-delay: 0.6s;">
@@ -178,9 +178,9 @@
                             <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Lancio</h3>
-                    <p class="text-gray-600">Porta la tua idea nel mondo. Condividi la tua visione e realizza il suo
-                        potenziale impatto.</p>
+                    <h3 class="text-xl font-semibold mb-2">Launch</h3>
+                    <p class="text-gray-600">Bring your idea into the world. Share your vision and realize its potential
+                        impact.</p>
                 </div>
             </div>
         </div>
@@ -188,7 +188,7 @@
 
     <section id="devel" class="py-16 md:py-24 bg-gray-100">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">Sviluppo dell'IDEA</h2>
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">IDEA Development</h2>
             <div class="relative wrap overflow-hidden p-10 h-full">
                 <div class="border-2-2 absolute border-opacity-20 border-gray-700 h-full border" style="left: 50%">
                 </div>
@@ -199,9 +199,9 @@
                         <h1 class="mx-auto font-semibold text-lg text-white">1</h1>
                     </div>
                     <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in">
-                        <h3 class="font-bold text-gray-800 text-xl mb-1">Scoperta</h3>
-                        <p class="text-sm leading-snug tracking-wide text-gray-600 text-opacity-100">Il momento
-                            iniziale, l'intuizione improvvisa o il problema da risolvere.</p>
+                        <h3 class="font-bold text-gray-800 text-xl mb-1">Discovery</h3>
+                        <p class="text-sm leading-snug tracking-wide text-gray-600 text-opacity-100">The initial moment,
+                            the sudden insight, or the problem to solve.</p>
                     </div>
                 </div>
 
@@ -212,9 +212,9 @@
                     </div>
                     <div class="order-1 bg-indigo-100 rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in"
                         style="animation-delay: 0.3s;">
-                        <h3 class="font-bold text-indigo-800 text-xl mb-1">Esplorazione</h3>
-                        <p class="text-sm leading-snug tracking-wide text-indigo-700 text-opacity-100">Ricerca,
-                            brainstorming, validazione del concetto e definizione.</p>
+                        <h3 class="font-bold text-indigo-800 text-xl mb-1">Exploration</h3>
+                        <p class="text-sm leading-snug tracking-wide text-indigo-700 text-opacity-100">Research,
+                            brainstorming, concept validation, and definition.</p>
                     </div>
                 </div>
 
@@ -225,9 +225,9 @@
                     </div>
                     <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in"
                         style="animation-delay: 0.6s;">
-                        <h3 class="font-bold text-gray-800 text-xl mb-1">Sviluppo</h3>
-                        <p class="text-sm leading-snug tracking-wide text-gray-600 text-opacity-100">Prototipazione,
-                            design, codifica e test iterativi.</p>
+                        <h3 class="font-bold text-gray-800 text-xl mb-1">Development</h3>
+                        <p class="text-sm leading-snug tracking-wide text-gray-600 text-opacity-100">Prototyping,
+                            design, coding, and iterative testing.</p>
                     </div>
                 </div>
 
@@ -238,9 +238,9 @@
                     </div>
                     <div class="order-1 bg-indigo-100 rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in"
                         style="animation-delay: 0.9s;">
-                        <h3 class="font-bold text-indigo-800 text-xl mb-1">Realizzazione</h3>
-                        <p class="text-sm leading-snug tracking-wide text-indigo-700 text-opacity-100">Lancio sul
-                            mercato, raccolta di feedback e crescita.</p>
+                        <h3 class="font-bold text-indigo-800 text-xl mb-1">Realization</h3>
+                        <p class="text-sm leading-snug tracking-wide text-indigo-700 text-opacity-100">Market launch,
+                            feedback collection, and growth.</p>
                     </div>
                 </div>
             </div>
@@ -250,35 +250,35 @@
 
     <section id="cta" class="py-16 md:py-24 bg-indigo-700 text-white">
         <div class="container mx-auto px-6 text-center fade-in">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4">Hai un'IDEA che Aspetta di Brillare?</h2>
-            <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">Non lasciarla nel cassetto. Inizia oggi il percorso per
-                trasformarla in qualcosa di straordinario.</p>
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">Have an IDEA Waiting to Shine?</h2>
+            <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">Don't leave it in the drawer. Start the journey today
+                to turn it into something extraordinary.</p>
         </div>
     </section>
 
     <footer class="bg-gray-800 text-gray-400 py-8">
         <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2025 IDEA Platform. Tutti i diritti riservati.</p>
-            <p class="text-sm mt-2">Realizzato con passione per le idee innovative.</p>
+            <p>&copy; 2025 IDEAforge Platform. All rights reserved.</p>
+            <p class="text-sm mt-2">Made with passion for innovative ideas.</p>
         </div>
     </footer>
 
     <script>
-        // Script per l'interattività semplice
+        // Script for simple interactivity (Kept as is, no language-specific parts)
 
-        // 1. Animazione all'apparizione degli elementi con classe 'fade-in'
+        // 1. Animation on appearance of elements with class 'fade-in'
         const fadeInElements = document.querySelectorAll('.fade-in');
         const observerOptions = {
-            root: null, // rispetto al viewport
+            root: null, // relative to the viewport
             rootMargin: '0px',
-            threshold: 0.1 // trigger quando il 10% dell'elemento è visibile
+            threshold: 0.1 // trigger when 10% of the element is visible
         };
 
         const observer = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('fade-in-visible'); // Aggiungi una classe per stile CSS se necessario
-                    // Rimuovi l'osservatore una volta che l'animazione è partita (opzionale)
+                    entry.target.classList.add('fade-in-visible'); // Add a class for CSS styling if needed
+                    // Remove the observer once the animation has started (optional)
                     observer.unobserve(entry.target);
                 }
             });
@@ -286,88 +286,106 @@
 
         fadeInElements.forEach(el => {
             observer.observe(el);
-            // Nascondi inizialmente per l'effetto fade-in (puoi farlo anche con CSS)
+            // Hide initially for the fade-in effect (can also be done with CSS)
             el.style.opacity = '0';
         });
 
-        // Aggiungere stile CSS per .fade-in-visible se non si usa l'animazione direttamente
+        // Add CSS style for .fade-in-visible if not using animation directly
         const styleSheet = document.createElement("style");
         styleSheet.type = "text/css";
         styleSheet.innerText = `.fade-in-visible { animation: fadeIn 0.8s ease-out forwards; }`;
         document.head.appendChild(styleSheet);
 
 
-        // 2. Interazione con la lampadina nella Hero section
+        // 2. Interaction with the lightbulb in the Hero section
         const lightbulb = document.getElementById('hero-lightbulb');
         if (lightbulb) {
             lightbulb.addEventListener('click', () => {
-                // Esempio: cambia leggermente colore o aggiungi un effetto
-                lightbulb.classList.toggle('text-yellow-400'); // Cambia intensità del giallo
-                // Aggiungi un piccolo "pop" all'icona
+                // Example: slightly change color or add an effect
+                lightbulb.classList.toggle('text-yellow-400'); // Change yellow intensity
+                // Add a small "pop" to the icon
                 lightbulb.style.transform = 'scale(1.2)';
                 setTimeout(() => {
                     lightbulb.style.transform = 'scale(1)';
-                }, 150); // Resetta la scala dopo 150ms
+                }, 150); // Reset scale after 150ms
             });
         }
 
-        // 4. Adattamento della timeline su schermi piccoli (opzionale ma consigliato)
-        // Questo richiederebbe logica più complessa per cambiare la struttura HTML/CSS
-        // o semplicemente nascondere la linea e impilare i blocchi verticalmente.
+        // 4. Adapt timeline on small screens (optional but recommended)
+        // This would require more complex logic to change HTML/CSS structure
+        // or simply hide the line and stack blocks vertically.
         function adjustTimelineLayout() {
             const timelineElements = document.querySelectorAll('.left-timeline, .right-timeline');
-            const timelineLine = document.querySelector('.relative.wrap > div[style*="left: 50%"]'); // Selettore più specifico
+            const timelineLine = document.querySelector('.relative.wrap > div[style*="left: 50%"]'); // More specific selector
 
-            if (window.innerWidth < 768) { // md breakpoint di Tailwind
-                if (timelineLine) timelineLine.style.display = 'none'; // Nasconde la linea centrale
+            if (window.innerWidth < 768) { // Tailwind's md breakpoint
+                if (timelineLine) timelineLine.style.display = 'none'; // Hide the center line
                 timelineElements.forEach(el => {
                     el.classList.remove('right-timeline', 'left-timeline');
-                    el.classList.add('timeline-stacked'); // Aggiungi una classe per lo stile mobile
-                    // Rimuovi stili specifici del layout desktop se necessario
-                    const contentDiv = el.querySelector('.w-5\/12.px-6.py-4');
-                    if (contentDiv) contentDiv.classList.replace('w-5\/12', 'w-full'); // Rendi il contenuto a larghezza piena
-                    const spacerDiv = el.querySelector('.order-1.w-5\/12');
-                    if (spacerDiv) spacerDiv.style.display = 'none'; // Nasconde il div spaziatore
-                    el.style.justifyContent = 'center'; // Centra il contenuto
-                    el.style.marginBottom = '1.5rem'; // Aggiunge spazio sotto ogni blocco
+                    el.classList.add('timeline-stacked'); // Add a class for mobile styling
+                    // Remove desktop layout specific styles if necessary
+                    const contentDiv = el.querySelector('.w-5\\/12.px-6.py-4'); // Escaped 5/12
+                    if (contentDiv) contentDiv.classList.replace('w-5/12', 'w-full'); // Make content full width
+                    const spacerDiv = el.querySelector('.order-1.w-5\\/12'); // Escaped 5/12
+                    if (spacerDiv) spacerDiv.style.display = 'none'; // Hide the spacer div
+                    el.style.justifyContent = 'center'; // Center content
+                    el.style.marginBottom = '1.5rem'; // Add space below each block
                 });
             } else {
-                if (timelineLine) timelineLine.style.display = 'block'; // Mostra la linea su desktop
+                if (timelineLine) timelineLine.style.display = 'block'; // Show line on desktop
                 timelineElements.forEach(el => {
                     el.classList.remove('timeline-stacked');
-                    // Ripristina le classi originali se necessario (più complesso)
-                    // Sarebbe meglio gestire questo con le classi responsive di Tailwind direttamente nell'HTML
+                    // Restore original classes if needed (more complex)
+                    // Better handled with Tailwind responsive classes directly in HTML
+                    const contentDiv = el.querySelector('.w-full.px-6.py-4');
+                    if (contentDiv && !contentDiv.classList.contains('w-5/12')) { // Check to avoid multiple replace
+                         contentDiv.classList.remove('w-full');
+                         contentDiv.classList.add('w-5/12');
+                    }
+                    const spacerDiv = el.querySelector('.order-1.w-5\\/12[style*="display: none"]'); // Find hidden spacer
+                    if (spacerDiv) spacerDiv.style.display = ''; // Show spacer div
+
+                    // Check if the element had w-5/12 originally before trying to add it back
+                    const originalSpacerDiv = el.querySelector('.order-1.w-5\\/12');
+                    if(originalSpacerDiv && originalSpacerDiv.style.display === 'none') {
+                        originalSpacerDiv.style.display = '';
+                    }
+
+                    el.style.justifyContent = ''; // Reset justification
                 });
             }
         }
 
-        // Aggiungere stile per .timeline-stacked
+        // Add style for .timeline-stacked
         const timelineStyleSheet = document.createElement("style");
         timelineStyleSheet.type = "text/css";
+        // Added escaped slashes for w-5/12
         timelineStyleSheet.innerText = `
             @media (max-width: 767px) {
                 .timeline-stacked .order-1.bg-white,
                 .timeline-stacked .order-1.bg-indigo-100 {
-                    width: 100%; /* Larghezza piena su mobile */
+                    width: 100% !important; /* Ensure full width on mobile */
                     margin-left: 0;
                     margin-right: 0;
-                    text-align: center; /* Centra testo se necessario */
+                    text-align: center; /* Center text if needed */
                 }
-                 .timeline-stacked .z-20 { /* Icona numerica */
-                     margin-bottom: 0.5rem; /* Spazio tra icona e testo */
-                     order: 0; /* Metti l'icona sopra */
+                 .timeline-stacked .z-20 { /* Numbered icon */
+                     margin-bottom: 0.5rem; /* Space between icon and text */
+                     order: 0; /* Put icon on top */
                  }
                  .timeline-stacked {
-                     flex-direction: column; /* Impila verticalmente */
-                     align-items: center; /* Centra gli elementi */
+                     flex-direction: column; /* Stack vertically */
+                     align-items: center; /* Center items */
                  }
-
+                 .timeline-stacked > .order-1.w-5\\/12:first-child { /* Hide spacer div more reliably */
+                    display: none !important;
+                 }
             }
         `;
         document.head.appendChild(timelineStyleSheet);
 
 
-        // Esegui l'aggiustamento al caricamento e al ridimensionamento
+        // Run adjustment on load and resize
         window.addEventListener('load', adjustTimelineLayout);
         window.addEventListener('resize', adjustTimelineLayout);
 
