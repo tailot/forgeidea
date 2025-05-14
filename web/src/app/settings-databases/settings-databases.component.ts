@@ -8,7 +8,10 @@ import { MatRadioModule } from '@angular/material/radio';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 
+import { DialogData } from '../dialog/dialog.component'
 import { StorageService } from '../services/storage.service';
+import { DialogService } from '../services/dialog.service';
+
 
 interface KeyValueItem {
   key: string;
@@ -33,9 +36,21 @@ export class SettingsDatabasesComponent {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   constructor(
-    private storageService: StorageService
+    private storageService: StorageService,
+    private dialogService: DialogService
   ) { }
 
+  showAlert(data: DialogData): void {
+    const dialogRef = this.dialogService.openDialog({
+      title: data.title,
+      message: data.message,
+      closeButtonText: data.closeButtonText
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Il dialogo è stato chiuso', result);
+    });
+  }
   ngOnInit(): void {
     this.loadDatabaseState();
   }
@@ -69,12 +84,16 @@ export class SettingsDatabasesComponent {
 
   async reinitializeDatabase(): Promise<void> {
     const currentDbToClear = this.storageService.getCurrentDatabaseName();
-    if (!confirm(`Are you sure you want to delete all data in the database '${currentDbToClear}'? This action cannot be undone.`)) {
-      return;
-    }
+
+
     console.log(`Clearing all data in database: ${currentDbToClear}...`);
     try {
       await this.storageService.clearAll();
+      this.showAlert({  
+        title: "Delete",
+        message: "Database is cleared.",
+        closeButtonText: "OK"
+      })
       console.log(`All data in database '${currentDbToClear}' has been cleared.`);
     } catch (error) {
       console.error(`Error clearing database '${currentDbToClear}':`, error);
@@ -137,7 +156,11 @@ export class SettingsDatabasesComponent {
     const file = input.files[0];
     if (file.type !== 'application/json') {
       console.error('Invalid file format. Please select a .json file.');
-      alert('Invalid file format. Please select a .json file.'); // User feedback
+      this.showAlert({
+        title: 'Invalid file format',
+        message: 'Please select a .json file.',
+        closeButtonText: 'OK'
+      });
       input.value = '';
       return;
     }
@@ -157,11 +180,19 @@ export class SettingsDatabasesComponent {
         await this.storageService.restoreDatabase(backupData);
 
         console.log(`Restore completed (${backupData.length} items).`);
-        alert('Database restored successfully!');
+        this.showAlert({
+          title: 'Hurra! Restore completed',
+          message: 'Database restored successfully!',
+          closeButtonText: 'OK'
+        })
         this.loadDatabaseState();
       } catch (error: any) {
         console.error('Error during restore:', error);
-        alert(`Error during restore: ${error.message || 'Unknown error'}`);
+        this.showAlert({
+          title: 'Error during restore',
+          message: `Error during restore: ${error.message || 'Unknown error'}`,
+          closeButtonText: 'OK'
+        });
       } finally {
         this.isRestoring = false;
         input.value = '';
@@ -170,7 +201,11 @@ export class SettingsDatabasesComponent {
 
     reader.onerror = (e) => {
       console.error('Error reading file:', e);
-      alert('Error reading file.');
+      this.showAlert({
+        title: 'Ops',
+        message: 'Error reading file.',
+        closeButtonText: 'OK'
+      });
       this.isRestoring = false;
       input.value = '';
     };
