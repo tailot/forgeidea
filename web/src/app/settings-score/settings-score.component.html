@@ -1,12 +1,21 @@
 <mat-card appearance="outlined" aria-label="In this settings section you can increase the quality of the ideas generated (experimental)">
     <mat-card-header>
-        <mat-card-title>IDEA score (experimental)</mat-card-title>
+        <mat-card-title id="ideaScoreLabel">IDEA score (experimental)</mat-card-title>
     </mat-card-header>
     <mat-card-content>
         <div class="slider-container" style="display: flex; justify-content: center; padding: 20px 0;">
-            <mat-slider  aria-label="Assign a value of 0 for ideas of any quality or a score from 1 to 10 where 10 is the highest and 1 is the lowest." min="0" max="10" step="1" discrete="true" showTickMarks>
-                <input matSliderThumb [(ngModel)]="scoreThreshold" (input)="onScoreThresholdChange()">
+            <mat-slider
+                min="0" max="10" step="1" discrete="true" showTickMarks>
+                <input matSliderThumb
+                       [(ngModel)]="scoreThreshold"
+                       (input)="onScoreThresholdChange()"
+                       aria-labelledby="ideaScoreLabel"
+                       aria-describedby="ideaScoreDescription">
             </mat-slider>
+            <p id="ideaScoreDescription" class="sr-only">Assign a value of 0 for ideas of any quality or a score from 1 to 10 where 10 is the highest and 1 is the lowest.</p>
         </div>
     </mat-card-content>
 </mat-card>
+<!-- Add this to your global styles or component styles if not already present:
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
+-->

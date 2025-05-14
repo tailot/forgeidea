@@ -18,13 +18,11 @@
     </div>
     <div *ngIf="!errorMessage">
         <mat-chip-listbox aria-label="Select the category for which you want to generate the idea." (change)="onCategorySelectionChange($event.value)"
-            [(ngModel)]="selectedCategory">
+            [(ngModel)]="selectedCategory" class="mat-mdc-chip-set-stacked">
             <ng-container *ngIf="categories$ | async as categories; else loadingOrNoData">
-                <mat-chip-listbox class="mat-mdc-chip-set-stacked" aria-label="Cutest dog breeds">
-                    <mat-chip-option *ngFor="let category of categories" [value]="category">
-                        {{ category }}
-                    </mat-chip-option>
-                </mat-chip-listbox>
+                <mat-chip-option *ngFor="let category of categories" [value]="category">
+                    {{ category }}
+                </mat-chip-option>
             </ng-container>
             <ng-template #loadingOrNoData>
                 <p *ngIf="(categories$ | async)?.length === 0 && !errorMessage">

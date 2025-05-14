@@ -12,6 +12,19 @@ a
   text-decoration: none
   &:hover
     text-decoration: underline
+
+.contact-info a
+    color: #0056b3; /* Blu accessibile con buon contrasto su sfondi chiari */
+    text-decoration: underline;
+  
+.contact-info a:hover, .contact-info a:focus
+    color: #003d80;
+  
+.contact-info a:focus-visible
+    outline: 2px solid #0056b3;
+    outline-offset: 2px;
+    border-radius: 2px;
+  
 pre
   white-space: pre-wrap; 
   word-wrap: break-word;
