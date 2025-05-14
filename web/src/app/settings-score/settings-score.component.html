@@ -1,0 +1,12 @@
+<mat-card appearance="outlined">
+    <mat-card-header>
+        <mat-card-title>IDEA score (experimental)</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="slider-container" style="display: flex; justify-content: center; padding: 20px 0;">
+            <mat-slider min="0" max="10" step="1" discrete="true" showTickMarks>
+                <input matSliderThumb [(ngModel)]="scoreThreshold" (input)="onScoreThresholdChange()">
+            </mat-slider>
+        </div>
+    </mat-card-content>
+</mat-card>
