@@ -26,7 +26,7 @@
     <div *ngIf="tasks && tasks.length > 0" class="task-list-container">
       <mat-chip-listbox multiple [(ngModel)]="selectedTasks">
         <mat-chip-option *ngFor="let task of tasks">
-          <span [innerHTML]="task" (click)="zoomedTaskResult=''"></span>
+          <span [innerHTML]="task" (click)="zoomedTaskResult=null"></span>
         </mat-chip-option>
       </mat-chip-listbox>
     </div>
@@ -37,7 +37,7 @@
           <mat-icon>play_arrow</mat-icon></mat-button-toggle>
         <mat-button-toggle value="save" (click)="saveDocument()">
           <mat-icon>archive</mat-icon></mat-button-toggle>
-        <mat-button-toggle value="close" (click)="zoomedTaskResult=''">
+        <mat-button-toggle value="close" (click)="zoomedTaskResult=null">
             <mat-icon>close</mat-icon></mat-button-toggle>
       </mat-button-toggle-group>
       <button mat-icon-button *ngIf="selectedTasks.length == 1 && tasks && tasks.indexOf(selectedTasks[0]) >= 1"
@@ -45,7 +45,7 @@
         <mat-icon>navigate_before</mat-icon>
       </button>
       <div class="zoomed-task-result" id="document">
-        <pre>{{ zoomedTaskResult }}</pre>
+        <pre>{{ zoomedTaskResult.text }}</pre>
       </div>
       <button mat-icon-button
         *ngIf="selectedTasks.length == 1 && tasks && tasks.indexOf(selectedTasks[0]) < tasks.length - 1"
@@ -59,7 +59,7 @@
       <mat-expansion-panel *ngFor="let doc of currentIdea.documents; let i = index">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-button-toggle value="zoom" (click)="playTask(doc.content); $event.stopPropagation()">
+            <mat-button-toggle value="zoom" (click)="playTask({ text: doc.content }); $event.stopPropagation()">
               <mat-icon>play_arrow</mat-icon></mat-button-toggle>
             <button mat-icon-button color="warn" (click)="deleteDocument(doc); $event.stopPropagation()">
               <mat-icon>unarchive</mat-icon>

@@ -17,6 +17,11 @@ import { StorageService } from '../services/storage.service';
 import { TexttospeechService } from '../services/texttospeech.service';
 import { OnlineStatusService } from '../services/onlinestatus.service';
 
+export interface document {
+  title?: string;
+  text: string;
+}
+
 @Component({
   selector: 'app-jobcard',
   templateUrl: './jobcard.component.html',
@@ -42,7 +47,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
   isDiscarding: boolean = false;
   documents: IdeaDocument[] | null = [];
 
-  zoomedTaskResult: string | null = null;
+  zoomedTaskResult: document | null = null;
   errorMessage: string | null = null;
 
   constructor(private route: ActivatedRoute,
@@ -138,7 +143,10 @@ export class JobcardComponent implements OnInit, OnDestroy {
     this.genkitService.callHelpTask(requestData, false).subscribe({
       next: (result: string) => {
         console.log('Received zoomed task result.');
-        this.zoomedTaskResult = result;
+        this.zoomedTaskResult = {
+          title: taskToZoom,
+          text: result
+        };
         // Ensure the DOM has updated before trying to scroll
         requestAnimationFrame(() => {
           const targetElement = document.getElementById('document');
@@ -269,7 +277,6 @@ export class JobcardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const currentTaskName = this.selectedTasks[0];
     try {
       const idea = await this.storageService.getItem<Idea>(this.ideaid);
 
@@ -284,8 +291,8 @@ export class JobcardComponent implements OnInit, OnDestroy {
 
       const newDocument: IdeaDocument = {
         key: crypto.randomUUID(),
-        name: currentTaskName,
-        content: this.zoomedTaskResult,
+        name: this.zoomedTaskResult.title,
+        content: this.zoomedTaskResult.text,
         createdAt: Date.now()
       };
 
@@ -300,14 +307,14 @@ export class JobcardComponent implements OnInit, OnDestroy {
     }
   }
 
-  playTask(text: string): void {
+  playTask(document: document): void {
     if (this.textToSpeechService.isSpeaking()) {
       this.textToSpeechService.stop();
       return;
     }
 
-    if (text) {
-      const textToSpeak = text;
+    if (document && document.text) {
+      const textToSpeak = document.text;
       if (textToSpeak.trim()) {
         const lang = this.languageService.getCurrentLanguageBcp47Tag();
         console.log(`JobcardComponent: Attempting to speak task in ${lang}: "${textToSpeak.substring(0, 50)}..."`);
