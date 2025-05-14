@@ -1,7 +1,8 @@
 <div class="search-bar-wrapper">
   <mat-form-field appearance="outline" class="search-field">
     <mat-icon matPrefix>search</mat-icon>
-    <input matInput
+    <input aria-label="Enter text to search for an idea from your saved ideas."
+           matInput
            type="text"
            placeholder="..."
            [(ngModel)]="searchTerm"
@@ -48,7 +49,7 @@
     </div>
     <ng-template #noIdeasFound>
       <div class="no-ideas">
-        <mat-icon>lightbulb_outline</mat-icon>
+        <mat-icon role="status" aria-label="No ideas found">lightbulb_outline</mat-icon>
         <p *ngIf="allIdeas.length === 0">...</p>
         <p *ngIf="allIdeas.length > 0 && filteredIdeas.length === 0">
           "<small>{{ searchTerm }}</small>".
@@ -64,5 +65,5 @@
                [pageSize]="pageSize"
                [pageSizeOptions]="[5, 10, 20, 50]"
                (page)="handlePageEvent($event)"
-               aria-label="Seleziona pagina delle idee">
+               aria-label="Select page of results of found ideas.">
 </mat-paginator>

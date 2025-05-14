@@ -1,42 +1,42 @@
 <div class="card-container">
 
   <div *ngIf="isLoading" class="loading-indicator">
-    <mat-spinner diameter="50"></mat-spinner>
+    <mat-spinner diameter="50" aria-label="Loading data"></mat-spinner>
     <p>...</p>
   </div>
 
   <div *ngIf="idea && !isLoading">
-    <mat-card class="idea-card" [ngClass]="!isScoring && ideaScore !== null ? getScoreColorClass(ideaScore) : ''"
+    <mat-card role="region" class="idea-card" [ngClass]="!isScoring && ideaScore !== null ? getScoreColorClass(ideaScore) : ''"
       matTooltipPosition="above">
       <mat-card-content>
         <p class="idea-text">{{ idea.text }}</p>
       </mat-card-content>
       <mat-card-actions align="end">
-        <button *ngIf="addIdeaButton" mat-icon-button color="primary"
+        <button aria-label="Save the idea" *ngIf="addIdeaButton" mat-icon-button color="primary"
           (click)="addIdea(idea);$event.stopPropagation()">
           <mat-icon>add</mat-icon>
         </button>
-        <button *ngIf="sharedButton" mat-icon-button color="primary"
+        <button aria-label="Share the idea" *ngIf="sharedButton" mat-icon-button color="primary"
           (click)="shareCurrentIdea(idea);$event.stopPropagation()">
           <mat-icon>share</mat-icon>
         </button>
-        <button *ngIf="documentsButton" mat-icon-button color="primary"
+        <button aria-label="Save the document" *ngIf="documentsButton" mat-icon-button color="primary"
           (click)="documentsEmiter(idea);">
           <mat-icon>archive</mat-icon>
         </button>
-        <button *ngIf="tasksButton" mat-icon-button color="primary"
+        <button aria-label="List tasks related to the idea" *ngIf="tasksButton" mat-icon-button color="primary"
           (click)="tasksEmiter(idea);">
           <mat-icon>list_alt</mat-icon>
         </button>
-        <button *ngIf="mergiable && fusionButton" mat-icon-button color="primary"
+        <button aria-label="Merge the current idea with the previously selected one." *ngIf="mergiable && fusionButton" mat-icon-button color="primary"
           (click)="operation(); $event.stopPropagation()">
           <mat-icon>join_right</mat-icon>
         </button>
-        <button class="redoOperation" *ngIf="!mergiable" mat-icon-button color="primary"
+        <button aria-label="Select the idea so you can merge it with another." class="redoOperation" *ngIf="!mergiable" mat-icon-button color="primary"
           (click)="clearOperation(); $event.stopPropagation()">
           <mat-icon>join_right</mat-icon>
         </button>
-        <button *ngIf="idea.id && trashButton" mat-icon-button color="primary" (click)="deleteIdea(idea.id);$event.stopPropagation()">
+        <button aria-label="Remove the idea." *ngIf="idea.id && trashButton" mat-icon-button color="primary" (click)="deleteIdea(idea.id);$event.stopPropagation()">
           <mat-icon>delete</mat-icon>
         </button>
       </mat-card-actions>

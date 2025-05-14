@@ -26,7 +26,7 @@
         }
 
         *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: var(--tw-color-gray-200); }
-        html { line-height: 1.5; -webkit-text-size-adjust: 100%; -moz-tab-size: 4; tab-size: 4; font-family: sans-serif; }
+        html { line-height: 1.5; -webkit-text-size-adjust: 100%; -moz-tab-size: 4; tab-size: 4; font-family: sans-serif; scroll-behavior: smooth; }
         body { margin: 0; line-height: inherit; }
         hr { height: 0; color: inherit; border-top-width: 1px; }
         h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
@@ -153,6 +153,13 @@
         .hover\:bg-indigo-700:hover { background-color: var(--tw-color-indigo-700); }
         .hover\:bg-yellow-500:hover { background-color: var(--tw-color-yellow-500); }
 
+        a:focus-visible, button:focus-visible, [tabindex="0"]:focus-visible {
+            outline: 2px solid var(--tw-color-indigo-500);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
+        }
+
+
         @media (min-width: 640px) {
             .sm\:flex { display: flex; }
             .sm\:hidden { display: none; }
@@ -187,7 +194,7 @@
             filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.7));
             transition: transform 0.3s ease, filter 0.3s ease;
         }
-        .lightbulb-icon:hover {
+        .lightbulb-icon:hover, .lightbulb-icon:focus-visible {
             transform: scale(1.1);
             filter: drop-shadow(0 0 25px rgba(250, 204, 21, 1));
         }
@@ -204,7 +211,7 @@
         .cta-button {
             transition: background-color 0.3s ease, transform 0.3s ease;
         }
-        .cta-button:hover {
+        .cta-button:hover, .cta-button:focus-visible {
             transform: scale(1.05);
         }
     </style>
@@ -212,11 +219,10 @@
 
 <body class="bg-gray-50 text-gray-800">
 
-    <header class="bg-white shadow-md sticky top-0 z-50">
-        <nav class="container mx-auto px-6 py-3 flex flex-col sm:flex-row sm:justify-between items-center">
+    <header role="banner" class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex flex-col sm:flex-row sm:justify-between items-center" aria-label="Main navigation">
             <div class="text-2xl font-bold text-indigo-600 hidden sm:flex items-center">
-                <span class="inline-block mr-2 align-middle">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                <span class="inline-block mr-2 align-middle" aria-hidden="true"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path
                             d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
@@ -230,8 +236,8 @@
             <div class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4 items-center w-full sm:w-auto mt-2 sm:mt-0">
                 <a href="#features" class="text-gray-600 hover:text-indigo-600">Features</a>
                 <a href="#devel" class="text-gray-600 hover:text-indigo-600">Development</a>
-                <a href="tos" class="text-gray-600 hover:text-indigo-600">[Terms of Service]</a>
-                <a href="privacy-policy" class="text-gray-600 hover:text-indigo-600">[Privacy Policy]</a>
+                <a href="tos" class="text-gray-600 hover:text-indigo-600">Terms of Service</a>
+                <a href="privacy-policy" class="text-gray-600 hover:text-indigo-600">Privacy Policy</a>
                 <a href="generate"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg cta-button">Get
                     Started</a>
@@ -239,165 +245,188 @@
         </nav>
     </header>
 
-    <section class="hero-gradient text-white py-20 md:py-32">
-        <div class="container mx-auto px-6 text-center fade-in">
-            <div class="flex justify-center mb-8">
-                <svg id="hero-lightbulb" xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24"
-                    fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round"
-                    stroke-linejoin="round" class="text-yellow-300 lightbulb-icon cursor-pointer">
-                    <path
-                        d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
-                    <path d="M9 18h6" />
-                    <path d="M10 22h4" />
-                </svg>
+    <main>
+        <section class="hero-gradient text-white py-20 md:py-32">
+            <div class="container mx-auto px-6 text-center fade-in">
+                <div class="flex justify-center mb-8">
+                    <svg id="hero-lightbulb" xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24"
+                        fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round"
+                        stroke-linejoin="round" class="text-yellow-300 lightbulb-icon cursor-pointer"
+                        role="button" tabindex="0" aria-label="Activate lightbulb animation">
+                        <title>Interactive Lightbulb</title> <path
+                            d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+                        <path d="M9 18h6" />
+                        <path d="M10 22h4" />
+                    </svg>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-bold mb-4">Where Great <span class="text-yellow-300">IDEAS</span> Are
+                    Born.</h1>
+                <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">Transform your insights into reality. Explore, develop,
+                    and launch your ideas with our innovative platform.</p>
+                <a href="#devel"
+                    class="bg-yellow-400 hover:bg-yellow-500 text-indigo-800 font-bold py-3 px-8 rounded-lg text-lg cta-button">Bring
+                    Your Idea to Life</a>
             </div>
-            <h1 class="text-4xl md:text-6xl font-bold mb-4">Where Great <span class="text-yellow-300">IDEAS</span> Are
-                Born.</h1>
-            <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">Transform your insights into reality. Explore, develop,
-                and launch your ideas with our innovative platform.</p> <a href="#devel"
-                class="bg-yellow-400 hover:bg-yellow-500 text-indigo-800 font-bold py-3 px-8 rounded-lg text-lg cta-button">Bring
-                Your Idea to Life</a>
-        </div>
-    </section>
+        </section>
 
-    <section id="features" class="py-16 md:py-24 bg-white">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">The Power of an IDEA</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="text-center p-6 border border-gray-200 rounded-lg idea-card fade-in"
-                    style="animation-delay: 0.2s;">
-                    <div class="flex justify-center mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="text-indigo-500">
-                            <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 1 0-2.496 8.63" />
-                            <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 1 1 2.496 8.63" />
-                            <path d="M15 13a4 4 0 1 1-6 0 4 4 0 0 1 6 0Z" />
-                            <path d="M12 13h.01" />
-                            <path
-                                d="M12 17a2 2 0 0 0-1.414.586A2 2 0 0 0 9.172 21H14.83a2 2 0 0 0 1.414-3.414A2 2 0 0 0 14.829 17A2 2 0 0 0 12 17Z" />
-                            <path d="M12 9a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h.01" />
-                            <path d="M15 9.5a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h.01" />
-                            <path d="M9 9.5a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h.01" />
-                        </svg>
+        <section id="features" class="py-16 md:py-24 bg-white" aria-labelledby="features-heading">
+            <div class="container mx-auto px-6">
+                <h2 id="features-heading" class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">The Power of an IDEA</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="text-center p-6 border border-gray-200 rounded-lg idea-card fade-in"
+                        style="animation-delay: 0.2s;">
+                        <div class="flex justify-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="text-indigo-500" role="img" aria-label="Inspiration icon: interconnected ideas forming a cloud">
+                                <title>Inspiration Icon</title>
+                                <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 1 0-2.496 8.63" />
+                                <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 1 1 2.496 8.63" />
+                                <path d="M15 13a4 4 0 1 1-6 0 4 4 0 0 1 6 0Z" />
+                                <path d="M12 13h.01" />
+                                <path
+                                    d="M12 17a2 2 0 0 0-1.414.586A2 2 0 0 0 9.172 21H14.83a2 2 0 0 0 1.414-3.414A2 2 0 0 0 14.829 17A2 2 0 0 0 12 17Z" />
+                                <path d="M12 9a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h.01" />
+                                <path d="M15 9.5a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h.01" />
+                                <path d="M9 9.5a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h.01" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Inspiration</h3>
+                        <p class="text-gray-600">Capture sparks of genius the moment they arrive. Don't let any idea go to
+                            waste.</p>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Inspiration</h3>
-                    <p class="text-gray-600">Capture sparks of genius the moment they arrive. Don't let any idea go to
-                        waste.</p>
-                </div>
-                <div class="text-center p-6 border border-gray-200 rounded-lg idea-card fade-in"
-                    style="animation-delay: 0.4s;">
-                    <div class="flex justify-center mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="text-indigo-500">
-                            <path d="M10 2v7.31" />
-                            <path d="M14 9.31V2" />
-                            <path d="M4 12.31C4 17.5 8 22 12 22s8-4.5 8-9.69V12H4Z" />
-                        </svg>
+                    <div class="text-center p-6 border border-gray-200 rounded-lg idea-card fade-in"
+                        style="animation-delay: 0.4s;">
+                        <div class="flex justify-center mb-4">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="text-indigo-500" role="img" aria-label="Development icon: a beaker or flask">
+                                <title>Development Icon</title>
+                                <path d="M10 2v7.31" />
+                                <path d="M14 9.31V2" />
+                                <path d="M4 12.31C4 17.5 8 22 12 22s8-4.5 8-9.69V12H4Z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Development</h3>
+                        <p class="text-gray-600">Shape your ideas. Collaborate, iterate, and transform abstract concepts
+                            into concrete projects.</p>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Development</h3>
-                    <p class="text-gray-600">Shape your ideas. Collaborate, iterate, and transform abstract concepts
-                        into concrete projects.</p>
-                </div>
-                <div class="text-center p-6 border border-gray-200 rounded-lg idea-card fade-in"
-                    style="animation-delay: 0.6s;">
-                    <div class="flex justify-center mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="text-indigo-500">
-                            <path
-                                d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
-                            <path
-                                d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
-                            <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
-                            <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Launch</h3>
-                    <p class="text-gray-600">Bring your idea into the world. Share your vision and realize its potential
-                        impact.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="devel" class="py-16 md:py-24 bg-gray-100">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">IDEA Development</h2>
-            <div class="relative wrap overflow-hidden p-10 h-full">
-                <div class="border-2-2 absolute border-opacity-20 border-gray-700 h-full border" style="left: 50%">
-                </div>
-
-                <div class="mb-8 flex justify-between items-center w-full right-timeline">
-                    <div class="order-1 w-5/12"></div>
-                    <div class="z-20 flex items-center order-1 bg-indigo-500 shadow-xl w-12 h-12 rounded-full">
-                        <h1 class="mx-auto font-semibold text-lg text-white">1</h1>
-                    </div>
-                    <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in">
-                        <h3 class="font-bold text-gray-800 text-xl mb-1">Discovery</h3>
-                        <p class="text-sm leading-snug tracking-wide text-gray-600 text-opacity-100">The initial moment,
-                            the sudden insight, or the problem to solve.</p>
-                    </div>
-                </div>
-
-                <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
-                    <div class="order-1 w-5/12"></div>
-                    <div class="z-20 flex items-center order-1 bg-indigo-500 shadow-xl w-12 h-12 rounded-full">
-                        <h1 class="mx-auto text-white font-semibold text-lg">2</h1>
-                    </div>
-                    <div class="order-1 bg-indigo-100 rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in"
-                        style="animation-delay: 0.3s;">
-                        <h3 class="font-bold text-indigo-800 text-xl mb-1">Exploration</h3>
-                        <p class="text-sm leading-snug tracking-wide text-indigo-700 text-opacity-100">Research,
-                            brainstorming, concept validation, and definition.</p>
-                    </div>
-                </div>
-
-                <div class="mb-8 flex justify-between items-center w-full right-timeline">
-                    <div class="order-1 w-5/12"></div>
-                    <div class="z-20 flex items-center order-1 bg-indigo-500 shadow-xl w-12 h-12 rounded-full">
-                        <h1 class="mx-auto font-semibold text-lg text-white">3</h1>
-                    </div>
-                    <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in"
+                    <div class="text-center p-6 border border-gray-200 rounded-lg idea-card fade-in"
                         style="animation-delay: 0.6s;">
-                        <h3 class="font-bold text-gray-800 text-xl mb-1">Development</h3>
-                        <p class="text-sm leading-snug tracking-wide text-gray-600 text-opacity-100">Prototyping,
-                            design, coding, and iterative testing.</p>
-                    </div>
-                </div>
-
-                <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
-                    <div class="order-1 w-5/12"></div>
-                    <div class="z-20 flex items-center order-1 bg-indigo-500 shadow-xl w-12 h-12 rounded-full">
-                        <h1 class="mx-auto text-white font-semibold text-lg">4</h1>
-                    </div>
-                    <div class="order-1 bg-indigo-100 rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in"
-                        style="animation-delay: 0.9s;">
-                        <h3 class="font-bold text-indigo-800 text-xl mb-1">Realization</h3>
-                        <p class="text-sm leading-snug tracking-wide text-indigo-700 text-opacity-100">Market launch,
-                            feedback collection, and growth.</p>
+                        <div class="flex justify-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="text-indigo-500" role="img" aria-label="Launch icon: a rocket taking off">
+                                <title>Launch Icon</title>
+                                <path
+                                    d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+                                <path
+                                    d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+                                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+                                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Launch</h3>
+                        <p class="text-gray-600">Bring your idea into the world. Share your vision and realize its potential
+                            impact.</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <section id="devel" class="py-16 md:py-24 bg-gray-100" aria-labelledby="development-heading">
+            <div class="container mx-auto px-6">
+                <h2 id="development-heading" class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">IDEA Development</h2>
+                <ol class="relative wrap overflow-hidden p-10 h-full list-none pl-0">
+                    <li class="border-2-2 absolute border-opacity-20 border-gray-700 h-full border" style="left: 50%" aria-hidden="true"></li>
+
+                    <li class="mb-8 flex justify-between items-center w-full right-timeline">
+                        <div class="order-1 w-5/12"></div>
+                        <div class="z-20 flex items-center order-1 bg-indigo-500 shadow-xl w-12 h-12 rounded-full">
+                            <span class="mx-auto font-semibold text-lg text-white" aria-hidden="true">1</span>
+                             <span class="sr-only">Step 1</span> </div>
+                        <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in">
+                            <h3 class="font-bold text-gray-800 text-xl mb-1">Discovery</h3>
+                            <p class="text-sm leading-snug tracking-wide text-gray-600 text-opacity-100">The initial moment,
+                                the sudden insight, or the problem to solve.</p>
+                        </div>
+                    </li>
+
+                    <li class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                        <div class="order-1 w-5/12"></div>
+                        <div class="z-20 flex items-center order-1 bg-indigo-500 shadow-xl w-12 h-12 rounded-full">
+                            <span class="mx-auto text-white font-semibold text-lg" aria-hidden="true">2</span>
+                            <span class="sr-only">Step 2</span>
+                        </div>
+                        <div class="order-1 bg-indigo-100 rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in"
+                            style="animation-delay: 0.3s;">
+                            <h3 class="font-bold text-indigo-800 text-xl mb-1">Exploration</h3>
+                            <p class="text-sm leading-snug tracking-wide text-indigo-700 text-opacity-100">Research,
+                                brainstorming, concept validation, and definition.</p>
+                        </div>
+                    </li>
+
+                    <li class="mb-8 flex justify-between items-center w-full right-timeline">
+                        <div class="order-1 w-5/12"></div>
+                        <div class="z-20 flex items-center order-1 bg-indigo-500 shadow-xl w-12 h-12 rounded-full">
+                            <span class="mx-auto font-semibold text-lg text-white" aria-hidden="true">3</span>
+                            <span class="sr-only">Step 3</span>
+                        </div>
+                        <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in"
+                            style="animation-delay: 0.6s;">
+                            <h3 class="font-bold text-gray-800 text-xl mb-1">Development</h3>
+                            <p class="text-sm leading-snug tracking-wide text-gray-600 text-opacity-100">Prototyping,
+                                design, coding, and iterative testing.</p>
+                        </div>
+                    </li>
+
+                    <li class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                        <div class="order-1 w-5/12"></div>
+                        <div class="z-20 flex items-center order-1 bg-indigo-500 shadow-xl w-12 h-12 rounded-full">
+                            <span class="mx-auto text-white font-semibold text-lg" aria-hidden="true">4</span>
+                            <span class="sr-only">Step 4</span>
+                        </div>
+                        <div class="order-1 bg-indigo-100 rounded-lg shadow-xl w-5/12 px-6 py-4 fade-in"
+                            style="animation-delay: 0.9s;">
+                            <h3 class="font-bold text-indigo-800 text-xl mb-1">Realization</h3>
+                            <p class="text-sm leading-snug tracking-wide text-indigo-700 text-opacity-100">Market launch,
+                                feedback collection, and growth.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </section>
 
 
-    <section id="cta" class="py-16 md:py-24 bg-indigo-700 text-white">
-        <div class="container mx-auto px-6 text-center fade-in">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4">Have an IDEA Waiting to Shine?</h2>
-            <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">Don't leave it in the drawer. Start the journey today
-                to turn it into something extraordinary.</p>
-        </div>
-    </section>
+        <section id="cta" class="py-16 md:py-24 bg-indigo-700 text-white" aria-labelledby="cta-heading">
+            <div class="container mx-auto px-6 text-center fade-in">
+                <h2 id="cta-heading" class="text-3xl md:text-4xl font-bold mb-4">Have an IDEA Waiting to Shine?</h2>
+                <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">Don't leave it in the drawer. Start the journey today
+                    to turn it into something extraordinary.</p>
+                </div>
+        </section>
+    </main>
 
-    <footer class="bg-gray-800 text-gray-400 py-8">
+    <footer role="contentinfo" class="bg-gray-800 text-gray-400 py-8">
         <div class="container mx-auto px-6 text-center">
             <p>&copy; 2025 IDEAforge Platform. All rights reserved.</p>
             <p class="text-sm mt-2">Made with passion for innovative ideas.</p>
         </div>
     </footer>
+    
+    <style>
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+    </style>
 
     <script>
         const fadeInElements = document.querySelectorAll('.fade-in');
@@ -427,18 +456,27 @@
 
         const lightbulb = document.getElementById('hero-lightbulb');
         if (lightbulb) {
-            lightbulb.addEventListener('click', () => {
+            const activateLightbulb = () => {
                 lightbulb.classList.toggle('text-yellow-400');
                 lightbulb.style.transform = 'scale(1.2)';
                 setTimeout(() => {
                     lightbulb.style.transform = 'scale(1)';
                 }, 150);
+            };
+
+            lightbulb.addEventListener('click', activateLightbulb);
+            
+            lightbulb.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    activateLightbulb();
+                }
             });
         }
 
         function adjustTimelineLayout() {
-            const timelineElements = document.querySelectorAll('.left-timeline, .right-timeline');
-            const timelineLine = document.querySelector('.relative.wrap > div[style*="left: 50%"]');
+            const timelineElements = document.querySelectorAll('ol.wrap > li:not([aria-hidden="true"])');
+            const timelineLine = document.querySelector('ol.wrap > li[aria-hidden="true"]');
 
             if (window.innerWidth < 768) {
                 if (timelineLine) timelineLine.style.display = 'none';
@@ -452,8 +490,8 @@
                         contentDiv.classList.add('w-full');
                         contentDiv.style.textAlign = 'center';
                     }
-                    const spacerDiv = el.querySelector('.order-1.w-5\\/12');
-                    if (spacerDiv && !spacerDiv.classList.contains('bg-white') && !spacerDiv.classList.contains('bg-indigo-100')) {
+                    const spacerDiv = el.querySelector('.order-1.w-5\\/12:not(.bg-white):not(.bg-indigo-100)');
+                    if (spacerDiv) {
                         spacerDiv.style.display = 'none';
                     }
                     const iconDiv = el.querySelector('.z-20');
@@ -467,7 +505,16 @@
                 if (timelineLine) timelineLine.style.display = 'block';
                 timelineElements.forEach(el => {
                     el.classList.remove('timeline-stacked', 'flex-col', 'items-center');
+                    
+                    if (el.classList.contains('flex-row-reverse')) {
+                        el.classList.add('left-timeline');
+                        el.classList.remove('right-timeline');
+                    } else {
+                        el.classList.add('right-timeline');
+                        el.classList.remove('left-timeline');
+                    }
                     el.classList.add('justify-between');
+
 
                     const contentDiv = el.querySelector('.order-1.bg-white, .order-1.bg-indigo-100');
                     if (contentDiv) {
@@ -475,21 +522,15 @@
                         contentDiv.classList.add('w-5/12');
                         contentDiv.style.textAlign = '';
                     }
-                    const spacerDiv = el.querySelector('.order-1.w-5\\/12');
-                     if (spacerDiv && !spacerDiv.classList.contains('bg-white') && !spacerDiv.classList.contains('bg-indigo-100')) {
+                    const spacerDiv = el.querySelector('.order-1.w-5\\/12:not(.bg-white):not(.bg-indigo-100)');
+                     if (spacerDiv) {
                         spacerDiv.style.display = ''; 
                     }
                     
                     const iconDiv = el.querySelector('.z-20');
                     if(iconDiv) {
-                        iconDiv.style.order = ""; 
+                        iconDiv.style.order = "";
                         iconDiv.style.marginBottom = "";
-                    }
-
-                    if (el.classList.contains('flex-row-reverse') && !el.classList.contains('left-timeline')) {
-                        el.classList.add('left-timeline');
-                    } else if (!el.classList.contains('flex-row-reverse') && !el.classList.contains('right-timeline')) {
-                         el.classList.add('right-timeline');
                     }
                     el.style.marginBottom = '2rem';
                 });

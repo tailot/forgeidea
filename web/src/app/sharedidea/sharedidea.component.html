@@ -10,9 +10,9 @@
   </div>
 </div>
 <div *ngIf="ideasQueue.length === 0" class="status-message">
-  <mat-icon>web_asset_off</mat-icon>
+  <mat-icon aria-label="Users are not sharing ideas.">web_asset_off</mat-icon>
 </div>
 
 <div class="queue-status">
-  <p>{{ this.ideasQueue.length }} / {{ MAX_QUEUE_SIZE_FOR_TEMPLATE }}</p>
+  <p aria-label="the maximum number of ideas you can view in real time.">{{ this.ideasQueue.length }} / {{ MAX_QUEUE_SIZE_FOR_TEMPLATE }}</p>
 </div>

@@ -1,13 +1,8 @@
 <div class="jobcard-container">
   <div>
-    <app-card-idea *ngIf="ideaid"
-      [documentsButton]="!currentIdea"
-      [tasksButton]="!tasks && ((isOnline$ | async) ?? false)" 
-      [evaluateScore]="true"
-      [ideaUuid]="ideaid"
-      (isDeleted)="updateCardIdea($event)"
-      (documentsOn)="showDocuments($event)"
-      (tasksOn)="showTasks($event)">
+    <app-card-idea *ngIf="ideaid" [documentsButton]="!currentIdea"
+      [tasksButton]="!tasks && ((isOnline$ | async) ?? false)" [evaluateScore]="true" [ideaUuid]="ideaid"
+      (isDeleted)="updateCardIdea($event)" (documentsOn)="showDocuments($event)" (tasksOn)="showTasks($event)">
     </app-card-idea>
     <p *ngIf="!ideaid">No Idea UUID found in route.</p>
   </div>
@@ -15,16 +10,16 @@
   <div class="tasks-container">
     <div *ngIf="selectedTasks && selectedTasks.length > 0" class="confirm-button-container">
       <mat-button-toggle-group #toggleGroup="matButtonToggleGroup">
-        <mat-button-toggle value="discard" (click)="discardTask()">
+        <mat-button-toggle aria-label="Remove a task" value="discard" (click)="discardTask()">
           <mat-icon>delete_sweep</mat-icon></mat-button-toggle>
-          <mat-button-toggle *ngIf="selectedTasks.length == 1" value="zoom" (click)="helpTask()">
-            <mat-icon>info</mat-icon></mat-button-toggle>
-        <mat-button-toggle value="deselect" (click)="deselectAllTasks()">
+        <mat-button-toggle aria-label="Download the detail document for the selected task." *ngIf="selectedTasks.length == 1" value="zoom" (click)="helpTask()">
+          <mat-icon>info</mat-icon></mat-button-toggle>
+        <mat-button-toggle aria-label="Deselect all tasks" value="deselect" (click)="deselectAllTasks()">
           <mat-icon>deselect</mat-icon></mat-button-toggle>
       </mat-button-toggle-group>
     </div>
     <div *ngIf="tasks && tasks.length > 0" class="task-list-container">
-      <mat-chip-listbox multiple [(ngModel)]="selectedTasks">
+      <mat-chip-listbox aria-label="The list of tasks that are useful for completing the idea."  multiple [(ngModel)]="selectedTasks">
         <mat-chip-option *ngFor="let task of tasks">
           <span [innerHTML]="task" (click)="zoomedTaskResult=null"></span>
         </mat-chip-option>
@@ -33,21 +28,21 @@
     <p *ngIf="tasks && tasks.length === 0"><mat-icon>counter_0</mat-icon></p>
     <div *ngIf="zoomedTaskResult" class="zoomed-task-result-wrapper">
       <mat-button-toggle-group #zoomedTaskActionsGroup="matButtonToggleGroup">
-        <mat-button-toggle value="play" (click)="playTask(zoomedTaskResult)">
+        <mat-button-toggle aria-label="Allows you to listen or stop listening to the document." value="play" (click)="playTask(zoomedTaskResult)">
           <mat-icon>play_arrow</mat-icon></mat-button-toggle>
-        <mat-button-toggle value="save" (click)="saveDocument()">
+        <mat-button-toggle aria-label="It allows you to archive the document so you can consult it even offline." value="save" (click)="saveDocument()">
           <mat-icon>archive</mat-icon></mat-button-toggle>
-        <mat-button-toggle value="close" (click)="zoomedTaskResult=null">
-            <mat-icon>close</mat-icon></mat-button-toggle>
+        <mat-button-toggle aria-label="Stop viewing this document." value="close" (click)="zoomedTaskResult=null">
+          <mat-icon>close</mat-icon></mat-button-toggle>
       </mat-button-toggle-group>
-      <button mat-icon-button *ngIf="selectedTasks.length == 1 && tasks && tasks.indexOf(selectedTasks[0]) >= 1"
+      <button aria-label="Download and view the document related to the previous task." mat-icon-button *ngIf="selectedTasks.length == 1 && tasks && tasks.indexOf(selectedTasks[0]) >= 1"
         (click)="selectPreviousTask()" class="nav-button left-nav">
         <mat-icon>navigate_before</mat-icon>
       </button>
       <div class="zoomed-task-result" id="document">
-        <pre>{{ zoomedTaskResult.text }}</pre>
+        <pre aria-label="Text of the last downloaded task.">{{ zoomedTaskResult.text }}</pre>
       </div>
-      <button mat-icon-button
+      <button aria-label="Download and view the document related to the previous task." mat-icon-button
         *ngIf="selectedTasks.length == 1 && tasks && tasks.indexOf(selectedTasks[0]) < tasks.length - 1"
         (click)="selectNextTask()" class="nav-button right-nav">
         <mat-icon>navigate_next</mat-icon>
@@ -56,23 +51,24 @@
   </div>
   <div *ngIf="currentIdea &&currentIdea.documents && currentIdea.documents.length > 0" class="documents-section">
     <mat-accordion multi>
-      <mat-expansion-panel *ngFor="let doc of currentIdea.documents; let i = index">
+      <mat-expansion-panel aria-label="The list of documents saved and available for offline consultation." *ngFor="let doc of currentIdea.documents; let i = index">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-button-toggle value="zoom" (click)="playTask({ text: doc.content }); $event.stopPropagation()">
+            <mat-button-toggle aria-label="Allows you to listen or stop listening to the document saved." value="zoom" (click)="playTask({ text: doc.content }); $event.stopPropagation()">
               <mat-icon>play_arrow</mat-icon></mat-button-toggle>
-            <button mat-icon-button color="warn" (click)="deleteDocument(doc); $event.stopPropagation()">
+            <button aria-label="Remove the saved document." mat-icon-button color="warn" (click)="deleteDocument(doc); $event.stopPropagation()">
               <mat-icon>unarchive</mat-icon>
             </button>
           </mat-panel-title>
-          {{ doc.name || ('Document ' + (i + 1)) }} 
+          <span aria-label="The title of the saved document.">{{ doc.name || ('Document ' + (i + 1)) }}</span>
         </mat-expansion-panel-header>
-        <pre [innerHTML]="doc.content"></pre>
+        <pre aria-label="the text of the saved document.">{{doc.content}}</pre>
       </mat-expansion-panel>
     </mat-accordion>
   </div>
-  <div *ngIf="currentIdea && (!currentIdea.documents || currentIdea.documents.length == 0)" class="no-documents-placeholder">
-    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; height: 100%;">
+  <div *ngIf="currentIdea && (!currentIdea.documents || currentIdea.documents.length == 0)"
+    class="no-documents-placeholder">
+    <div aria-label="You have not saved any documents yet." style="display: flex; justify-content: center; align-items: center; flex-direction: column; height: 100%;">
       <mat-icon>folder_off</mat-icon>
     </div>
   </div>

@@ -1,10 +1,10 @@
 <div class="search-bar-container">
     <mat-form-field appearance="outline" class="search-input">
-        <input matInput type="text" [(ngModel)]="searchTerm" placeholder="..." (keyup.enter)="loadCategories(searchTerm)">
-        <button mat-icon-button matSuffix *ngIf="searchTerm" (click)="searchTerm = ''" aria-label="Clear">
+        <input aria-label="Search for a category that interests you." matInput type="text" [(ngModel)]="searchTerm" placeholder="..." (keyup.enter)="loadCategories(searchTerm)">
+        <button aria-label="Clear the search field." mat-icon-button matSuffix *ngIf="searchTerm" (click)="searchTerm = ''" aria-label="Clear">
             <mat-icon>close</mat-icon>
         </button>
-        <button mat-icon-button matSuffix *ngIf="searchTerm" (click)="loadCategories(searchTerm)" aria-label="Search">
+        <button aria-label="Start a search." mat-icon-button matSuffix *ngIf="searchTerm" (click)="loadCategories(searchTerm)" aria-label="Search">
             <mat-icon>search</mat-icon>
         </button>
 
@@ -17,7 +17,7 @@
         <button mat-button color="warn" (click)="loadCategories()">Retry</button>
     </div>
     <div *ngIf="!errorMessage">
-        <mat-chip-listbox aria-label="Select an idea category" (change)="onCategorySelectionChange($event.value)"
+        <mat-chip-listbox aria-label="Select the category for which you want to generate the idea." (change)="onCategorySelectionChange($event.value)"
             [(ngModel)]="selectedCategory">
             <ng-container *ngIf="categories$ | async as categories; else loadingOrNoData">
                 <mat-chip-listbox class="mat-mdc-chip-set-stacked" aria-label="Cutest dog breeds">

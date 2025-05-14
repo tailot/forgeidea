@@ -1,5 +1,5 @@
 <div class="global-spinner-overlay" *ngIf="loadingService.isLoading$ | async">
-  <mat-spinner diameter="50"></mat-spinner>
+  <mat-spinner aria-label="Some content is loading, please be patient." diameter="50"></mat-spinner>
 </div>
 <div class="content-wrapper">
   <router-outlet></router-outlet>

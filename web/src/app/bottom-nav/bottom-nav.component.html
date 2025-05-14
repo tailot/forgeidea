@@ -1,27 +1,27 @@
-<mat-toolbar color="primary" class="bottom-nav-toolbar">
+<mat-toolbar color="primary" class="bottom-nav-toolbar" role="toolbar" aria-label="Navigation menu">
   <div style="display: flex; flex-direction: column; align-items: flex-start;">
-    <button mat-button routerLink="/privacy-policy" routerLinkActive="active-nav-link" aria-label="Privacy Policy">
+    <button aria-label="Privacy policy" mat-button routerLink="/privacy-policy" routerLinkActive="active-nav-link" aria-label="Privacy Policy">
       [privacy policy]
     </button>
-    <button mat-button routerLink="/tos" routerLinkActive="active-nav-link" aria-label="Terms of Service">
+    <button aria-label="Terms of service" mat-button routerLink="/tos" routerLinkActive="active-nav-link" aria-label="Terms of Service">
       [terms of service]
     </button>
   </div>
 
-  <button *ngIf="isOnline$ | async" mat-icon-button routerLink="/generate" routerLinkActive="active-nav-link"
+  <button aria-label="One area of ​​the site will allow you to generate a random idea." *ngIf="isOnline$ | async" mat-icon-button routerLink="/generate" routerLinkActive="active-nav-link"
     [routerLinkActiveOptions]="{exact: true}" aria-label="IDEA">
     <mat-icon>lightbulb</mat-icon>
   </button>
-  <button *ngIf="isOnline$ | async" mat-icon-button routerLink="/generateCategory" routerLinkActive="active-nav-link" aria-label="New idea">
+  <button aria-label="Generate ideas based on category." *ngIf="isOnline$ | async" mat-icon-button routerLink="/generateCategory" routerLinkActive="active-nav-link" aria-label="New idea">
     <mat-icon>list</mat-icon>
   </button>
-  <button *ngIf="isOnline$ | async" mat-icon-button routerLink="/shared" routerLinkActive="active-nav-link" aria-label="New idea">
+  <button aria-label="View ideas shared by others in real time." *ngIf="isOnline$ | async" mat-icon-button routerLink="/shared" routerLinkActive="active-nav-link" aria-label="New idea">
     <mat-icon>groups_2</mat-icon>
   </button>
-  <button mat-icon-button routerLink="/list" routerLinkActive="active-nav-link" aria-label="IDEAS">
+  <button aria-label="List of ideas" mat-icon-button routerLink="/list" routerLinkActive="active-nav-link" aria-label="IDEAS">
     <mat-icon>apps</mat-icon>
   </button>
-  <button mat-icon-button routerLink="/settings" routerLinkActive="active-nav-link" aria-label="settings">
+  <button aria-label="Settings" mat-icon-button routerLink="/settings" routerLinkActive="active-nav-link" aria-label="settings">
     <mat-icon>settings</mat-icon>
   </button>
 
