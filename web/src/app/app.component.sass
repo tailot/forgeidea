@@ -16,12 +16,15 @@
   align-items: center
   padding: 20px 0
 
+$offset-top-toolbar-height: 108px
+
 .global-spinner-overlay
   position: fixed
-  top: 50%
+  top: calc(50% - ($offset-top-toolbar-height / 2))
   left: 50%
   width: 50px
   height: 50px
+  transform: translate(-50%, -50%)
   z-index: 9999
 
 .content-wrapper 

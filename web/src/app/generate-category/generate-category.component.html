@@ -1,6 +1,6 @@
 <div class="search-bar-container">
     <mat-form-field appearance="outline" class="search-input">
-        <input aria-label="Search for a category that interests you." matInput type="text" [(ngModel)]="searchTerm" placeholder="..." (keyup.enter)="loadCategories(searchTerm)">
+        <input aria-label="Search for a category that interests you." matInput type="text" [(ngModel)]="searchTerm" placeholder="Search categories" (keyup.enter)="loadCategories(searchTerm)">
         <button aria-label="Clear the search field." mat-icon-button matSuffix *ngIf="searchTerm" (click)="searchTerm = ''">
             <mat-icon style="color: black;">close</mat-icon>
         </button>

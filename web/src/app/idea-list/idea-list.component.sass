@@ -1,5 +1,5 @@
 $search-bar-height: 76px
-$bottom-nav-height: 56px
+$bottom-nav-height: 65px
 $paginator-height: 56px
 $bottom-content-spacing: 20px
 $content-max-width: 1200px
@@ -28,10 +28,6 @@ $card-column-min-width-mobile: 280px
       color: rgba(0, 0, 0, 0.87)
 
 .idea-list-container
-  max-width: $content-max-width
-  margin: 0 auto
-  padding-left: $container-horizontal-padding
-  padding-right: $container-horizontal-padding
   padding-top: $search-bar-height + 16px
   padding-bottom: $paginator-height + $bottom-nav-height + $bottom-content-spacing
 
@@ -51,8 +47,7 @@ $card-column-min-width-mobile: 280px
 
 .error-message
   mat-card
-    width: 90%
-    max-width: 500px
+    width: 100%
     padding: 16px
 
     mat-card-content
@@ -90,7 +85,6 @@ $card-column-min-width-mobile: 280px
   gap: 16px
   margin-top: $search-bar-height !important
 
-  // Adatta la larghezza minima delle colonne per schermi più piccoli
   @media (max-width: 489px)
     grid-template-columns: repeat(auto-fill, minmax($card-column-min-width-mobile, 1fr))
 
@@ -102,7 +96,6 @@ $card-column-min-width-mobile: 280px
   border-radius: 8px
   overflow: hidden
 
-// Stili per il Paginatore Fisso
 mat-paginator
   position: fixed
   bottom: $bottom-nav-height

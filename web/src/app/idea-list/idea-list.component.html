@@ -4,7 +4,7 @@
     <input aria-label="Enter text to search for an idea from your saved ideas."
            matInput
            type="text"
-           placeholder="..."
+           placeholder="Search through saved ideas"
            [(ngModel)]="searchTerm"
            (ngModelChange)="onSearchChange()">
     <button mat-icon-button matSuffix *ngIf="searchTerm" (click)="clearSearch()" aria-label="Clear search">
@@ -52,7 +52,7 @@
         <mat-icon role="status" aria-label="No ideas found">lightbulb_outline</mat-icon>
         <p *ngIf="allIdeas.length === 0">...</p>
         <p *ngIf="allIdeas.length > 0 && filteredIdeas.length === 0">
-          "<small>{{ searchTerm }}</small>".
+          <small>{{ searchTerm }}</small>
         </p>
       </div>
     </ng-template>
