@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { JobcardComponent } from './jobcard.component';
 
 describe('JobcardComponent', () => {
@@ -8,7 +9,11 @@ describe('JobcardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [JobcardComponent]
+      imports: [
+        JobcardComponent,
+        RouterTestingModule,
+        HttpClientTestingModule
+      ]
     })
     .compileComponents();
 
@@ -20,4 +25,5 @@ describe('JobcardComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
 });

@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { CardIdeaComponent } from './card-idea.component';
 
 describe('CardIdeaComponent', () => {
@@ -8,7 +10,12 @@ describe('CardIdeaComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CardIdeaComponent]
+      imports: [
+        CardIdeaComponent,
+        RouterTestingModule,
+        HttpClientTestingModule,
+        NoopAnimationsModule
+      ]
     })
     .compileComponents();
 

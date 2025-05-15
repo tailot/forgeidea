@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { RouterTestingModule } from '@angular/router/testing'; // <-- Import RouterTestingModule
 import { BottomNavComponent } from './bottom-nav.component';
 
 describe('BottomNavComponent', () => {
@@ -8,7 +8,10 @@ describe('BottomNavComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BottomNavComponent]
+      imports: [
+        BottomNavComponent,
+        RouterTestingModule
+      ]
     })
     .compileComponents();
 

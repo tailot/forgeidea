@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ConsoleoverrideService } from './consoleoverride.service';
+import { ConsoleOverrideService } from './consoleoverride.service';
 
 describe('ConsoleoverrideService', () => {
-  let service: ConsoleoverrideService;
+  let service: ConsoleOverrideService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ConsoleoverrideService);
+    service = TestBed.inject(ConsoleOverrideService);
   });
 
   it('should be created', () => {
