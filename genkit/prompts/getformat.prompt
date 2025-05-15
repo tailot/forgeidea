@@ -1,0 +1,7 @@
+---
+input:
+  schema:
+    promptfile: string
+---
+What format does the following prompt output? I answer with the format without adding comments or considerations:
+{{promptfile}}
