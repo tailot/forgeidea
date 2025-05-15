@@ -2,8 +2,8 @@
 input:
   schema:
     generator: string
-    ideaprompt: string
+    categoriesprompt: string
   default:
 ---
 Transform the prompt for the {{generator}} domain. You will need to generate a prompt (OF THE SAME FORMAT) in English, maintaining the variables. The prompt should generate the same output (the list as a simple comma-separated string), which is a list:
-{{ideaprompt}}
+{{categoriesprompt}}
