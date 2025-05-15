@@ -1,15 +1,15 @@
 {
   "dependencies": {
-    "@genkit-ai/express": "^1.8.0",
-    "@genkit-ai/googleai": "^1.8.0",
+    "@genkit-ai/express": "^1.9.0",
+    "@genkit-ai/googleai": "^1.9.0",
     "dotenv": "^16.5.0",
-    "genkit": "^1.8.0",
-    "genkitx-ollama": "^1.8.0",
+    "genkit": "^1.9.0",
+    "genkitx-ollama": "^1.9.0",
     "zod": "^3.24.3"
   },
   "devDependencies": {
     "@types/node": "^22.15.2",
-    "genkit-cli": "^1.8.0",
+    "genkit-cli": "^1.9.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
