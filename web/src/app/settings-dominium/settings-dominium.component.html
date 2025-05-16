@@ -1,0 +1,22 @@
+<mat-card appearance="outlined"
+  aria-label="You can set a word to change the domain of the generator, rather than idea you could choose recipes, gadgets etc.">
+  <mat-card-header>
+    <mat-card-title>Dominium</mat-card-title>
+    <mat-card-subtitle>Configure your generator.</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <div>
+      <mat-form-field appearance="fill">
+        <mat-label>Generator of</mat-label>
+        <mat-error *ngIf="errorGenerator">Error</mat-error>
+        <input matInput name="dominiumValue" [(ngModel)]="dominiumValue" minlength="5" maxlength="13"
+          placeholder="Enter up to 13 characters." [disabled]="isSettingDominium">
+      </mat-form-field>
+      <button mat-raised-button color="primary" (keyup.enter)="setDominium()" (click)="setDominium()"
+        style="margin-left: 10px;">Set</button>
+      <mat-divider></mat-divider>
+      <button mat-raised-button color="primary" (click)="dominiumValue = '';cleanStorage()"
+        style="margin-left: 10px;">Default</button>
+    </div>
+  </mat-card-content>
+</mat-card>

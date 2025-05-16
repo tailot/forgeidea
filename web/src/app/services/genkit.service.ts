@@ -68,6 +68,23 @@ export interface HelpTaskRequestData {
   language?: string;
 }
 
+export interface GetPromptRequestData {
+  generator: string;
+  promptname: string;
+}
+
+export interface EncryptedPayloadData {
+  iv: string;
+  encryptedData: string;
+  authTag: string;
+}
+
+export interface ExecFlowRequestData {
+  encryptedPromptPayload: EncryptedPayloadData;
+  promptVariables?: Record<string, any>;
+}
+
+
 export interface IdeaDocument {
   key: string;
   name?: string;
@@ -574,6 +591,76 @@ export class GenkitService {
     this.cache.set(cacheKey, request$);
     return request$;
   }
+
+  callGetPrompt(
+    data: GetPromptRequestData,
+    bypassCache = false,
+    noLoading: boolean = false
+  ): Observable<EncryptedPayloadData> {
+    const flowName = 'getPrompt';
+    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
+    const headers = this.createHeaders();
+    const body = { data };
+    const cacheKey = this.generateCacheKey(flowName, data);
+    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
+
+    if (!bypassCache && this.cache.has(cacheKey)) {
+      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
+      return this.cache.get(cacheKey)!;
+    }
+
+    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
+    const request$ = this.http.post<GenkitFlowResponse<EncryptedPayloadData>>(endpointUrl, body, { headers, context })
+      .pipe(
+        timeout(this.requestTimeout),
+        retry(1),
+        map(response => this.extractResult(response, flowName)),
+        catchError(error => {
+          this.cache.delete(cacheKey);
+          return this.handleError(error, flowName);
+        }),
+        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+
+    this.cache.set(cacheKey, request$);
+    return request$;
+  }
+
+  callExecFlow(
+    data: ExecFlowRequestData,
+    bypassCache = false,
+    noLoading: boolean = false
+  ): Observable<string> {
+    const flowName = 'execFlow';
+    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
+    const headers = this.createHeaders();
+    const body = { data };
+    const cacheKey = this.generateCacheKey(flowName, data);
+    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
+
+    if (!bypassCache && this.cache.has(cacheKey)) {
+      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
+      return this.cache.get(cacheKey)!;
+    }
+
+    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
+    const request$ = this.http.post<GenkitFlowResponse<string>>(endpointUrl, body, { headers, context })
+      .pipe(
+        timeout(this.requestTimeout),
+        retry(1),
+        map(response => this.extractResult(response, flowName)),
+        catchError(error => {
+          this.cache.delete(cacheKey);
+          return this.handleError(error, flowName);
+        }),
+        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+    this.cache.set(cacheKey, request$);
+    return request$;
+  }
+
   clearCache(): void {
     this.cache.clear();
     console.log('GenkitService: Cache cleared.');

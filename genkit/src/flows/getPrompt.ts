@@ -6,12 +6,11 @@ import * as crypto from 'crypto';
 
 import { FlowCryptographer } from '../lib/cypher';
 
-
 export const getPromptFlow = ai.defineFlow(
   {
     name: 'getPrompt',
     inputSchema: z.object({
-      generator: z.string(),
+      generator: z.string().min(4, { message: "Generator must be at least 4 characters long" }).max(13, { message: "Generator must be at most 13 characters long" }),
       promptname: z.string().refine(name => name.startsWith('_'), {
         message: "promptname must start with '_'",
       }),
