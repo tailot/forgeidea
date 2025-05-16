@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, Output, EventEmitter } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -28,9 +28,11 @@ import { StorageService } from '../services/storage.service';
   styleUrl: './settings-dominium.component.sass'
 })
 export class SettingsDominiumComponent implements OnInit, OnDestroy {
+  @Output() dominiumOn = new EventEmitter<boolean>();
+  
   errorGenerator = false;
   isSettingDominium = false
-  dominiumValue: string = '';
+  dominiumValue: string | undefined;
   private setDominiumSubscription: Subscription | undefined;
   private loadDominiumSubscription: Subscription | undefined;
 
@@ -42,7 +44,11 @@ export class SettingsDominiumComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadDominiumSubscription = from(this.storageService.getItem<string>('generator')).pipe(
       tap(value => {
-        this.dominiumValue = value || '';
+        this.dominiumValue = value;
+        if(value){
+        this.dominiumOn.emit(true);
+
+        }
         console.log('Dominium value loaded from storage:', this.dominiumValue);
       }),
       catchError(error => {
@@ -81,7 +87,7 @@ export class SettingsDominiumComponent implements OnInit, OnDestroy {
       switchMap(() => {
         console.log('Proceeding to fetch _category after _idea operations.');
         const requestDataCategory: GetPromptRequestData = {
-          generator: this.dominiumValue,
+          generator: this.dominiumValue || '',
           promptname: '_categories'
         };
         return this.genkitService.callGetPrompt(requestDataCategory);
@@ -93,8 +99,8 @@ export class SettingsDominiumComponent implements OnInit, OnDestroy {
         );
       }),
       catchError(error => {
-        this.cleanStorage();
-
+        this.setDefaultValue()
+        this.dominiumOn.emit(false);
         this.errorGenerator = true;
         console.error('Error during setDominium operations chain (_idea or _category):', error);
         return EMPTY;
@@ -105,6 +111,7 @@ export class SettingsDominiumComponent implements OnInit, OnDestroy {
       })
     ).subscribe({
       next: () => {
+        this.dominiumOn.emit(true);
         this.storageService.setItem('generator', this.dominiumValue);
         console.log('All dominium settings (_idea and _categories) processed and saved successfully.');
       },
@@ -123,6 +130,12 @@ export class SettingsDominiumComponent implements OnInit, OnDestroy {
     this.storageService.removeItem('_categories');
     this.storageService.removeItem('generator');
     console.log('Dominium-related items removed from storage.');
+  }
+
+  setDefaultValue(){
+    this.dominiumValue = '';
+    this.cleanStorage()
+    this.dominiumOn.emit(false);
   }
   ngOnDestroy(): void {
     if (this.setDominiumSubscription) {

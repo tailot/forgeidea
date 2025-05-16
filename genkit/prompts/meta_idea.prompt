@@ -5,5 +5,5 @@ input:
     prompt: string
   default:
 ---
-Transform the prompt to create a {{generator}} generator. The prompt should maintain the same reduced prompt and the same input names as the following prompt (OF THE SAME FORMAT) and write it in English:
+Transform the prompt to create a {{generator}} generator. The prompt should maintain the same reduced prompt and the same input names as the following prompt (OF THE SAME FORMAT not a json) and write it in English:
 {{prompt}}

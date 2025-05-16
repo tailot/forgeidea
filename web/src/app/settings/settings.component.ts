@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { SettingsDatabasesComponent } from '../settings-databases/settings-databases.component';
 import { SettingsScoreComponent } from '../settings-score/settings-score.component';
@@ -10,9 +11,18 @@ import { SettingsDominiumComponent } from '../settings-dominium/settings-dominiu
   imports: [
     SettingsDatabasesComponent,
     SettingsScoreComponent,
-    SettingsDominiumComponent
+    SettingsDominiumComponent,
+    CommonModule
   ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.sass']
 })
-export class SettingsComponent {}
+export class SettingsComponent {
+  dominium = false;
+
+  dominiumIs(event: boolean){
+    console.log(event)
+    this.dominium = event;
+  }
+
+}

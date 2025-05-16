@@ -22,7 +22,7 @@ export const verifyIdeaFlow = ai.defineFlow(
       model: modelToUse
     })
 
-    // input.idea === result.text :)   
+    // input.idea === result.text :)
     return result.text;
   }
 );

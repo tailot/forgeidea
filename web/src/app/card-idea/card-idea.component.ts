@@ -63,12 +63,10 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
   private socket: SocketIoClientSocket;
 
   constructor(
-    private route: ActivatedRoute,
     private storageService: StorageService,
     private router: Router,
     private genkitService: GenkitService,
     private languageService: LanguageService,
-    private snackBar: MatSnackBar
   ) {
     this.socket = io(environment.socketAddr, {
       transports: ['websocket']

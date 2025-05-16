@@ -1,5 +1,5 @@
 <div class="settings-container">
   <app-settings-databases></app-settings-databases>
-  <app-settings-score></app-settings-score>
-  <app-settings-dominium></app-settings-dominium>
+  <app-settings-score *ngIf="!dominium"></app-settings-score>
+  <app-settings-dominium (dominiumOn)="dominiumIs($event)"></app-settings-dominium>
 </div>
