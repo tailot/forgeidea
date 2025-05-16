@@ -17,7 +17,7 @@ Given a specific CATEGORY, your task is to generate ONLY ONE idea for an origina
 
 ## Input:
 The input will be a string containing the CATEGORY or field of application.
-CATEGORIA: {{category}}
+CATEGORY: {{category}}
 
 ## Key Criteria for Generated Invention:
 1.  **Novelty:** The idea must propose something genuinely new (a new device, material, process, significant algorithm) or a novel combination/application of existing technologies for that category.

@@ -21,7 +21,6 @@ export class SettingsComponent {
   dominium = false;
 
   dominiumIs(event: boolean){
-    console.log(event)
     this.dominium = event;
   }
 
