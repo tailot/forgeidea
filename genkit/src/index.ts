@@ -12,7 +12,7 @@ import { requirementScoreFlow } from './flows/requirementscore'
 import { verifyIdeaFlow } from './flows/verifyIdeaFlow';
 import { helpTaskFlow } from './flows/help';
 import { getPromptFlow } from './flows/getPrompt';
-
+import { execFlow } from './flows/execFlow';
 
 startFlowServer({
   flows: [
@@ -27,7 +27,8 @@ startFlowServer({
     requirementScoreFlow,
     verifyIdeaFlow,
     helpTaskFlow,
-    getPromptFlow
+    getPromptFlow,
+    execFlow
   ],
   port: 4001,
   cors: {

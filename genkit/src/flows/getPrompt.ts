@@ -2,6 +2,10 @@ import { ai } from '../config/genkit'
 import { z } from 'zod';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as crypto from 'crypto';
+
+import { FlowCryptographer } from '../lib/cypher';
+
 
 export const getPromptFlow = ai.defineFlow(
   {
@@ -12,9 +16,17 @@ export const getPromptFlow = ai.defineFlow(
         message: "promptname must start with '_'",
       }),
     }),
-    outputSchema: z.string(),
+    outputSchema: z.object({
+      iv: z.string(),
+      encryptedData: z.string(),
+      authTag: z.string(),
+    })
   },
   async (input) => {
+    const basekey = process.env.KEYCIPHER || crypto.randomBytes(32).toString('base64');
+    const buffKey = Buffer.from(basekey, 'base64');
+    const cryptographer = new FlowCryptographer(buffKey);
+
     const { generator, promptname } = input;
 
     const contentPromptFilenameBase = promptname.substring(1);
@@ -44,12 +56,11 @@ export const getPromptFlow = ai.defineFlow(
             {
               model: modelToUse,
               config: {
-                temperature: 0,
-                topP: 0.95,
+                temperature: 0
               }
             }
           );
-          return result.text;
+          return cryptographer.encrypt(result.text);
 
     } catch (error) {
       console.error(`Error executing prompt ${promptname}:`, error);
