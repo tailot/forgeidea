@@ -2,7 +2,7 @@
   <div>
     <app-card-idea *ngIf="ideaid" [documentsButton]="!currentIdea"
       [tasksButton]="!tasks && ((isOnline$ | async) ?? false)" [evaluateScore]="true" [ideaUuid]="ideaid"
-      (isDeleted)="updateCardIdea($event)" (documentsOn)="showDocuments($event)" (tasksOn)="showTasks($event)">
+      (isDeleted)="updateCardIdea()" (documentsOn)="showDocuments($event)" (tasksOn)="showTasks($event)">
     </app-card-idea>
     <p *ngIf="!ideaid">No Idea UUID found in route.</p>
   </div>
@@ -12,7 +12,7 @@
       <mat-button-toggle-group #toggleGroup="matButtonToggleGroup">
         <mat-button-toggle aria-label="Remove a task" value="discard" (click)="discardTask()">
           <mat-icon>delete_sweep</mat-icon></mat-button-toggle>
-        <mat-button-toggle aria-label="Download the detail document for the selected task." *ngIf="selectedTasks.length == 1" value="zoom" (click)="helpTask()">
+        <mat-button-toggle aria-label="Download the detail document for the selected task." *ngIf="selectedTasks.length === 1" value="zoom" (click)="helpTask()">
           <mat-icon>info</mat-icon></mat-button-toggle>
         <mat-button-toggle aria-label="Deselect all tasks" value="deselect" (click)="deselectAllTasks()">
           <mat-icon>deselect</mat-icon></mat-button-toggle>
@@ -21,7 +21,7 @@
     <div *ngIf="tasks && tasks.length > 0" class="task-list-container">
       <mat-chip-listbox aria-label="The list of tasks that are useful for completing the idea."  multiple [(ngModel)]="selectedTasks">
         <mat-chip-option *ngFor="let task of tasks">
-          <span [innerHTML]="task" (click)="zoomedTaskResult=null"></span>
+          <span (click)="zoomedTaskResult=null">{{task}}</span>
         </mat-chip-option>
       </mat-chip-listbox>
     </div>
@@ -35,7 +35,7 @@
         <mat-button-toggle aria-label="Stop viewing this document." value="close" (click)="zoomedTaskResult=null">
           <mat-icon>close</mat-icon></mat-button-toggle>
       </mat-button-toggle-group>
-      <button aria-label="Download and view the document related to the previous task." mat-icon-button *ngIf="selectedTasks.length == 1 && tasks && tasks.indexOf(selectedTasks[0]) >= 1"
+      <button aria-label="Download and view the document related to the previous task." mat-icon-button *ngIf="selectedTasks.length === 1 && tasks && tasks.indexOf(selectedTasks[0]) >= 1"
         (click)="selectPreviousTask()" class="nav-button left-nav">
         <mat-icon>navigate_before</mat-icon>
       </button>
@@ -43,7 +43,7 @@
         <pre aria-label="Text of the last downloaded task.">{{ zoomedTaskResult.text }}</pre>
       </div>
       <button aria-label="Download and view the document related to the previous task." mat-icon-button
-        *ngIf="selectedTasks.length == 1 && tasks && tasks.indexOf(selectedTasks[0]) < tasks.length - 1"
+        *ngIf="selectedTasks.length === 1 && tasks && tasks.indexOf(selectedTasks[0]) < tasks.length - 1"
         (click)="selectNextTask()" class="nav-button right-nav">
         <mat-icon>navigate_next</mat-icon>
       </button>
@@ -66,7 +66,7 @@
       </mat-expansion-panel>
     </mat-accordion>
   </div>
-  <div *ngIf="currentIdea && (!currentIdea.documents || currentIdea.documents.length == 0)"
+  <div *ngIf="currentIdea && (!currentIdea.documents || currentIdea.documents.length === 0)"
     class="no-documents-placeholder">
     <div aria-label="You have not saved any documents yet." style="display: flex; justify-content: center; align-items: center; flex-direction: column; height: 100%;">
       <mat-icon>folder_off</mat-icon>

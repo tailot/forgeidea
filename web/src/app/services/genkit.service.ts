@@ -125,7 +125,7 @@ export class GenkitService {
   }
 
   private createHeaders(): HttpHeaders {
-    let headers = new HttpHeaders({
+    const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     });

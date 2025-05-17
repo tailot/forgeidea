@@ -1,16 +1,16 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { io, Socket as SocketIoClientSocket } from 'socket.io-client';
 
 import { StorageService } from '../services/storage.service';
-import { Idea, GenkitService, GenerateTasksRequestData, ScoreIdeaRequestData, OperationRequestData, IdeaDocument } from '../services/genkit.service';
+import { Idea, GenkitService, GenerateTasksRequestData, ScoreIdeaRequestData, OperationRequestData } from '../services/genkit.service';
 import { LanguageService } from '../services/language.service';
 import { environment } from '../../environments/environment';
 
@@ -208,7 +208,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
               this.isGeneratingTasks = false;
             });
         },
-        error: (error) => {
+        error: () => {
           this.isGeneratingTasks = false;
         }
       });
@@ -220,7 +220,6 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   async createIdea(uuid: string,text: string, language?: string): Promise<Idea> {
-    const newIdeaUuid = crypto.randomUUID();
     const newIdea: Idea = {
       id: uuid,
       text: text,
@@ -278,7 +277,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
   private async loadIdeaData(uuid: string): Promise<void> {
     this.isLoading = true;
     try {
-      const retrievedIdea = await this.storageService.getItem<Idea>(uuid).then(idea => {
+      await this.storageService.getItem<Idea>(uuid).then(idea => {
         if(idea){
           idea.id = uuid;
           this.idea = idea;
@@ -311,7 +310,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
         }
         this.isScoring = false;
       },
-      error: (error) => {        
+      error: () => {        
         this.isScoring = false;
       }
     });

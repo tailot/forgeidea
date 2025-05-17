@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, ElementRef, ViewChild, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -23,7 +23,7 @@ interface KeyValueItem {
   templateUrl: './settings-databases.component.html',
   styleUrl: './settings-databases.component.sass'
 })
-export class SettingsDatabasesComponent {
+export class SettingsDatabasesComponent implements OnInit {
   isBackingUp = false;
   isRestoring = false;
 

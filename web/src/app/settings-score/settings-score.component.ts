@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatSliderModule } from '@angular/material/slider';
 import { FormsModule } from '@angular/forms';
@@ -14,7 +14,7 @@ import { StorageService } from '../services/storage.service';
   templateUrl: './settings-score.component.html',
   styleUrl: './settings-score.component.sass'
 })
-export class SettingsScoreComponent {
+export class SettingsScoreComponent implements OnInit {
   scoreThreshold: number = 5;
 
   constructor(

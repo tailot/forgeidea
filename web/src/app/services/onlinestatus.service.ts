@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { BehaviorSubject, Observable, fromEvent, merge } from 'rxjs';
+import { BehaviorSubject, Observable, fromEvent } from 'rxjs';
 import { map, distinctUntilChanged, tap } from 'rxjs/operators';
 
 @Injectable({

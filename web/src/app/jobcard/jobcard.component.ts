@@ -173,9 +173,9 @@ export class JobcardComponent implements OnInit, OnDestroy {
     }
 
     const currentTask = this.selectedTasks.length > 0 ? this.selectedTasks[0] : null;
-    let currentIndex = currentTask ? this.tasks.indexOf(currentTask) : -1;
+    const currentIndex = currentTask ? this.tasks.indexOf(currentTask) : -1;
 
-    let nextIndex = (currentIndex + 1) % this.tasks.length;
+    const nextIndex = (currentIndex + 1) % this.tasks.length;
 
     this.selectedTasks = [this.tasks[nextIndex]];
     console.log("Selected next task:", this.selectedTasks[0]);
@@ -190,9 +190,9 @@ export class JobcardComponent implements OnInit, OnDestroy {
     }
 
     const currentTask = this.selectedTasks.length > 0 ? this.selectedTasks[0] : null;
-    let currentIndex = currentTask ? this.tasks.indexOf(currentTask) : 0; // Default to 0 if none selected
+    const currentIndex = currentTask ? this.tasks.indexOf(currentTask) : 0; // Default to 0 if none selected
 
-    let previousIndex = (currentIndex - 1 + this.tasks.length) % this.tasks.length;
+    const previousIndex = (currentIndex - 1 + this.tasks.length) % this.tasks.length;
 
     this.selectedTasks = [this.tasks[previousIndex]];
     console.log("Selected previous task:", this.selectedTasks[0]);
@@ -233,7 +233,6 @@ export class JobcardComponent implements OnInit, OnDestroy {
       next: (updatedTasks: string[]) => {
         console.log('Received updated tasks:', updatedTasks);
 
-        const tasksToStore = { text: updatedTasks };
         const storageKey = `tasks_${this.ideaid}`;
 
         console.log(`Attempting to save updated tasks to storage with key: ${storageKey}`);
@@ -259,7 +258,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
     });
   }
 
-  updateCardIdea(uuid: string) {
+  updateCardIdea() {
     this.router.navigate(['/list']);
   }
 

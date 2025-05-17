@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, PLATFORM_ID, inject } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 @Component({

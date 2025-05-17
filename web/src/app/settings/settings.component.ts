@@ -1,4 +1,4 @@
-import { Component, EventEmitter } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { SettingsDatabasesComponent } from '../settings-databases/settings-databases.component';

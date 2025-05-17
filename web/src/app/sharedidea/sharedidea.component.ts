@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
 import { io, Socket } from 'socket.io-client';
-import { Subscription, interval, timer, takeWhile } from 'rxjs';
+import { Subscription, interval } from 'rxjs';
 import { CardIdeaComponent } from '../card-idea/card-idea.component';
 import { environment } from '../../environments/environment';
 import { Idea } from '../services/genkit.service';
@@ -47,7 +47,7 @@ export class SharedIdeaComponent implements OnInit, OnDestroy {
       this.handleNewIdea(idea);
     });
 
-    this.socket.on('disconnect', (reason: string) => { });
+    this.socket.on('disconnect', () => { });
 
     this.socket.on('connect_error', (error: Error) => {
       console.error('Socket connection error:', error);
