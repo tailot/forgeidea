@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DOCUMENT, CommonModule } from '@angular/common';
 
 @Component({
@@ -6,7 +6,8 @@ import { DOCUMENT, CommonModule } from '@angular/common';
   templateUrl: './privacy-policy.component.html',
   styleUrls: ['./privacy-policy.component.sass'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PrivacyPolicyComponent implements OnInit {
   websiteUrl: string;

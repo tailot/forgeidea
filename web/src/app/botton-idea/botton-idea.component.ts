@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
@@ -14,7 +14,8 @@ import { LanguageService } from '../services/language.service';
     MatButtonModule
   ],
   templateUrl: './botton-idea.component.html',
-  styleUrl: './botton-idea.component.sass'
+  styleUrl: './botton-idea.component.sass',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BottonIdeaComponent {
   constructor(

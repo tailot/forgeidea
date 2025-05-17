@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
@@ -18,7 +18,8 @@ export interface DialogData {
   ],
   standalone: true,
   templateUrl: './dialog.component.html',
-  styleUrl: './dialog.component.sass'
+  styleUrl: './dialog.component.sass',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DialogComponent {
   constructor(
