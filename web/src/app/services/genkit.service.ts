@@ -43,13 +43,6 @@ export interface SubjectRequestData extends WithIdeaText, WithLanguage {}
 
 export interface GenerateTasksRequestData extends  SubjectRequestData {}
 
-/*
-export interface ZoomTaskRequestData {
-  idea: string;
-  task: string;
-  language?: string;
-}
-*/
 
 export interface DiscardTasksRequestData extends WithIdeaText, WithLanguage {
   tasks: string;
@@ -180,6 +173,52 @@ export class GenkitService {
     }
   }
 
+  private _callFlow<TRequest, TResponseRaw, TResponseFinal = TResponseRaw>(
+    flowName: string,
+    data: TRequest | undefined,
+    bypassCache: boolean,
+    noLoading: boolean,
+    options: {
+      isDataOptional?: boolean; // True if data can be {} when undefined
+      transformFn?: (rawResult: TResponseRaw, originalData: TRequest | undefined) => TResponseFinal;
+    } = {}
+  ): Observable<TResponseFinal> {
+    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
+    const headers = this.createHeaders();
+    
+    const body = options.isDataOptional ? { data: data || {} } : { data };
+    
+    const cacheKey = this.generateCacheKey(flowName, data);
+    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
+
+    if (!bypassCache && this.cache.has(cacheKey)) {
+      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
+      return this.cache.get(cacheKey)!;
+    }
+
+    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
+    const request$ = this.http.post<GenkitFlowResponse<TResponseRaw>>(endpointUrl, body, { headers, context })
+      .pipe(
+        timeout(this.requestTimeout),
+        retry(1),
+        map(response => this.extractResult<TResponseRaw>(response, flowName)),
+        map(rawResult => {
+          if (options.transformFn) {
+            return options.transformFn(rawResult, data);
+          }
+          return rawResult as unknown as TResponseFinal;
+        }),
+        catchError(error => {
+          this.cache.delete(cacheKey);
+          return this.handleError(error, flowName);
+        }),
+        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+
+    this.cache.set(cacheKey, request$);
+    return request$;
+  }
   callGenerateIdeaCategories(
     data?: GenerateIdeaCategoriesRequestData,
     bypassCache = false,
@@ -187,32 +226,13 @@ export class GenkitService {
   ): Observable<string[]> {
     const flowName = 'generateIdeaCategories';
     const endpointUrl = `${this.apiUrlBase}/${flowName}`;
-    const headers = this.createHeaders();
-    const body = { data: data || {} };
-    const cacheKey = this.generateCacheKey(flowName, data);
-    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
-
-    if (!bypassCache && this.cache.has(cacheKey)) {
-      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
-      return this.cache.get(cacheKey)!;
-    }
-
-    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
-    const request$ = this.http.post<GenkitFlowResponse<string[]>>(endpointUrl, body, { headers, context })
-      .pipe(
-        timeout(this.requestTimeout),
-        retry(1),
-        map(response => this.extractResult(response, flowName)),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return this.handleError(error, flowName);
-        }),
-        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
-        shareReplay({ bufferSize: 1, refCount: false })
-      );
-
-    this.cache.set(cacheKey, request$);
-    return request$;
+    return this._callFlow<GenerateIdeaCategoriesRequestData, string[], string[]>(
+      flowName,
+      data,
+      bypassCache,
+      noLoading,
+      { isDataOptional: true }
+    );
   }
 
   callGenerateIdea(
@@ -220,39 +240,20 @@ export class GenkitService {
     bypassCache = false,
     noLoading: boolean = false
   ): Observable<Idea> {
-    const flowName = 'generateIdeaFlow';
-    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
-    const headers = this.createHeaders();
-    const body = { data };
-    const cacheKey = this.generateCacheKey(flowName, data);
-    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
-
-    if (!bypassCache && this.cache.has(cacheKey)) {
-      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
-      return this.cache.get(cacheKey)!;
-    }
-
-    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
-    const request$ = this.http.post<GenkitFlowResponse<Idea>>(endpointUrl, body, { headers, context })
-      .pipe(
-        timeout(this.requestTimeout),
-        retry(1),
-        map(response => this.extractResult(response, flowName)),
-        map(ideaText => ({
-          text: typeof ideaText === 'string' ? ideaText : JSON.stringify(ideaText), // Ensure text is a string
-          category: data.category,
-          language: data.language
-        } as Idea)),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return this.handleError(error, flowName);
-        }),
-        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
-        shareReplay({ bufferSize: 1, refCount: false })
-      );
-
-    this.cache.set(cacheKey, request$);
-    return request$;
+    const flowName = 'generateIdeaFlow';    
+    return this._callFlow<GenerateIdeaRequestData, any, Idea>( // Assuming backend might return string or Idea-like object
+      flowName,
+      data,
+      bypassCache,
+      noLoading,
+      {
+        transformFn: (rawResult, originalData) => ({
+          text: typeof rawResult === 'string' ? rawResult : JSON.stringify(rawResult),
+          category: originalData!.category,
+          language: originalData!.language
+        } as Idea)
+      }
+    );
   }
 
   callRandomIdea(
@@ -260,38 +261,20 @@ export class GenkitService {
     bypassCache = false,
     noLoading: boolean = false
   ): Observable<Idea> {
-    const flowName = 'randomIdeaFlow';
-    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
-    const headers = this.createHeaders();
-    const body = { data: data || {} };
-    const cacheKey = this.generateCacheKey(flowName, data);
-    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
-
-    if (!bypassCache && this.cache.has(cacheKey)) {
-      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
-      return this.cache.get(cacheKey)!;
-    }
-
-    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
-    const request$ = this.http.post<GenkitFlowResponse<Idea>>(endpointUrl, body, { headers, context })
-      .pipe(
-        timeout(this.requestTimeout),
-        retry(1),
-        map(response => this.extractResult(response, flowName)),
-        map(ideaText => ({
-          text: typeof ideaText === 'string' ? ideaText : JSON.stringify(ideaText), // Ensure text is a string
-          language: data?.language
-        } as Idea)),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return this.handleError(error, flowName);
-        }),
-        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
-        shareReplay({ bufferSize: 1, refCount: false })
-      );
-
-    this.cache.set(cacheKey, request$);
-    return request$;
+    const flowName = 'randomIdeaFlow';    
+    return this._callFlow<RandomIdeaRequestData, any, Idea>( // Assuming backend might return string or Idea-like object
+      flowName,
+      data,
+      bypassCache,
+      noLoading,
+      {
+        isDataOptional: true,
+        transformFn: (rawResult, originalData) => ({
+          text: typeof rawResult === 'string' ? rawResult : JSON.stringify(rawResult),
+          language: originalData?.language
+        } as Idea)
+      }
+    );
   }
 
   callSubject(
@@ -299,34 +282,13 @@ export class GenkitService {
     bypassCache = false,
     noLoading: boolean = false
   ): Observable<string> {
-    const flowName = 'subjectFlow';
-    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
-    const headers = this.createHeaders();
-    const body = { data };
-    const cacheKey = this.generateCacheKey(flowName, data);
-    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
-
-    if (!bypassCache && this.cache.has(cacheKey)) {
-      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
-      return this.cache.get(cacheKey)!;
-    }
-
-    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
-    const request$ = this.http.post<GenkitFlowResponse<string>>(endpointUrl, body, { headers, context })
-      .pipe(
-        timeout(this.requestTimeout),
-        retry(1),
-        map(response => this.extractResult(response, flowName)),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return this.handleError(error, flowName);
-        }),
-        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
-        shareReplay({ bufferSize: 1, refCount: false })
-      );
-
-    this.cache.set(cacheKey, request$);
-    return request$;
+    const flowName = 'subjectFlow';    
+    return this._callFlow<SubjectRequestData, string>(
+      flowName,
+      data,
+      bypassCache,
+      noLoading
+    );
   }
 
   callGenerateTasks(
@@ -334,34 +296,13 @@ export class GenkitService {
     bypassCache = false,
     noLoading: boolean = false
   ): Observable<string[]> {
-    const flowName = 'generateTasks';
-    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
-    const headers = this.createHeaders();
-    const body = { data };
-    const cacheKey = this.generateCacheKey(flowName, data);
-    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
-
-    if (!bypassCache && this.cache.has(cacheKey)) {
-      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
-      return this.cache.get(cacheKey)!;
-    }
-
-    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
-    const request$ = this.http.post<GenkitFlowResponse<string[]>>(endpointUrl, body, { headers, context })
-      .pipe(
-        timeout(this.requestTimeout),
-        retry(1),
-        map(response => this.extractResult(response, flowName)),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return this.handleError(error, flowName);
-        }),
-        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
-        shareReplay({ bufferSize: 1, refCount: false })
-      );
-
-    this.cache.set(cacheKey, request$);
-    return request$;
+    const flowName = 'generateTasks';    
+    return this._callFlow<GenerateTasksRequestData, string[]>(
+      flowName,
+      data,
+      bypassCache,
+      noLoading
+    );
   }
 
   callOperation(
@@ -369,34 +310,13 @@ export class GenkitService {
     bypassCache = false,
     noLoading: boolean = false
   ): Observable<string> {
-    const flowName = 'ideaOperationFlow'; // Correct flow name from backend
-    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
-    const headers = this.createHeaders();
-    const body = { data };
-    const cacheKey = this.generateCacheKey(flowName, data);
-    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
-
-    if (!bypassCache && this.cache.has(cacheKey)) {
-      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
-      return this.cache.get(cacheKey)!;
-    }
-
-    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
-    const request$ = this.http.post<GenkitFlowResponse<string>>(endpointUrl, body, { headers, context })
-      .pipe(
-        timeout(this.requestTimeout),
-        retry(1),
-        map(response => this.extractResult(response, flowName)),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return this.handleError(error, flowName);
-        }),
-        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
-        shareReplay({ bufferSize: 1, refCount: false })
-      );
-
-    this.cache.set(cacheKey, request$);
-    return request$;
+    const flowName = 'ideaOperationFlow';    
+    return this._callFlow<OperationRequestData, string>(
+      flowName,
+      data,
+      bypassCache,
+      noLoading
+    );
   }
 
   callDiscardTasks(
@@ -404,119 +324,40 @@ export class GenkitService {
     bypassCache = false,
     noLoading: boolean = false
   ): Observable<string[]> {
-    const flowName = 'discardTasksFlow';
-    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
-    const headers = this.createHeaders();
-    const body = { data };
-    const cacheKey = this.generateCacheKey(flowName, data);
-    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
-
-    if (!bypassCache && this.cache.has(cacheKey)) {
-      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
-      return this.cache.get(cacheKey)!;
-    }
-
-    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
-    const request$ = this.http.post<GenkitFlowResponse<string[]>>(endpointUrl, body, { headers, context })
-      .pipe(
-        timeout(this.requestTimeout),
-        retry(1),
-        map(response => this.extractResult(response, flowName)),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return this.handleError(error, flowName);
-        }),
-        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
-        shareReplay({ bufferSize: 1, refCount: false })
-      );
-
-    this.cache.set(cacheKey, request$);
-    return request$;
+    const flowName = 'discardTasksFlow';    
+    return this._callFlow<DiscardTasksRequestData, string[]>(
+      flowName,
+      data,
+      bypassCache,
+      noLoading
+    );
   }
-/*
-  callZoomTask(
-    data: ZoomTaskRequestData,
-    bypassCache = false,
-    noLoading: boolean = false
-  ): Observable<string> {
-    const flowName = 'zoomTaskFlow';
-    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
-    const headers = this.createHeaders();
-    const body = { data };
-    const cacheKey = this.generateCacheKey(flowName, data);
-    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
 
-    if (!bypassCache && this.cache.has(cacheKey)) {
-      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
-      return this.cache.get(cacheKey)!;
-    }
-
-    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
-    const request$ = this.http.post<GenkitFlowResponse<string>>(endpointUrl, body, { headers, context })
-      .pipe(
-        timeout(this.requestTimeout),
-        retry(1),
-        map(response => this.extractResult(response, flowName)),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return this.handleError(error, flowName);
-        }),
-        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
-        shareReplay({ bufferSize: 1, refCount: false })
-      );
-
-    this.cache.set(cacheKey, request$);
-    return request$;
-  }
-  */
   callScoreIdea(
     data: ScoreIdeaRequestData,
     bypassCache = false,
     noLoading: boolean = false
   ): Observable<number> {
-    const flowName = 'scoreIdeaFlow';
-    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
-    const headers = this.createHeaders();
-    const body = { data };
-    const cacheKey = this.generateCacheKey(flowName, data);
-    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
-
-    if (!bypassCache && this.cache.has(cacheKey)) {
-      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
-      return this.cache.get(cacheKey)!;
-    }
-
-    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
-    const request$ = this.http.post<GenkitFlowResponse<string>>(endpointUrl, body, { headers, context })
-      .pipe(
-        timeout(this.requestTimeout),
-        retry(1),
-        map(response => this.extractResult(response, flowName)),
-        map(responseText => {
-          const score = parseInt(responseText, 10);
-          if (isNaN(score)) {
-            console.error(`GenkitService (${flowName}): Failed to parse score from response: "${responseText}"`);
-            throw new Error(`Could not parse the score received from ${flowName}. Response: "${responseText}"`);
-          }
-          if (score < 1 || score > 10) {
-             console.warn(`GenkitService (${flowName}): Score ${score} is outside the expected range (1-10). Response: "${responseText}"`);
-
-          }
-          return score;
-        }),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          if (error instanceof Error && (error.message.startsWith('Could not parse the score received from') || error.message.startsWith('Score'))) {
-            return throwError(() => error);
-          }
-          return this.handleError(error, flowName);
-        }),
-        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
-        shareReplay({ bufferSize: 1, refCount: false })
-      );
-
-    this.cache.set(cacheKey, request$);
-    return request$;
+    const flowName = 'scoreIdeaFlow';    
+    return this._callFlow<ScoreIdeaRequestData, string, number>(
+      flowName,
+      data,
+      bypassCache,
+      noLoading,
+      {
+        transformFn: (responseText) => {
+            const score = parseInt(responseText, 10);
+            if (isNaN(score)) {
+              console.error(`GenkitService (${flowName}): Failed to parse score from response: "${responseText}"`);
+              throw new Error(`Could not parse the score received from ${flowName}. Response: "${responseText}"`);
+            }
+            if (score < 1 || score > 10) {
+               console.warn(`GenkitService (${flowName}): Score ${score} is outside the expected range (1-10). Response: "${responseText}"`);
+            }
+            return score;
+        },
+      }
+    );
   }
 
   callRequirementScore(
@@ -524,34 +365,13 @@ export class GenkitService {
     bypassCache = false,
     noLoading: boolean = false
   ): Observable<string> {
-    const flowName = 'requirementScoreFlow';
-    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
-    const headers = this.createHeaders();
-    const body = { data };
-    const cacheKey = this.generateCacheKey(flowName, data);
-    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
-
-    if (!bypassCache && this.cache.has(cacheKey)) {
-      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
-      return this.cache.get(cacheKey)!;
-    }
-
-    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
-    const request$ = this.http.post<GenkitFlowResponse<string>>(endpointUrl, body, { headers, context })
-      .pipe(
-        timeout(this.requestTimeout),
-        retry(1),
-        map(response => this.extractResult(response, flowName)),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return this.handleError(error, flowName);
-        }),
-        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
-        shareReplay({ bufferSize: 1, refCount: false })
-      );
-
-    this.cache.set(cacheKey, request$);
-    return request$;
+    const flowName = 'requirementScoreFlow';    
+    return this._callFlow<RequirementScoreRequestData, string>(
+      flowName,
+      data,
+      bypassCache,
+      noLoading
+    );
   }
 
   callHelpTask(
@@ -559,34 +379,13 @@ export class GenkitService {
     bypassCache = false,
     noLoading: boolean = false
   ): Observable<string> {
-    const flowName = 'helpTaskFlow';
-    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
-    const headers = this.createHeaders();
-    const body = { data };
-    const cacheKey = this.generateCacheKey(flowName, data);
-    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
-
-    if (!bypassCache && this.cache.has(cacheKey)) {
-      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
-      return this.cache.get(cacheKey)!;
-    }
-
-    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
-    const request$ = this.http.post<GenkitFlowResponse<string>>(endpointUrl, body, { headers, context })
-      .pipe(
-        timeout(this.requestTimeout),
-        retry(1),
-        map(response => this.extractResult(response, flowName)),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return this.handleError(error, flowName);
-        }),
-        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
-        shareReplay({ bufferSize: 1, refCount: false })
-      );
-
-    this.cache.set(cacheKey, request$);
-    return request$;
+    const flowName = 'helpTaskFlow';    
+    return this._callFlow<HelpTaskRequestData, string>(
+      flowName,
+      data,
+      bypassCache,
+      noLoading
+    );
   }
 
   callGetPrompt(
@@ -594,34 +393,13 @@ export class GenkitService {
     bypassCache = false,
     noLoading: boolean = false
   ): Observable<EncryptedPayloadData> {
-    const flowName = 'getPrompt';
-    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
-    const headers = this.createHeaders();
-    const body = { data };
-    const cacheKey = this.generateCacheKey(flowName, data);
-    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
-
-    if (!bypassCache && this.cache.has(cacheKey)) {
-      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
-      return this.cache.get(cacheKey)!;
-    }
-
-    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
-    const request$ = this.http.post<GenkitFlowResponse<EncryptedPayloadData>>(endpointUrl, body, { headers, context })
-      .pipe(
-        timeout(this.requestTimeout),
-        retry(1),
-        map(response => this.extractResult(response, flowName)),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return this.handleError(error, flowName);
-        }),
-        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
-        shareReplay({ bufferSize: 1, refCount: false })
-      );
-
-    this.cache.set(cacheKey, request$);
-    return request$;
+    const flowName = 'getPrompt';    
+    return this._callFlow<GetPromptRequestData, EncryptedPayloadData>(
+      flowName,
+      data,
+      bypassCache,
+      noLoading
+    );
   }
 
   callExecFlow(
@@ -629,33 +407,13 @@ export class GenkitService {
     bypassCache = false,
     noLoading: boolean = false
   ): Observable<string> {
-    const flowName = 'execFlow';
-    const endpointUrl = `${this.apiUrlBase}/${flowName}`;
-    const headers = this.createHeaders();
-    const body = { data };
-    const cacheKey = this.generateCacheKey(flowName, data);
-    const context = new HttpContext().set(BYPASS_LOADING, noLoading);
-
-    if (!bypassCache && this.cache.has(cacheKey)) {
-      console.log(`GenkitService: Returning cached response for ${cacheKey}`);
-      return this.cache.get(cacheKey)!;
-    }
-
-    console.log(`GenkitService: Calling ${endpointUrl} (Cache key: ${cacheKey}, Bypass: ${bypassCache})`, body);
-    const request$ = this.http.post<GenkitFlowResponse<string>>(endpointUrl, body, { headers, context })
-      .pipe(
-        timeout(this.requestTimeout),
-        retry(1),
-        map(response => this.extractResult(response, flowName)),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return this.handleError(error, flowName);
-        }),
-        tap(() => console.log(`GenkitService: Caching response for ${cacheKey}`)),
-        shareReplay({ bufferSize: 1, refCount: false })
-      );
-    this.cache.set(cacheKey, request$);
-    return request$;
+    const flowName = 'execFlow';    
+    return this._callFlow<ExecFlowRequestData, string>(
+      flowName,
+      data,
+      bypassCache,
+      noLoading
+    );
   }
 
   clearCache(): void {
