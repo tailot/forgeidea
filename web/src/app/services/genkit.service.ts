@@ -5,41 +5,43 @@ import { catchError, map, retry, timeout, shareReplay, tap } from 'rxjs/operator
 import { environment } from '../../environments/environment';
 import { BYPASS_LOADING } from './loading-interceptor.service';
 
-export interface ScoreIdeaRequestData {
+export interface WithLanguage {
+  language?: string;
+}
+
+export interface WithMandatoryLanguage {
+  language: string;
+}
+
+export interface WithIdeaText {
   idea: string;
 }
 
-export interface GenerateIdeaCategoriesRequestData {
-  count?: number,
-  language?: string;
-  context?: string;
+export interface WithCategory {
+  category: string;
 }
 
-export interface GenerateIdeaRequestData {
-  category: string;
-  language?: string;
+export interface BaseIdeaIdentity {
+  id: string;
+  text: string;
+}
+
+export interface ScoreIdeaRequestData extends WithIdeaText {}
+
+export interface GenerateIdeaCategoriesRequestData extends WithLanguage {
+  count?: number;
+  context?: string;
 }
 
 export interface RandomIdeaRequestData {
   language?: string;
 }
 
-export interface SubjectRequestData {
-  idea: string;
-  language?: string;
-}
+export interface GenerateIdeaRequestData extends WithCategory, WithLanguage {}
 
-export interface GenerateTasksRequestData {
-  idea: string;
-  language?: string;
-}
+export interface SubjectRequestData extends WithIdeaText, WithLanguage {}
 
-export interface DiscardTasksRequestData {
-  idea: string;
-  tasks: string;
-  tasksdiscard: string;
-  language?: string;
-}
+export interface GenerateTasksRequestData extends  SubjectRequestData {}
 
 /*
 export interface ZoomTaskRequestData {
@@ -49,23 +51,23 @@ export interface ZoomTaskRequestData {
 }
 */
 
-export interface RequirementScoreRequestData {
-  category: string;
-  maxscore: number;
-  language: string;
+export interface DiscardTasksRequestData extends WithIdeaText, WithLanguage {
+  tasks: string;
+  tasksdiscard: string;
 }
 
-export interface OperationRequestData {
+export interface RequirementScoreRequestData extends WithCategory, WithMandatoryLanguage {
+  maxscore: number;
+}
+
+export interface OperationRequestData extends WithLanguage {
   idea1: string;
   idea2?: string;
   operation: "Combine" | "Integrate";
-  language?: string;
 }
 
-export interface HelpTaskRequestData {
-  idea: string;
+export interface HelpTaskRequestData extends WithIdeaText, WithLanguage {
   task: string;
-  language?: string;
 }
 
 export interface GetPromptRequestData {
@@ -84,7 +86,6 @@ export interface ExecFlowRequestData {
   promptVariables?: Record<string, any>;
 }
 
-
 export interface IdeaDocument {
   key: string;
   name?: string;
@@ -92,14 +93,10 @@ export interface IdeaDocument {
   createdAt: number;
 }
 
-export interface Idea {
-  id: string;
-  text: string;
+export interface Idea extends BaseIdeaIdentity, WithLanguage {
   category?: string;
-  language?: string;
   documents?: IdeaDocument[]
 }
-
 
 export interface GenkitFlowResponse<T> {
   result?: T;
