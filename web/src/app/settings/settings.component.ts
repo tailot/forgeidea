@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { SettingsDatabasesComponent } from '../settings-databases/settings-databases.component';
@@ -18,10 +18,18 @@ import { SettingsDominiumComponent } from '../settings-dominium/settings-dominiu
   styleUrls: ['./settings.component.sass']
 })
 export class SettingsComponent {
+  refresh = true;
   dominium = false;
 
-  dominiumIs(event: boolean){
-    this.dominium = event;
+  dominiumIs(isDominium: boolean){
+    this.dominium = isDominium;
   }
 
+  databaseIsChanged() {
+    this.refresh = false;
+
+    setTimeout(() => {
+      this.refresh = true;
+    });
+  }
 }

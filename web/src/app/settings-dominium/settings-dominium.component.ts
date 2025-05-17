@@ -12,7 +12,6 @@ import { catchError, tap, switchMap, finalize } from 'rxjs/operators';
 import { GenkitService, GetPromptRequestData, EncryptedPayloadData } from '../services/genkit.service';
 import { StorageService } from '../services/storage.service';
 
-
 @Component({
   selector: 'app-settings-dominium',
   imports: [
@@ -29,7 +28,7 @@ import { StorageService } from '../services/storage.service';
 })
 export class SettingsDominiumComponent implements OnInit, OnDestroy {
   @Output() dominiumOn = new EventEmitter<boolean>();
-  
+
   errorGenerator = false;
   isSettingDominium = false
   dominiumValue: string | undefined;
@@ -39,15 +38,16 @@ export class SettingsDominiumComponent implements OnInit, OnDestroy {
   constructor(
     private genkitService: GenkitService,
     private storageService: StorageService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadDominiumSubscription = from(this.storageService.getItem<string>('generator')).pipe(
       tap(value => {
         this.dominiumValue = value;
-        if(value){
-        this.dominiumOn.emit(true);
-
+        if (value) {
+          this.dominiumOn.emit(true);
+        }else{
+          this.dominiumOn.emit(false);
         }
         console.log('Dominium value loaded from storage:', this.dominiumValue);
       }),
@@ -100,7 +100,6 @@ export class SettingsDominiumComponent implements OnInit, OnDestroy {
       }),
       catchError(error => {
         this.setDefaultValue()
-        this.dominiumOn.emit(false);
         this.errorGenerator = true;
         console.error('Error during setDominium operations chain (_idea or _category):', error);
         return EMPTY;
@@ -132,11 +131,12 @@ export class SettingsDominiumComponent implements OnInit, OnDestroy {
     console.log('Dominium-related items removed from storage.');
   }
 
-  setDefaultValue(){
+  setDefaultValue() {
     this.dominiumValue = '';
     this.cleanStorage()
     this.dominiumOn.emit(false);
   }
+
   ngOnDestroy(): void {
     if (this.setDominiumSubscription) {
       this.setDominiumSubscription.unsubscribe();

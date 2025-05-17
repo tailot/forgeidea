@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -11,7 +11,6 @@ import { MatCardModule } from '@angular/material/card';
 import { DialogData } from '../dialog/dialog.component'
 import { StorageService } from '../services/storage.service';
 import { DialogService } from '../services/dialog.service';
-
 
 interface KeyValueItem {
   key: string;
@@ -33,6 +32,7 @@ export class SettingsDatabasesComponent {
   isSwitchingDb: boolean = false;
   isCreatingDb: boolean = false;
 
+  @Output() change: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   constructor(
@@ -48,16 +48,16 @@ export class SettingsDatabasesComponent {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('Il dialogo è stato chiuso', result);
+      console.log('Dialog closed', result);
     });
   }
-  ngOnInit(): void {
-    this.loadDatabaseState();
+  async ngOnInit(): Promise<void> {
+    await this.loadDatabaseState();
   }
 
-  private loadDatabaseState(): void {
-    this.initializedDbNames = this.storageService.getInitializedDatabaseNames();
-    this.currentDbName = this.storageService.getCurrentDatabaseName();
+  private async loadDatabaseState(): Promise<void> {
+    this.initializedDbNames = await this.storageService.getInitializedDatabaseNames();
+    this.currentDbName = await this.storageService.getCurrentDatabaseName();
     console.log('Loaded database state - Current DB:', this.currentDbName, 'Initialized DBs:', this.initializedDbNames);
   }
 
@@ -74,6 +74,7 @@ export class SettingsDatabasesComponent {
       await this.storageService.switchDatabase(newDbName);
       this.initializedDbNames = this.storageService.getInitializedDatabaseNames();
       console.log(`Successfully switched to database: ${this.storageService.getCurrentDatabaseName()}`);
+      this.change.emit();
     } catch (error) {
       console.error(`Error switching to database '${newDbName}':`, error);
       this.currentDbName = this.storageService.getCurrentDatabaseName();
@@ -94,6 +95,7 @@ export class SettingsDatabasesComponent {
         message: "Database is cleared.",
         closeButtonText: "OK"
       })
+      this.change.emit();
       console.log(`All data in database '${currentDbToClear}' has been cleared.`);
     } catch (error) {
       console.error(`Error clearing database '${currentDbToClear}':`, error);
@@ -132,6 +134,7 @@ export class SettingsDatabasesComponent {
       URL.revokeObjectURL(url);
 
       console.log(`Backup completed (${backupData.length} items). File downloaded.`);
+
     } catch (error) {
       console.error('Error during backup:', error);
     } finally {
@@ -232,6 +235,7 @@ export class SettingsDatabasesComponent {
       this.currentDbName = this.storageService.getCurrentDatabaseName();
       this.initializedDbNames = this.storageService.getInitializedDatabaseNames();
     } finally {
+      this.change.emit();
       this.isCreatingDb = false;
     }
   }

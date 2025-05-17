@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     environment:
       GEMINI_API_KEY: KEYKUAKEY
+      KEYCIPHER: KUAKEYKUA
       CUSTOM_MODEL: googleai/gemini-2.0-flash
       ORIGIN: '*'
     ports:

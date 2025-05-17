@@ -45,5 +45,6 @@ export const routes: Routes = [
         path: 'tos',
         loadComponent: () => import('./tos/tos.component').then(m => m.TosComponent),
         title: 'Terms of service - forge IDEA'
-    }
+    },
+    { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
