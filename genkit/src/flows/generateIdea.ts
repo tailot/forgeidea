@@ -11,7 +11,6 @@ export const generateIdeaFlow = ai.defineFlow(
     outputSchema: z.string().describe("The generated idea"),
   },
   async (params) => {
-    console.log(`Generating idea for category: ${params.category}`);
     try {
       const ideaPromptFunction = ai.prompt('idea');
       const modelToUse = process.env.CUSTOM_MODEL;
@@ -28,7 +27,6 @@ export const generateIdeaFlow = ai.defineFlow(
       );
 
       const ideaText = result.text;
-      console.log("Idea generated successfully:", ideaText);
       return ideaText;
 
     } catch (error) {
