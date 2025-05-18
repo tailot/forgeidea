@@ -4,6 +4,7 @@
     "@genkit-ai/googleai": "^1.9.0",
     "dotenv": "^16.5.0",
     "genkit": "^1.9.0",
+    "genkitx-groq": "^0.22.0",
     "genkitx-ollama": "^1.9.0",
     "zod": "^3.24.3"
   },
