@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { SettingsDatabasesComponent } from '../settings-databases/settings-databases.component';
 import { SettingsScoreComponent } from '../settings-score/settings-score.component';
 import { SettingsDominiumComponent } from '../settings-dominium/settings-dominium.component';
+import { SettingsThemeComponent } from '../settings-theme/settings-theme.component';
+
 
 @Component({
   selector: 'app-settings',
@@ -12,7 +14,8 @@ import { SettingsDominiumComponent } from '../settings-dominium/settings-dominiu
     SettingsDatabasesComponent,
     SettingsScoreComponent,
     SettingsDominiumComponent,
-    CommonModule
+    CommonModule,
+    SettingsThemeComponent
   ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.sass']

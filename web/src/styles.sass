@@ -1,40 +1,56 @@
-@use '@angular/material' as mat;
-@use 'static-assets/theme-colors' as theme;
-@import 'static-assets/material-icons.css';
+@use '@angular/material' as mat
+@use 'static-assets/theme-colors' as app-colors
+@import 'static-assets/material-icons.css'
 
 html
-  color-scheme: light;
   @include mat.theme((
-    color: mat.$violet-palette,
-    typogra phy: Roboto,
+    color: (
+      primary: app-colors.$primary-palette,
+      tertiary: app-colors.$tertiary-palette,
+    ),
+    typography: 'Roboto, "Helvetica Neue", sans-serif',
     density: 0
-  ));
+  ))
 
 body
-  margin: 0 // Reset del margine
-  font-family: Roboto, "Helvetica Neue", sans-serif
+  background: var(--mat-sys-surface)
+  color: var(--mat-sys-on-surface)
+  margin: 0
+  font-family: 'Roboto, "Helvetica Neue", sans-serif'
 
-a
-  color: #007bff // Un colore personalizzato per i link
-  text-decoration: none
-  &:hover
-    text-decoration: underline
+.theme-light
+  color-scheme: light
+
+  a
+    color: #007bff
+
+  mat-chip-listbox mat-chip-option[aria-selected="true"]
+    background-color: var(--mat-sys-primary) !important
+    color: var(--mat-sys-on-primary) !important
+
+.theme-dark
+  color-scheme: dark
+
+  a
+    color: #64b5f6
+
+  mat-chip-listbox mat-chip-option[aria-selected="true"]
+    background-color: var(--mat-sys-primary) !important
+    color: var(--mat-sys-on-primary) !important
 
 .contact-info a
-    color: #0056b3; /* Blu accessibile con buon contrasto su sfondi chiari */
-    text-decoration: underline;
-  
-.contact-info a:hover, .contact-info a:focus
-    color: #003d80;
-  
-.contact-info a:focus-visible
-    outline: 2px solid #0056b3;
-    outline-offset: 2px;
-    border-radius: 2px;
-  
+  color: #0056b3
+  text-decoration: underline
+  &:hover, &:focus
+    color: #003d80
+  &:focus-visible
+    outline: 2px solid #0056b3
+    outline-offset: 2px
+    border-radius: 2px
+
 pre
-  white-space: pre-wrap; 
-  word-wrap: break-word;
+  white-space: pre-wrap
+  word-wrap: break-word
 
 .container
   max-width: 1200px
@@ -48,11 +64,5 @@ mat-chip-listbox
   gap: 10px
   margin-bottom: 20px
   width: 100%
-
   mat-chip-option
     cursor: pointer
-
-  mat-chip-option[aria-selected="true"]
-    background-color: #3f51b5 !important // Mantieni lo sfondo blu
-
-    --mdc-chip-label-text-color: white !important

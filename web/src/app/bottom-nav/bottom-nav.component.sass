@@ -1,6 +1,4 @@
-
 $bottom-nav-z-index: 1050
-$active-nav-color: red;
 
 :host
   position: fixed
@@ -8,7 +6,7 @@ $active-nav-color: red;
   left: 0
   right: 0
   z-index: $bottom-nav-z-index
-  box-shadow: 0 -2px 5px rgba(0,0,0, 0.1)
+  box-shadow: 0 -2px 7px rgba(0,0,0, 0.3)
 
 .bottom-nav-toolbar
   justify-content: space-around
@@ -21,7 +19,7 @@ $active-nav-color: red;
     cursor: pointer
 
     &.active-nav-link
-      color: $active-nav-color
+      color: var(--mat-sys-primary)
 
 .nav-button > div
   display: flex;
