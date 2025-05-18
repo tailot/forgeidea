@@ -1,7 +1,14 @@
+@use '@angular/material' as mat;
+@use 'static-assets/theme-colors' as theme;
 @import 'static-assets/material-icons.css';
 
-html, body
-  height: 100%
+html
+  color-scheme: light;
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typogra phy: Roboto,
+    density: 0
+  ));
 
 body
   margin: 0 // Reset del margine
@@ -34,14 +41,6 @@ pre
   margin: 0 auto
   padding: 1rem
 
-mat-card
-
-  mat-card-title
-    color: yellow // Colore del titolo giallo
-
-  mat-card-content
-    color: white // Colore del testo del contenuto bianco
-
 mat-chip-listbox
   display: flex
   flex-wrap: wrap
@@ -52,8 +51,6 @@ mat-chip-listbox
 
   mat-chip-option
     cursor: pointer
-
-    --mdc-chip-label-text-color: black !important
 
   mat-chip-option[aria-selected="true"]
     background-color: #3f51b5 !important // Mantieni lo sfondo blu
