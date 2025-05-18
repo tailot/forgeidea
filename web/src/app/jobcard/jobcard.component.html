@@ -11,11 +11,17 @@
     <div *ngIf="selectedTasks && selectedTasks.length > 0" class="confirm-button-container">
       <mat-button-toggle-group #toggleGroup="matButtonToggleGroup">
         <mat-button-toggle aria-label="Remove a task" value="discard" (click)="discardTask()">
-          <mat-icon>delete_sweep</mat-icon></mat-button-toggle>
+          <mat-icon>delete_sweep</mat-icon>
+          <span>Remove</span>
+        </mat-button-toggle>
         <mat-button-toggle aria-label="Download the detail document for the selected task." *ngIf="selectedTasks.length === 1" value="zoom" (click)="helpTask()">
-          <mat-icon>info</mat-icon></mat-button-toggle>
+          <mat-icon>info</mat-icon>
+          <span>Detail</span>
+        </mat-button-toggle>
         <mat-button-toggle aria-label="Deselect all tasks" value="deselect" (click)="deselectAllTasks()">
-          <mat-icon>deselect</mat-icon></mat-button-toggle>
+          <mat-icon>deselect</mat-icon>
+          <span>Deselect</span>
+        </mat-button-toggle>
       </mat-button-toggle-group>
     </div>
     <div *ngIf="tasks && tasks.length > 0" class="task-list-container">
@@ -29,11 +35,17 @@
     <div *ngIf="zoomedTaskResult" class="zoomed-task-result-wrapper">
       <mat-button-toggle-group #zoomedTaskActionsGroup="matButtonToggleGroup">
         <mat-button-toggle aria-label="Allows you to listen or stop listening to the document." value="play" (click)="playTask(zoomedTaskResult)">
-          <mat-icon>play_arrow</mat-icon></mat-button-toggle>
+          <mat-icon>play_arrow</mat-icon>
+          <span>Play</span>
+        </mat-button-toggle>
         <mat-button-toggle aria-label="It allows you to archive the document so you can consult it even offline." value="save" (click)="saveDocument()">
-          <mat-icon>archive</mat-icon></mat-button-toggle>
+          <mat-icon>archive</mat-icon>
+          <span>Save</span>
+        </mat-button-toggle>
         <mat-button-toggle aria-label="Stop viewing this document." value="close" (click)="zoomedTaskResult=null">
-          <mat-icon>close</mat-icon></mat-button-toggle>
+          <mat-icon>close</mat-icon>
+          <span>Close</span>
+        </mat-button-toggle>
       </mat-button-toggle-group>
       <button aria-label="Download and view the document related to the previous task." mat-icon-button *ngIf="selectedTasks.length === 1 && tasks && tasks.indexOf(selectedTasks[0]) >= 1"
         (click)="selectPreviousTask()" class="nav-button left-nav">
