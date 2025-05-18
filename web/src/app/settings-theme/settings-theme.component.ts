@@ -2,6 +2,7 @@ import { Component, OnInit, Renderer2, Inject } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatCardModule } from '@angular/material/card';
+import { StorageService } from '../services/storage.service';
 
 @Component({
   selector: 'app-settings-theme',
@@ -19,7 +20,8 @@ export class SettingsThemeComponent implements OnInit {
 
   constructor(
     private renderer: Renderer2,
-    @Inject(DOCUMENT) private document: Document
+    @Inject(DOCUMENT) private document: Document,
+    private storageService: StorageService
   ) { }
 
   ngOnInit(): void {
@@ -27,16 +29,19 @@ export class SettingsThemeComponent implements OnInit {
   }
 
   private loadThemePreference(): void {
-    const storedPreference = localStorage.getItem(this.themeKey);
-    this.isDarkMode = storedPreference === this.darkThemeClass;
-    this.isDarkModeActive = this.isDarkMode;
-    this.applyTheme();
+    this.storageService.getItem<string>(this.themeKey).then(theme => {
+        this.isDarkMode = theme === this.darkThemeClass;
+        this.isDarkModeActive = this.isDarkMode;
+        this.applyTheme();
+    }).catch(error => {
+      console.error("Error loading theme preference from database:", error);
+    });
   }
 
   toggleTheme(): void {
     this.isDarkMode = !this.isDarkMode;
     this.isDarkModeActive = this.isDarkMode;
-    localStorage.setItem(this.themeKey, this.isDarkMode ? this.darkThemeClass : this.lightThemeClass);
+    this.storageService.setItem(this.themeKey, this.isDarkMode ? this.darkThemeClass : this.lightThemeClass);
     this.applyTheme();
   }
 

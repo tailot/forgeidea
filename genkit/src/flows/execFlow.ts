@@ -1,8 +1,8 @@
 import { ai } from '../config/genkit';
 import { z } from 'zod';
 import { FlowCryptographer, EncryptedPayload } from '../lib/cypher';
-import * as crypto from 'crypto';
 import { generate } from '@genkit-ai/ai';
+import { getModelToUse } from '../config/genkit';
 
 // Zod schema for the encrypted payload part, matching the EncryptedPayload interface
 const EncryptedPayloadSchema = z.object({
@@ -24,9 +24,13 @@ export const execFlow = ai.defineFlow(
         outputSchema: z.string().describe("The AI model's response to the decrypted prompt, or an empty string if decryption fails."),
     },
     async (input: z.infer<typeof ExecFlowInputSchema>): Promise<string> => {
-        if (!process.env.KEYCIPHER) return '';
+        const keyCipher = process.env.KEYCIPHER;
+        if (!keyCipher) {
+            console.error("execFlow: KEYCIPHER environment variable is not set.");
+            return '';
+        }
 
-        const basekey = process.env.KEYCIPHER;
+        const basekey = keyCipher;
         const buffKey = Buffer.from(basekey, 'base64');
 
         let cryptographer: FlowCryptographer;
@@ -41,8 +45,15 @@ export const execFlow = ai.defineFlow(
         }
 
         let decryptedPromptTemplate: string;
+        const encryptedPayload = input.encryptedPromptPayload;
+
+        if (!encryptedPayload || typeof encryptedPayload.iv !== 'string' || typeof encryptedPayload.encryptedData !== 'string' || typeof encryptedPayload.authTag !== 'string') {
+             console.error("execFlow: Invalid encrypted payload structure.");
+             return "";
+        }
+
         try {
-            decryptedPromptTemplate = cryptographer.decrypt(input.encryptedPromptPayload);
+            decryptedPromptTemplate = cryptographer.decrypt(encryptedPayload);
         } catch (decryptionError) {
             console.warn(
                 'execFlow: Decryption failed (possibly invalid key, tampered data, or mismatched KEYCIPHER):',
@@ -52,10 +63,10 @@ export const execFlow = ai.defineFlow(
         }
 
         if (!decryptedPromptTemplate || decryptedPromptTemplate.trim() === '') {
-            console.warn("execFlow: Decrypted prompt is empty. Executing empty prompt.");
+            console.warn("execFlow: Decrypted prompt is empty or whitespace only. Cannot execute.");
+            return "";
         }
 
-        // Substitute variables in the decrypted prompt template if promptVariables are provided
         let finalPromptText = decryptedPromptTemplate;
         if (input.promptVariables) {
             finalPromptText = Object.entries(input.promptVariables).reduce(
@@ -67,7 +78,7 @@ export const execFlow = ai.defineFlow(
         }
 
         try {
-            const modelName = process.env.CUSTOM_MODEL;
+            const modelName = getModelToUse();
             if (!modelName) {
                 console.error("execFlow: CUSTOM_MODEL environment variable is not set.");
                 throw new Error("CUSTOM_MODEL is not configured for prompt execution.");

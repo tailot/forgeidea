@@ -1,4 +1,4 @@
-import { ai } from '../config/genkit';
+import { ai, getModelToUse } from '../config/genkit';
 import { z } from 'zod';
 import { generateIdeaFlow } from '../flows/generateIdea';
 import { scoreIdeaFlow } from '../flows/scoreidea';
@@ -20,7 +20,7 @@ export const miningFlow = ai.defineFlow(
             };
             const idea = await generateIdeaFlow(paramInput);
             const score = await scoreIdeaFlow({idea: idea});
-            const modelToUse = process.env.CUSTOM_MODEL;
+            const modelToUse = getModelToUse();
 
             const competitorsPrompt = ai.prompt('competitors');
 

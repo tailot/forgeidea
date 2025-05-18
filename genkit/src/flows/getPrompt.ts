@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 
 import { FlowCryptographer } from '../lib/cypher';
+import { getModelToUse } from '../config/genkit';
 
 export const getPromptFlow = ai.defineFlow(
   {
@@ -22,7 +23,13 @@ export const getPromptFlow = ai.defineFlow(
     })
   },
   async (input) => {
-    const basekey = process.env.KEYCIPHER || crypto.randomBytes(32).toString('base64');
+    const keyCipher = process.env.KEYCIPHER;
+    if (!keyCipher) {
+        console.error("getPrompt: KEYCIPHER environment variable is not set. Cannot encrypt prompt.");
+        throw new Error("KEYCIPHER environment variable is not set.");
+    }
+
+    const basekey = keyCipher;
     const buffKey = Buffer.from(basekey, 'base64');
     const cryptographer = new FlowCryptographer(buffKey);
 
@@ -47,7 +54,13 @@ export const getPromptFlow = ai.defineFlow(
             generator: generator,
             prompt: promptContent,
         }
-        const modelToUse = process.env.CUSTOM_MODEL;
+        const modelToUse = getModelToUse();
+
+        if (!modelToUse) {
+          console.error("getPrompt: AI model not configured. Please set \n CUSTOM_MODELS environment variable.");
+          throw new Error("AI model not configured for prompt execution.");
+        }
+
         const promptRunner = ai.prompt("meta"+promptname)
 
         const result = await promptRunner(

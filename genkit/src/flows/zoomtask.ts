@@ -1,6 +1,8 @@
 import { ai } from '../config/genkit'
 import { z } from 'zod';
 
+import { getModelToUse } from '../config/genkit';
+
 const TaskInputSchema = z.object({
   idea: z.string().describe("The text of the idea"),
   task: z.string().describe("The task to be developed"),
@@ -17,7 +19,12 @@ export const zoomTaskFlow = ai.defineFlow(
   },
   async (input) => {
     const develPrompt = ai.prompt('zoomtask');
-    const modelToUse = process.env.CUSTOM_MODEL;
+    const modelToUse = getModelToUse();
+
+    if (!modelToUse) {
+      throw new Error("AI model not configured. Please set \n CUSTOM_MODELS environment variable.");
+    }
+
     const result = await develPrompt(
       input, {
       model: modelToUse

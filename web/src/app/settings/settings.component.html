@@ -1,5 +1,5 @@
 <div class="settings-container">
-  <app-settings-theme></app-settings-theme>
+  <app-settings-theme *ngIf="refresh"></app-settings-theme>
   <app-settings-databases (change)="databaseIsChanged()"></app-settings-databases>
     <app-settings-score *ngIf="refresh && !dominium"></app-settings-score>
   <app-settings-dominium *ngIf="refresh" (dominiumOn)="dominiumIs($event)">

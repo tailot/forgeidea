@@ -4,6 +4,8 @@ import { generate } from '@genkit-ai/ai';
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { getModelToUse } from '../config/genkit';
+
 export const requirementScoreFlow = ai.defineFlow(
     {
         name: 'requirementScoreFlow',
@@ -72,12 +74,21 @@ export const requirementScoreFlow = ai.defineFlow(
             throw new Error("The final 'result' prompt is empty or undefined.");
         }
 
-        const modelToUse = process.env.CUSTOM_MODEL;
+        const modelToUse = getModelToUse();
+
+        if (!modelToUse) {
+          console.error("requirementScoreFlow: AI model not configured. Please set CUSTOM_MODEL or CUSTOM_MODELS environment variable.");
+          throw new Error("AI model not configured for prompt execution.");
+        }
 
         const response = await generate(ai.registry, {
             prompt: promptToRun,
             model: modelToUse,
         });
+
+        if (!modelToUse) {
+          throw new Error("AI model not configured. Please set \n CUSTOM_MODELS environment variable.");
+        }
 
         return response.text;
     }

@@ -5,8 +5,9 @@ services:
       dockerfile: Dockerfile
     environment:
       GEMINI_API_KEY: KEYKUAKEY
+      GROQ_API_KEY: KEYTUATUA
       KEYCIPHER: KUAKEYKUA
-      CUSTOM_MODEL: googleai/gemini-2.0-flash
+      CUSTOM_MODELS: googleai/gemini-2.0-flash,groq/llama-3-70b,ollama/gemma3:4b
       ORIGIN: '*'
     ports:
         - "4001:4001"

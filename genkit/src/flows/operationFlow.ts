@@ -1,6 +1,8 @@
 import { ai } from '../config/genkit';
 import { z } from 'zod';
 
+import { getModelToUse } from '../config/genkit';
+
 export const operationFlow = ai.defineFlow(
   {
     name: 'ideaOperationFlow',
@@ -17,7 +19,11 @@ export const operationFlow = ai.defineFlow(
   },
   async (input) => {
     const ideaOperationPrompt = ai.prompt('operationidea');
-    const modelToUse = process.env.CUSTOM_MODEL;
+    const modelToUse = getModelToUse();
+
+    if (!modelToUse) {
+      throw new Error("AI model not configured. Please set \n CUSTOM_MODELS environment variable.");
+    }
 
     const result = await ideaOperationPrompt(
       input, {
