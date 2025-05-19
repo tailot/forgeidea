@@ -22,24 +22,49 @@ export class AppDB extends Dexie {
 })
 export class StorageService {
   private readonly DEFAULT_NAME_DB = 'forgeIDEA';
+  readonly DEFAULT_DB_STORAGE_KEY = 'defaultDB';
 
   private dbs: Map<string, AppDB> = new Map();
   private currentDb!: AppDB;
   private currentDbName: string;
 
-  constructor() {
-    this.currentDbName = this.DEFAULT_NAME_DB;
+  private readyPromise: Promise<void>;
+  private resolveReady!: () => void;
 
+
+  constructor() {
+    this.readyPromise = new Promise(resolve => {
+      this.resolveReady = resolve;
+    });
+    this.currentDbName = this.DEFAULT_NAME_DB;
     const defaultDbInstance = new AppDB(this.currentDbName);
     this.dbs.set(this.currentDbName, defaultDbInstance);
     this.currentDb = defaultDbInstance;
 
-    this.currentDb.open().catch(err => {
-      console.error(`StorageService: Error opening default database '${this.currentDbName}': ${err.stack || err}`);
-    });
-    console.log(`StorageService (Dexie-based) initialized. Default database: '${this.currentDbName}'.`);
+    // Asynchronously open the default DB and then proceed with other initializations
+    // that might depend on DB state.
+    const initializeAsync = async () => {
+      try {
+        await this.currentDb.open();
+        console.log(`StorageService (Dexie-based) initialized. Default database: '${this.currentDbName}' opened.`);
+        
+        await this.loadExistingDatabaseNames();
+        await this.applyDefaultDatabaseSetting();
 
-    this.loadExistingDatabaseNames();
+      } catch (err: any) {
+        console.error(`StorageService: Critical error during async initialization: ${err.stack || err}`);
+      } finally {
+        this.resolveReady();
+        console.log(`StorageService: Async initialization finished. Ready state resolved.`);
+      }
+    };
+
+    initializeAsync();
+    console.log(`StorageService: Synchronous part of constructor finished. Async initialization started.`);
+  }
+
+  public async whenReady(): Promise<void> {
+    return this.readyPromise;
   }
 
   public async createDatabase(dbName: string): Promise<void> {
@@ -262,5 +287,43 @@ export class StorageService {
     }
     await this.loadExistingDatabaseNames();
     console.log(`StorageService: Database list refreshed after deletion of '${dbName}'. Current databases in map: ${Array.from(this.dbs.keys()).join(', ')}`);
+  }
+
+  public async applyDefaultDatabaseSetting(): Promise<void> {
+    console.log(`StorageService: Checking for '${this.DEFAULT_DB_STORAGE_KEY}' setting in current DB '${this.currentDbName}' to apply as default.`);
+
+    let preferredDbName: string | undefined;
+    try {
+      // Ensure the current DB is open before trying to read from it.
+      // Dexie's getItem should handle opening if not already open, but an explicit check can be safer during init.
+      if (!this.currentDb.isOpen()) {
+          console.log(`StorageService: Current DB '${this.currentDbName}' is not open. Attempting to open before reading '${this.DEFAULT_DB_STORAGE_KEY}'.`);
+          await this.currentDb.open();
+          console.log(`StorageService: Current DB '${this.currentDbName}' opened successfully.`);
+      }
+      preferredDbName = await this.getItem<string>(this.DEFAULT_DB_STORAGE_KEY);
+    } catch (error) {
+      console.error(`StorageService: Error reading '${this.DEFAULT_DB_STORAGE_KEY}' from '${this.currentDbName}': ${error instanceof Error ? error.stack : error}. Will not switch based on this setting.`);
+      return; 
+    }
+
+    if (preferredDbName && typeof preferredDbName === 'string') {
+      if (preferredDbName === this.currentDbName) {
+        console.log(`StorageService: Preferred default database '${preferredDbName}' (from '${this.DEFAULT_DB_STORAGE_KEY}') is already the current database. No switch needed.`);
+        return;
+      }
+
+      console.log(`StorageService: Found preferred default database '${preferredDbName}' from '${this.DEFAULT_DB_STORAGE_KEY}' setting. Attempting to switch...`);
+      try {
+        await this.switchDatabase(preferredDbName);
+        console.log(`StorageService: Successfully switched to preferred default database '${this.currentDbName}' based on '${this.DEFAULT_DB_STORAGE_KEY}' setting.`);
+      } catch (switchError) {
+        console.error(`StorageService: Failed to switch to preferred default database '${preferredDbName}' (from '${this.DEFAULT_DB_STORAGE_KEY}'): ${switchError instanceof Error ? switchError.stack : switchError}.`);
+      }
+    } else if (preferredDbName === undefined) {
+      console.log(`StorageService: No '${this.DEFAULT_DB_STORAGE_KEY}' setting found in '${this.currentDbName}'. No automatic switch will occur based on this setting.`);
+    } else {
+      console.warn(`StorageService: Invalid value for '${this.DEFAULT_DB_STORAGE_KEY}' setting in '${this.currentDbName}':`, preferredDbName, `. Expected a string. No automatic switch will occur.`);
+    }
   }
 }
