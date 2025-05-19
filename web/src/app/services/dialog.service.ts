@@ -1,7 +1,14 @@
+// Angular Core
 import { Injectable } from '@angular/core';
+
+// Angular Material
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { DialogComponent, DialogData } from '../dialog/dialog.component';
+
+// RxJS
 import { Observable, map } from 'rxjs';
+
+// Application-specific Components and Models
+import { DialogComponent, DialogData } from '../dialog/dialog.component';
 
 @Injectable({
   providedIn: 'root'

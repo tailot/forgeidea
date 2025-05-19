@@ -1,8 +1,12 @@
+// Angular Core and Forms
 import { Component, OnInit } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatSliderModule } from '@angular/material/slider';
 import { FormsModule } from '@angular/forms';
 
+// Angular Material Modules
+import { MatCardModule } from '@angular/material/card';
+import { MatSliderModule } from '@angular/material/slider';
+
+// Application-specific Services
 import { StorageService } from '../services/storage.service';
 
 @Component({

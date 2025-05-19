@@ -77,7 +77,7 @@ export const requirementScoreFlow = ai.defineFlow(
         const modelToUse = getModelToUse();
 
         if (!modelToUse) {
-          console.error("requirementScoreFlow: AI model not configured. Please set CUSTOM_MODEL or CUSTOM_MODELS environment variable.");
+          console.error("requirementScoreFlow: AI model not configured. Please set CUSTOM_MODELS environment variable.");
           throw new Error("AI model not configured for prompt execution.");
         }
 

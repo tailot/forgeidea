@@ -1,9 +1,16 @@
+// Angular Core
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse, HttpContext } from '@angular/common/http';
+
+// Angular Common/HTTP
+import { HttpClient, HttpContext, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+
+// RxJS
 import { Observable, throwError } from 'rxjs';
-import { catchError, map, retry, timeout, shareReplay, tap } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
+import { catchError, map, retry, shareReplay, tap, timeout } from 'rxjs/operators';
+
+// Application-specific
 import { BYPASS_LOADING } from './loading-interceptor.service';
+import { environment } from '../../environments/environment';
 
 export interface WithLanguage {
   language?: string;

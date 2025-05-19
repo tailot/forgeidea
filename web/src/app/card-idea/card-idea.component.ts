@@ -1,17 +1,25 @@
+// Angular Core and Common
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Router } from '@angular/router';
+
+// Angular Material Modules
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+
+// Third-party Libraries
 import { io, Socket as SocketIoClientSocket } from 'socket.io-client';
 
-import { StorageService } from '../services/storage.service';
-import { Idea, GenkitService, GenerateTasksRequestData, ScoreIdeaRequestData, OperationRequestData } from '../services/genkit.service';
+// Application-specific Services and Models
+import { GenkitService, Idea, GenerateTasksRequestData, ScoreIdeaRequestData, OperationRequestData } from '../services/genkit.service';
 import { LanguageService } from '../services/language.service';
+import { StorageService } from '../services/storage.service';
+
+// Environment
 import { environment } from '../../environments/environment';
 
 export interface CardIdeaEmitData {

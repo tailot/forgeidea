@@ -1,15 +1,21 @@
-import { Component, OnDestroy, OnInit, Output, EventEmitter } from '@angular/core';
+// Angular Core, Common, and Forms
+import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+// Angular Material Modules
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { MatDividerModule } from '@angular/material/divider';
-import { Subscription, EMPTY, from } from 'rxjs';
-import { catchError, tap, switchMap, finalize } from 'rxjs/operators';
 
-import { GenkitService, GetPromptRequestData, EncryptedPayloadData } from '../services/genkit.service';
+// RxJS
+import { EMPTY, Subscription, from } from 'rxjs';
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
+
+// Application-specific Services and Models
+import { EncryptedPayloadData, GenkitService, GetPromptRequestData } from '../services/genkit.service';
 import { StorageService } from '../services/storage.service';
 
 @Component({

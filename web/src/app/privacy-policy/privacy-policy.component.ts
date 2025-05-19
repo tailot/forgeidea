@@ -1,5 +1,6 @@
-import { Component, Inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+// Angular Core and Common
 import { DOCUMENT, CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-privacy-policy',

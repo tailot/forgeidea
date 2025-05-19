@@ -1,11 +1,15 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
+// Angular Core and Router
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Router } from '@angular/router';
 
+// Angular Material Modules
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+
+// Application-specific Services and Models
 import { GenkitService, Idea } from '../services/genkit.service';
-import { StorageService } from '../services/storage.service';
 import { LanguageService } from '../services/language.service';
+import { StorageService } from '../services/storage.service';
 
 @Component({
   selector: 'app-botton-idea',

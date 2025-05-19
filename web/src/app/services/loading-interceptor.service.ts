@@ -1,14 +1,23 @@
+// Angular Core
 import { Injectable } from '@angular/core';
+
+// Angular Common HTTP
 import {
-  HttpRequest,
-  HttpHandler,
+  HttpContextToken,
   HttpEvent,
+  HttpHandler,
   HttpInterceptor,
-  HttpContextToken
+  HttpRequest,
 } from '@angular/common/http';
+
+// RxJS
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
+
+// Application-specific Services
 import { LoadingService } from './loading.service';
+
+// Environment
 import { environment } from '../../environments/environment';
 
 export const BYPASS_LOADING = new HttpContextToken<boolean>(() => false);

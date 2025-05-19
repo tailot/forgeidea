@@ -1,5 +1,8 @@
-import { Injectable, ApplicationRef, Inject } from '@angular/core';
+// Angular Core
+import { ApplicationRef, Inject, Injectable } from '@angular/core';
+// Angular Common
 import { DOCUMENT } from '@angular/common';
+// Environment
 import { environment } from '../../environments/environment';
 
 @Injectable({

@@ -1,5 +1,8 @@
+// Angular Core
 import { Injectable } from '@angular/core';
+// Third-party Libraries
 import Dexie, { Table, IndexableType } from 'dexie';
+
 
 interface KeyValueItem {
   key: string;

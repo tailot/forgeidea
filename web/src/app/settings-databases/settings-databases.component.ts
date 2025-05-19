@@ -1,14 +1,19 @@
-import { Component, ElementRef, ViewChild, Output, EventEmitter, OnInit } from '@angular/core';
+// Angular Core
+import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+// Angular Common
 import { CommonModule } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatRadioModule } from '@angular/material/radio';
+// Angular Forms
 import { FormsModule } from '@angular/forms';
+// Angular Material Modules
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatRadioModule } from '@angular/material/radio';
 
-import { DialogData } from '../dialog/dialog.component'
+// Application-specific Components and Services
+import { DialogData } from '../dialog/dialog.component';
 import { StorageService } from '../services/storage.service';
 import { DialogService } from '../services/dialog.service';
 

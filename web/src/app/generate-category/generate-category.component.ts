@@ -1,15 +1,21 @@
-import { Component, OnInit, inject } from '@angular/core';
+// Angular Core, Common, Forms, and Router
 import { CommonModule } from '@angular/common';
-import { MatChipsModule } from '@angular/material/chips';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+
+// Angular Material Modules
 import { MatButtonModule } from '@angular/material/button';
-import { Observable, of, firstValueFrom, map } from 'rxjs'; // Added map
+import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+
+// RxJS
+import { Observable, firstValueFrom, map, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+// Application-specific Services and Models
 import { GenkitService, Idea, EncryptedPayloadData } from '../services/genkit.service';
 import { LanguageService } from '../services/language.service';
 import { StorageService } from '../services/storage.service';

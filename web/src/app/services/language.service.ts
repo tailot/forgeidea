@@ -1,4 +1,7 @@
+// Angular Core
 import { Injectable } from '@angular/core';
+
+// RxJS
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface LanguageDefinition {

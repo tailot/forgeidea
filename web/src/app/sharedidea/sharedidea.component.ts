@@ -1,12 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+// Angular Core and Common
 import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+
+// Angular Material
 import { MatIconModule } from '@angular/material/icon';
 
-import { io, Socket } from 'socket.io-client';
+// Third-party Libraries
 import { Subscription, interval } from 'rxjs';
+import { Socket, io } from 'socket.io-client';
+
+// Application-specific Components, Services and Models
 import { CardIdeaComponent } from '../card-idea/card-idea.component';
-import { environment } from '../../environments/environment';
 import { Idea } from '../services/genkit.service';
+
+// Environment
+import { environment } from '../../environments/environment';
 
 interface IdeaSocketResponse {
   id: string;

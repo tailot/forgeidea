@@ -97,7 +97,6 @@ export class IdeaListComponent implements OnInit, OnDestroy {
         try {
           const retrievedData = await this.storageService.getItem<Idea>(uuid);
           if (retrievedData) {
-            // Assicuriamoci che l'ID dell'idea sia impostato con la chiave UUID
             retrievedData.id = uuid;
             return retrievedData;
           } else {
@@ -187,11 +186,9 @@ export class IdeaListComponent implements OnInit, OnDestroy {
 
     if (this.allIdeas.length === initialCount) {
       console.warn(`Idea with ID ${deletedIdeaId} not found in allIdeas. List not updated.`);
-      // Non è necessario chiamare applyFilterAndPaginate se nessuna idea è stata rimossa.
       return;
     }
 
-    // Ora che allIdeas è aggiornato, rinfresca la lista filtrata e la paginazione
     this.applyFilterAndPaginate();
   }
 }

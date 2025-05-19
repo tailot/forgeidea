@@ -1,8 +1,13 @@
-import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
+// Angular Core
 import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+
+// Angular Material
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
+
+// RxJS
 import { Observable, Subscription } from 'rxjs';
 
 import { OnlineStatusService } from '../services/onlinestatus.service';

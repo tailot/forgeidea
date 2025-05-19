@@ -1,5 +1,8 @@
-import { Component, OnInit, Renderer2, Inject } from '@angular/core';
+// Angular Core
+import { Component, Inject, OnInit, Renderer2 } from '@angular/core';
+// Angular Common
 import { CommonModule, DOCUMENT } from '@angular/common';
+// Angular Material Modules
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatCardModule } from '@angular/material/card';
 

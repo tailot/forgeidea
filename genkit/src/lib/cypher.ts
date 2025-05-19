@@ -2,7 +2,6 @@ import * as crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm' as crypto.CipherGCMTypes;
 const IV_LENGTH = 12;
-const AUTH_TAG_LENGTH = 16;
 
 export interface EncryptedPayload {
   iv: string;

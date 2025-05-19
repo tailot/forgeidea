@@ -1,6 +1,11 @@
+// Angular Core
 import { Injectable, NgZone } from '@angular/core';
+
+// RxJS
 import { BehaviorSubject, Observable, fromEvent } from 'rxjs';
-import { map, distinctUntilChanged, tap } from 'rxjs/operators';
+
+// RxJS Operators
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'

@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+// Angular Core and Common
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 
+// Application-specific Components
 import { SettingsDatabasesComponent } from '../settings-databases/settings-databases.component';
-import { SettingsScoreComponent } from '../settings-score/settings-score.component';
 import { SettingsDominiumComponent } from '../settings-dominium/settings-dominium.component';
+import { SettingsScoreComponent } from '../settings-score/settings-score.component';
 
 
 @Component({
