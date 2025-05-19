@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { SettingsDatabasesComponent } from '../settings-databases/settings-databases.component';
 import { SettingsScoreComponent } from '../settings-score/settings-score.component';
 import { SettingsDominiumComponent } from '../settings-dominium/settings-dominium.component';
-import { SettingsThemeComponent } from '../settings-theme/settings-theme.component';
 
 
 @Component({
@@ -14,8 +13,7 @@ import { SettingsThemeComponent } from '../settings-theme/settings-theme.compone
     SettingsDatabasesComponent,
     SettingsScoreComponent,
     SettingsDominiumComponent,
-    CommonModule,
-    SettingsThemeComponent
+    CommonModule
   ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.sass']

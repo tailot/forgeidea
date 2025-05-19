@@ -6,11 +6,12 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { Observable, Subscription } from 'rxjs';
 
 import { OnlineStatusService } from '../services/onlinestatus.service';
+import { SettingsThemeComponent } from '../settings-theme/settings-theme.component';
 
 @Component({
   selector: 'app-bottom-nav',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatToolbarModule, RouterLink, RouterLinkActive], // Aggiungi CommonModule
+  imports: [CommonModule, MatIconModule, MatToolbarModule, RouterLink, RouterLinkActive, SettingsThemeComponent],
   templateUrl: './bottom-nav.component.html',
   styleUrl: './bottom-nav.component.sass',
   changeDetection: ChangeDetectionStrategy.OnPush
