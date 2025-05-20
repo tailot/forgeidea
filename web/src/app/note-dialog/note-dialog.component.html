@@ -1,4 +1,4 @@
-<div class="dialog-title-custom">
+<div class="dialog-title-custom" aria-label="Note navigation and options">
   <button mat-icon-button (click)="onPreviousRequest()" [disabled]="data.isFirst" aria-label="Previous note" data-testid="prev-note-button">
     <mat-icon>chevron_left</mat-icon>
   </button>
@@ -23,6 +23,6 @@
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()" data-testid="cancel-button">Cancel</button>
-  <button mat-button color="primary" (click)="onSave()" [disabled]="editedText === (data.note ? data.note.text : '')" data-testid="save-button">Save</button>
+  <button mat-button (click)="onCancel()" data-testid="cancel-button" aria-label="Discard note changes">Cancel</button>
+  <button mat-button color="primary" (click)="onSave()" [disabled]="editedText === (data.note ? data.note.text : '')" data-testid="save-button" aria-label="Save note">Save</button>
 </mat-dialog-actions>
