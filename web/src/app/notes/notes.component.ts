@@ -82,7 +82,7 @@ export class NotesComponent implements OnInit {
       effectiveDialogIndex = this.notes.length;
     } else {
       if (this.currentNoteIndex < 0 || this.currentNoteIndex >= this.notes.length) {
-        console.error("Stato inconsistente: tentativo di modificare una nota con indice non valido:", this.currentNoteIndex);
+        console.error("Inconsistent state: attempt to modify a note with an invalid index:", this.currentNoteIndex);
         this.activeDialogRef = null;
         return;
       }
@@ -203,7 +203,7 @@ export class NotesComponent implements OnInit {
 
   private async deleteNoteAndRefreshDialog(indexToDelete: number): Promise<void> {
     if (indexToDelete < 0 || indexToDelete >= this.notes.length) {
-      console.warn('[NotesComponent] Tentativo di eliminare una nota con indice non valido:', indexToDelete);
+      console.warn('[NotesComponent] Attempt to delete a note with an invalid index:', indexToDelete);
       if (this.activeDialogRef) this.activeDialogRef.close();
       this.activeDialogRef = null;
       return;
@@ -217,9 +217,9 @@ export class NotesComponent implements OnInit {
 
     try {
       await this.storageService.setItem(this.NOTES_STORAGE_KEY, this.notes);
-      console.log(`[NotesComponent] Nota all'indice ${indexToDelete} eliminata e note salvate.`);
+      console.log(`[NotesComponent] Note at index ${indexToDelete} deleted and notes saved.`);
     } catch (error) {
-      console.error('[NotesComponent] Errore nel salvare le note dopo l\'eliminazione:', error);
+      console.error('[NotesComponent] Error saving notes after deletion:', error);
     }
 
     if (dialogToClose) {
@@ -299,10 +299,6 @@ export class NotesComponent implements OnInit {
 
   showNextNote(): void {
     if (this.canNavigateNext) this.showNextNoteInternal();
-  }
-
-  get fabActionText(): string {
-    return this.notes.length > 0 ? 'Apri Note' : 'Crea Nota';
   }
 
   get canNavigatePrevious(): boolean {
