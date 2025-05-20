@@ -10,6 +10,8 @@ export interface DialogData {
   title?: string;
   message: string;
   closeButtonText?: string;
+  height?: string;
+  width?: string;
 }
 
 @Component({

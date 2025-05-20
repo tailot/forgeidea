@@ -1,0 +1,6 @@
+<div class="notes-fab-container">
+    <button mat-fab extended (click)="openNotesDialog(0)" [disabled]="isLoading">
+        <mat-icon>note_alt</mat-icon>
+        {{ notes.length > 0 ? 'Open Notes' : 'Notes' }}
+    </button>
+</div>

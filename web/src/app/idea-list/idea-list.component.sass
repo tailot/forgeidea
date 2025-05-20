@@ -1,5 +1,5 @@
 $search-bar-height: 76px
-$bottom-nav-height: 59px
+$bottom-nav-height: 54px
 $paginator-height: 56px
 $bottom-content-spacing: 20px
 $content-max-width: 1200px
@@ -23,9 +23,6 @@ $card-column-min-width-mobile: 280px
     width: 100%
     margin: 0
     display: block
-
-    ::ng-deep .mat-mdc-input-element
-      color: rgba(0, 0, 0, 0.87)
 
 .idea-list-container
   padding-top: $search-bar-height + 16px
@@ -104,6 +101,7 @@ mat-paginator
   background-color: $fixed-elements-background
   border-top: 1px solid var(--app-divider-color, rgba(0, 0, 0, 0.12))
   z-index: 100
+  padding-bottom: 8px
 
   ::ng-deep
     .mat-mdc-paginator-container

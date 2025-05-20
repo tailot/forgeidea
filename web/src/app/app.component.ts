@@ -14,14 +14,16 @@ import { filter } from 'rxjs/operators';
 import { BottomNavComponent } from './bottom-nav/bottom-nav.component';
 import { ConsoleOverrideService } from './services/consoleoverride.service';
 import { LoadingService } from './services/loading.service';
+import { NotesComponent } from './notes/notes.component';
 
 @Component({
   selector: 'app-root',
   imports: [
     CommonModule,
     RouterOutlet,
+    MatProgressSpinnerModule,
     BottomNavComponent,
-    MatProgressSpinnerModule
+    NotesComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.sass'
