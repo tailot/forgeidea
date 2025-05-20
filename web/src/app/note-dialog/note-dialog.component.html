@@ -3,6 +3,15 @@
     <mat-icon>chevron_left</mat-icon>
   </button>
   <h1 mat-dialog-title class="actual-title">{{ data.note && data.note.text.trim() !== '' ? 'Edit Note' : 'New Note' }}</h1>
+  <button mat-icon-button
+          color="warn"
+          (click)="onDeleteRequest()"
+          *ngIf="!(data.isLast && (!data.note || data.note.text.trim() === ''))"
+          aria-label="Delete note"
+          data-testid="delete-note-button"
+          matTooltip="Delete note">
+    <mat-icon>delete</mat-icon>
+  </button>
   <button mat-icon-button (click)="onNextRequest()" [disabled]="data.isLast" aria-label="Next note" data-testid="next-note-button">
     <mat-icon>chevron_right</mat-icon>
   </button>

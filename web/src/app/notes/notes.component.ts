@@ -60,8 +60,8 @@ export class NotesComponent implements OnInit {
       this.currentNoteIndex = initialIndex;
     } else {
       this.currentNoteIndex = (this.currentNoteIndex >= 0 && this.currentNoteIndex < this.notes.length)
-                              ? this.currentNoteIndex
-                              : 0;
+        ? this.currentNoteIndex
+        : 0;
     }
     this.displayCurrentNoteInDialog();
   }
@@ -72,7 +72,7 @@ export class NotesComponent implements OnInit {
     }
 
     const isCreatingNewNote = (this.notes.length === 0 && this.currentNoteIndex === 0) ||
-                              this.currentNoteIndex >= this.notes.length;
+      this.currentNoteIndex >= this.notes.length;
 
     let noteForDialog: Note;
     let effectiveDialogIndex: number;
@@ -123,6 +123,22 @@ export class NotesComponent implements OnInit {
       ).subscribe(() => {
         this.processNavigationRequest('next', dialogInstance.editedText);
       });
+
+      dialogInstance.deleteRequested.pipe(
+        takeUntil(dialogRefForThisInstance.afterClosed()),
+        takeUntil(this.componentDestroyed$)
+      ).subscribe(() => {
+        if (effectiveDialogIndex < this.notes.length) {
+          this.currentNoteIndex = effectiveDialogIndex;
+          this.deleteNoteAndRefreshDialog(this.currentNoteIndex);
+        } else {
+          console.warn("Delete requested for a new/non-existent note from dialog, closing dialog.");
+          if (this.activeDialogRef === dialogRefForThisInstance) {
+            dialogRefForThisInstance.close();
+            this.activeDialogRef = null;
+          }
+        }
+      });
     }
 
     dialogRefForThisInstance.afterClosed().pipe(takeUntil(this.componentDestroyed$)).subscribe(async result => {
@@ -130,7 +146,7 @@ export class NotesComponent implements OnInit {
         this.navigationInProgress = false;
         return;
       }
-      
+
       if (result !== undefined) {
         const noteBeingHandledIndex = effectiveDialogIndex;
 
@@ -149,7 +165,7 @@ export class NotesComponent implements OnInit {
           }
         } else {
           if (this.notes[noteBeingHandledIndex].text !== result) {
-             await this.updateNoteText(noteBeingHandledIndex, result);
+            await this.updateNoteText(noteBeingHandledIndex, result);
           }
         }
       }
@@ -177,11 +193,50 @@ export class NotesComponent implements OnInit {
     if (currentDialogText !== originalText) {
       await this.updateNoteText(noteIndexBeforeNavigation, currentDialogText, true);
     }
-    
+
     dialogToClose.close();
+    this.navigationInProgress = false;
 
     if (direction === 'previous') this.showPreviousNoteInternal();
     else if (direction === 'next') this.showNextNoteInternal();
+  }
+
+  private async deleteNoteAndRefreshDialog(indexToDelete: number): Promise<void> {
+    if (indexToDelete < 0 || indexToDelete >= this.notes.length) {
+      console.warn('[NotesComponent] Tentativo di eliminare una nota con indice non valido:', indexToDelete);
+      if (this.activeDialogRef) this.activeDialogRef.close();
+      this.activeDialogRef = null;
+      return;
+    }
+
+    const dialogToClose = this.activeDialogRef;
+    this.navigationInProgress = true;
+    this.activeDialogRef = null;
+
+    this.notes.splice(indexToDelete, 1);
+
+    try {
+      await this.storageService.setItem(this.NOTES_STORAGE_KEY, this.notes);
+      console.log(`[NotesComponent] Nota all'indice ${indexToDelete} eliminata e note salvate.`);
+    } catch (error) {
+      console.error('[NotesComponent] Errore nel salvare le note dopo l\'eliminazione:', error);
+    }
+
+    if (dialogToClose) {
+      dialogToClose.close();
+    }
+    this.navigationInProgress = false;
+
+    if (this.notes.length === 0) {
+      this.currentNoteIndex = 0;
+    } else {
+      if (indexToDelete >= this.notes.length) {
+        this.currentNoteIndex = this.notes.length - 1;
+      } else {
+        this.currentNoteIndex = indexToDelete;
+      }
+      this.displayCurrentNoteInDialog();
+    }
   }
 
   async loadNotes(): Promise<void> {

@@ -40,6 +40,7 @@ export interface NoteDialogData {
 export class NoteDialogComponent {
   @Output() previousRequested = new EventEmitter<void>();
   @Output() nextRequested = new EventEmitter<void>();
+  @Output() deleteRequested = new EventEmitter<void>();
 
   editedText: string;
 
@@ -56,9 +57,9 @@ export class NoteDialogComponent {
 
   onSave(): void {
     if (this.editedText !== (this.data.note ? this.data.note.text : '')) {
-        this.dialogRef.close(this.editedText);
+      this.dialogRef.close(this.editedText);
     } else {
-        this.dialogRef.close();
+      this.dialogRef.close();
     }
   }
 
@@ -69,4 +70,9 @@ export class NoteDialogComponent {
   onNextRequest(): void {
     this.nextRequested.emit();
   }
+
+  onDeleteRequest(): void {
+    this.deleteRequested.emit();
+  }
+
 }
