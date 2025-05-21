@@ -348,7 +348,7 @@ export class JobcardComponent implements OnInit, OnDestroy {
     }
 
     if (document?.text) {
-      const textToSpeak = document.text; // Assuming text is plain text
+      const textToSpeak = document.text.replace(/[#*]/g, '');
       if (textToSpeak.trim()) {
         const lang = this.languageService.getCurrentLanguageBcp47Tag();
         console.log(`JobcardComponent: Attempting to speak task in ${lang}: "${textToSpeak.substring(0, 50)}..."`);
