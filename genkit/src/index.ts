@@ -1,5 +1,7 @@
+// Genkit
 import { startFlowServer } from '@genkit-ai/express';
 
+// Flows
 import { generateIdeaCategoriesFlow } from './flows/generateIdeaCategories';
 import { generateIdeaFlow } from './flows/generateIdea';
 import { randomIdeaFlow } from './flows/randomIdea';
@@ -13,6 +15,11 @@ import { verifyIdeaFlow } from './flows/verifyIdeaFlow';
 import { helpTaskFlow } from './flows/help';
 import { getPromptFlow } from './flows/getPrompt';
 import { execFlow } from './flows/execFlow';
+
+//Utils
+import { applyGenkitProductionLogFilter } from './utils/logFilter';
+
+applyGenkitProductionLogFilter();
 
 startFlowServer({
   flows: [
