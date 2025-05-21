@@ -11,7 +11,13 @@ COPY . .
 ARG production
 ARG genkitApiUrl
 ARG socketAddr
+ARG nameANDsurname
+ARG email
+ARG productName
 
+ENV nameANDsurname=$nameANDsurname
+ENV email=$email
+ENV productName=$productName
 ENV production=$production
 ENV genkitApiUrl=$genkitApiUrl
 ENV socketAddr=$socketAddr

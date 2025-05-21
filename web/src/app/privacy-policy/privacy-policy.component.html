@@ -1,17 +1,17 @@
 <div class="container" aria-label="Privacy Policy">
-    <h1>Privacy Policy for forgeIdea</h1>
+    <h1>Privacy Policy for {{productOwner.productName}}</h1>
 
     <p><strong>Last updated:</strong> May 13, 2025</p>
 
-    <p>Welcome to forgeIdea (hereinafter referred to as the "Service"). Your privacy is very important to me. This Privacy Policy describes how I collect, use, and protect the personal information of users of my Service.</p>
+    <p>Welcome to {{productOwner.productName}} (hereinafter referred to as the "Service"). Your privacy is very important to me. This Privacy Policy describes how I collect, use, and protect the personal information of users of my Service.</p>
 
     <p>By using the Service, you accept the practices described in this Privacy Policy.</p>
 
     <h2>1. Data Controller</h2>
     <p>The Data Controller is:</p>
     <p class="contact-info">
-        Vincenzo Tilotta<br>
-        Contact Email: <a href="mailto:tailot@gmail.com">tailot&#64;gmail.com</a><br>
+        {{productOwner.nameANDsurname}}<br>
+        Contact Email: <a href="mailto:tailot@gmail.com">{{productOwner.email}}</a><br>
         Website: <a [href]="websiteUrl" target="_blank">{{ websiteUrl }}</a>
     </p>
 
@@ -65,8 +65,8 @@
     <div class="contact-info">
         <p>For any questions or clarifications regarding this Privacy Policy, please do not hesitate to contact me:</p>
         <p>
-            Vincenzo Tilotta<br>
-            Email: <a href="mailto:tailot@gmail.com">tailot&#64;gmail.com</a>
+            {{productOwner.nameANDsurname}}<br>
+            Email: <a href="mailto:{{productOwner.email}}">{{productOwner.email}}</a>
         </p>
     </div>
 </div>

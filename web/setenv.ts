@@ -1,25 +1,31 @@
 const fs = require('fs');
 const path = require('path');
 
-const envFileName = './src/environments/environment.prod.ts';
-const envFilePath = path.resolve(__dirname, envFileName);
+// Path for environment.prod.ts (input for keys, and an output file)
+const prodEnvFileName = './src/environments/environment.prod.ts';
+const prodEnvFilePath = path.resolve(__dirname, prodEnvFileName);
+const tempProdEnvFileName = `${prodEnvFileName}.tmp`;
+const tempProdEnvFilePath = path.resolve(__dirname, tempProdEnvFileName);
 
-const tempEnvFileName = `${envFileName}.tmp`;
-const tempEnvFilePath = path.resolve(__dirname, tempEnvFileName);
+// Path for env.json (output file)
+const outputJsonFileName = './src/static-assets/env.json';
+const outputJsonFilePath = path.resolve(__dirname, outputJsonFileName);
+const tempOutputJsonFileName = `${outputJsonFileName}.tmp`;
+const tempOutputJsonFilePath = path.resolve(__dirname, tempOutputJsonFileName);
 
-console.log(`Reading keys and rewriting: ${envFilePath}`);
+console.log(`Reading keys from: ${prodEnvFilePath}`);
 
 let inputFileContent;
 try {
-  inputFileContent = fs.readFileSync(envFilePath, 'utf8');
+  inputFileContent = fs.readFileSync(prodEnvFilePath, 'utf8');
 } catch (error) {
   console.error('Ensure the file exists.');
   process.exit(1);
 }
 const envObjectMatch = inputFileContent.match(/export const environment\s*=\s*\{([\s\S]*?)\};/);
-
+// Extract keys from the environment object in the input file
 if (!envObjectMatch || !envObjectMatch[1]) {
-  console.error(`Error: Could not find the 'export const environment = {...};' object in the file "${envFileName}".`);
+  console.error(`Error: Could not find the 'export const environment = {...};' object in the file "${prodEnvFileName}".`);
   console.error('Ensure the file contains exactly "export const environment = { ... };".');
   process.exit(1);
 }
@@ -34,55 +40,96 @@ while ((match = propertyRegex.exec(objectContent)) !== null) {
 }
 
 if (keys.length === 0) {
-  console.warn(`Warning: No valid keys found in the 'environment' object in "${envFileName}". The file might be rewritten with an empty object.`);
+  console.warn(`Warning: No valid keys found in the 'environment' object in "${prodEnvFileName}". Both output files will represent an empty environment object.`);
 } else {
   console.log(`Keys extracted from the source file: ${keys.join(', ')}`);
 }
 
-let outputString = 'export const environment = {\n';
+// Prepare data for JSON output
+const outputEnvData: { [key: string]: any } = {};
+
+// Prepare string for TypeScript output (environment.prod.ts)
+let outputTsString = 'export const environment = {\n';
 
 for (let i = 0; i < keys.length; i++) {
   const key = keys[i];
   const envValue = process.env[key];
 
-  let formattedValue;
+  // Logic for JSON
   if (envValue === undefined) {
-    console.warn(`Warning: Environment variable "${key}" not found in process.env. Setting "${key}" to undefined.`);
-    formattedValue = 'undefined';
+    console.warn(`Warning: Environment variable "${key}" not found in process.env. Setting "${key}" to null in the JSON output.`);
+    outputEnvData[key] = null; // Use null for missing values in JSON
   } else if (envValue.toLowerCase() === 'true') {
-    formattedValue = 'true';
+    outputEnvData[key] = true; // Boolean true
   } else if (envValue.toLowerCase() === 'false') {
-    formattedValue = 'false';
+    outputEnvData[key] = false; // Boolean false
   } else {
+    outputEnvData[key] = envValue; // String value
+  }
+
+  // Logic for TypeScript (environment.prod.ts)
+  let formattedValueTs;
+  if (envValue === undefined) {
+    console.warn(`Warning: Environment variable "${key}" not found in process.env. Setting "${key}" to undefined in ${prodEnvFileName}.`);
+    formattedValueTs = 'undefined'; // Literal undefined for TS
+  } else if (envValue.toLowerCase() === 'true') {
+    formattedValueTs = 'true'; // Literal true for TS
+  } else if (envValue.toLowerCase() === 'false') {
+    formattedValueTs = 'false'; // Literal false for TS
+  } else {
+    // Escape backslashes and single quotes for TypeScript string
     const escapedValue = envValue
       .replace(/\\/g, '\\\\') // Escape backslashes first!
       .replace(/'/g, "\\'")   // Escape single quotes
       .replace(/\n/g, '\\n')   // Escape newlines
       .replace(/\r/g, '\\r'); // Escape carriage returns
-
-    formattedValue = `'${escapedValue}'`;
+    formattedValueTs = `'${escapedValue}'`;
   }
-
-  outputString += `  ${key}: ${formattedValue}${i < keys.length - 1 ? ',' : ''}\n`;
+  outputTsString += `  ${key}: ${formattedValueTs}${i < keys.length - 1 ? ',' : ''}\n`;
 }
 
-outputString += '};\n';
+outputTsString += '};\n';
 
+const outputJsonString = JSON.stringify(outputEnvData, null, 2); // Format JSON with 2 spaces indentation
+
+// Write to static-assets/env.json
 try {
-  fs.writeFileSync(tempEnvFilePath, outputString, 'utf8');
-  console.log(`Content temporarily written to: "${tempEnvFileName}"`);
+  console.log(`Writing JSON content to: "${outputJsonFilePath}"`);
+  // Ensure the directory exists
+  fs.mkdirSync(path.dirname(outputJsonFilePath), { recursive: true });
 
-  fs.renameSync(tempEnvFilePath, envFilePath);
-  console.log(`File "${envFileName}" updated successfully.`);
-
+  fs.writeFileSync(tempOutputJsonFilePath, outputJsonString, 'utf8');
+  console.log(`Content temporarily written to: "${tempOutputJsonFileName}"`);
+  fs.renameSync(tempOutputJsonFilePath, outputJsonFilePath);
+  console.log(`File "${outputJsonFileName}" updated successfully.`);
 } catch (error) {
-  console.error(`Error during file writing`);
-  if (fs.existsSync(tempEnvFilePath)) {
+  console.error(`Error writing ${outputJsonFileName}:`, error);
+  if (fs.existsSync(tempOutputJsonFilePath)) {
     try {
-      fs.unlinkSync(tempEnvFilePath);
-      console.error(`Cleaned up temporary file: "${tempEnvFileName}"`);
+      fs.unlinkSync(tempOutputJsonFilePath);
+      console.error(`Cleaned up temporary file: "${tempOutputJsonFileName}".`);
     } catch (e) {
-      console.error(`Error cleaning up temporary file "${tempEnvFileName}"`);
+      console.error(`Error cleaning up temporary file "${tempOutputJsonFileName}"`);
+    }
+  }
+  process.exit(1);
+}
+
+// Write to src/environments/environment.prod.ts
+try {
+  console.log(`Rewriting TypeScript environment file: "${prodEnvFilePath}"`);
+  fs.writeFileSync(tempProdEnvFilePath, outputTsString, 'utf8');
+  console.log(`Content temporarily written to: "${tempProdEnvFileName}"`);
+  fs.renameSync(tempProdEnvFilePath, prodEnvFilePath);
+  console.log(`File "${prodEnvFileName}" updated successfully.`);
+} catch (error) {
+  console.error(`Error writing ${prodEnvFileName}:`, error);
+  if (fs.existsSync(tempProdEnvFilePath)) {
+    try {
+      fs.unlinkSync(tempProdEnvFilePath);
+      console.error(`Cleaned up temporary file: "${tempProdEnvFileName}".`);
+    } catch (e) {
+      console.error(`Error cleaning up temporary file "${tempProdEnvFileName}"`);
     }
   }
   process.exit(1);

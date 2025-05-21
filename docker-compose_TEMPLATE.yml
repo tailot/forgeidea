@@ -19,6 +19,9 @@ services:
         production: true
         genkitApiUrl: 'http://localhost:4001'
         socketAddr: 'http://localhost:3001'
+        nameANDsurname: 'Topolino Inopo'
+        email: '____@____.__'
+        productName: 'forgeIdea'
     ports:
       - "80:80"
   socket:

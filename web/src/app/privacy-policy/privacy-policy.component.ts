@@ -2,6 +2,9 @@
 import { DOCUMENT, CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
 
+// Environment
+import { environment } from '../../environments/environment';
+
 @Component({
   selector: 'app-privacy-policy',
   templateUrl: './privacy-policy.component.html',
@@ -12,7 +15,11 @@ import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/cor
 })
 export class PrivacyPolicyComponent implements OnInit {
   websiteUrl: string;
-
+  productOwner = {
+    productName: environment.productName,
+    nameANDsurname: environment.nameANDsurname,
+    email: environment.email
+  }
   constructor(@Inject(DOCUMENT) private document: Document) {
     this.websiteUrl = '';
   }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ForgeIDEA - Bring Your Insights to Life</title>
+    <title>forgeIDEA</title>
     <style>
         :root {
             --tw-color-gray-50: #f9fafb;
@@ -168,7 +168,7 @@
             .sm\:items-center { align-items: center; }
             .sm\:justify-between { justify-content: space-between; }
             .sm\:space-x-4 > :not([hidden]) ~ :not([hidden]) { margin-left: 1rem; }
-            .sm\:space-y-0 > :not([hidden]) ~ :not([hidden]) { margin-top: 0; }
+            .sm\:space-y-0 > :not([hidden]) ~ :not([hidden]) { margin-top: 0px; }
             .sm\:mt-0 { margin-top: 0px; }
         }
 
@@ -214,6 +214,20 @@
         .cta-button:hover, .cta-button:focus-visible {
             transform: scale(1.05);
         }
+
+        /* */
+        .dynamic-text-placeholder { 
+            visibility: hidden; /* Nasconde il testo placeholder inizialmente */
+            /* Puoi aggiungere una transizione se vuoi un effetto fade-in */
+            /* transition: visibility 0s linear 0.3s, opacity 0.3s linear; */
+            /* opacity: 0; */
+        }
+        .dynamic-text-loaded { 
+            visibility: visible;
+            /* opacity: 1; */
+        }
+        /* */
+
     </style>
 </head>
 
@@ -230,7 +244,7 @@
                         <path d="M10 22h4" />
                     </svg>
                 </span>
-                forgeIDEA
+                <span id="nav-product-name" class="dynamic-text-placeholder">forgeIDEA</span>
             </div>
 
             <div class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4 items-center w-full sm:w-auto mt-2 sm:mt-0">
@@ -261,8 +275,10 @@
                 </div>
                 <h1 class="text-4xl md:text-6xl font-bold mb-4">Where Great <span class="text-yellow-300">IDEAS</span> Are
                     Born.</h1>
-                <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">Transform your insights into reality. Explore, develop,
-                    and launch your ideas with our innovative platform.</p>
+                <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">
+                    <span id="hero-product-name" class="dynamic-text-placeholder">Our platform</span> helps you transform your insights into reality. Explore, develop,
+                    and launch your ideas with our innovative platform.
+                </p>
                 <a href="#devel"
                     class="bg-yellow-400 hover:bg-yellow-500 text-indigo-800 font-bold py-3 px-8 rounded-lg text-lg cta-button">Bring
                     Your Idea to Life</a>
@@ -409,7 +425,7 @@
 
     <footer role="contentinfo" class="bg-gray-800 text-gray-400 py-8">
         <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2025 IDEAforge Platform. All rights reserved.</p>
+            <p>&copy; 2025 <span id="footer-brand-name" class="dynamic-text-placeholder">forgeIDEA</span> Platform. All rights reserved.</p>
             <p class="text-sm mt-2">Made with passion for innovative ideas.</p>
         </div>
     </footer>
@@ -429,13 +445,56 @@
     </style>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('env.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok for env.json: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(config => {
+                    const productName = config.productName || 'forgeIDEA'; // Fallback
+
+                    document.title = productName + ' - Bring Your Insights to Life';
+
+                    const navProductNameEl = document.getElementById('nav-product-name');
+                    if (navProductNameEl) {
+                        navProductNameEl.textContent = productName;
+                        navProductNameEl.classList.remove('dynamic-text-placeholder'); // Rimuove la classe placeholder
+                        navProductNameEl.classList.add('dynamic-text-loaded'); // Aggiunge la classe per testo caricato
+                    }
+                    
+                    const heroProductNameEl = document.getElementById('hero-product-name');
+                    if (heroProductNameEl) {
+                        heroProductNameEl.textContent = productName; 
+                        heroProductNameEl.classList.remove('dynamic-text-placeholder');
+                        heroProductNameEl.classList.add('dynamic-text-loaded');
+                    }
+
+                    const footerBrandNameEl = document.getElementById('footer-brand-name');
+                    if (footerBrandNameEl) {
+                        footerBrandNameEl.textContent = productName; 
+                        footerBrandNameEl.classList.remove('dynamic-text-placeholder');
+                        footerBrandNameEl.classList.add('dynamic-text-loaded');
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to load product info from env.json:', error);
+                    document.querySelectorAll('.dynamic-text-placeholder').forEach(el => {
+                        el.classList.remove('dynamic-text-placeholder');
+                        el.classList.add('dynamic-text-loaded'); 
+                    });
+                    document.title = 'forgeIDEA - Welcome'; 
+                });
+        });
+
         const fadeInElements = document.querySelectorAll('.fade-in');
         const observerOptions = {
             root: null,
             rootMargin: '0px',
             threshold: 0.1
         };
-
         const observer = new IntersectionObserver((entries, obs) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -444,11 +503,9 @@
                 }
             });
         }, observerOptions);
-
         fadeInElements.forEach(el => {
             observer.observe(el);
         });
-
         const styleSheetFadeIn = document.createElement("style");
         styleSheetFadeIn.type = "text/css";
         styleSheetFadeIn.innerText = `.fade-in-visible { opacity:0; animation: fadeIn 0.8s ease-out forwards; } .fade-in { opacity: 0; }`;
@@ -463,9 +520,7 @@
                     lightbulb.style.transform = 'scale(1)';
                 }, 150);
             };
-
             lightbulb.addEventListener('click', activateLightbulb);
-            
             lightbulb.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
@@ -524,7 +579,7 @@
                     }
                     const spacerDiv = el.querySelector('.order-1.w-5\\/12:not(.bg-white):not(.bg-indigo-100)');
                      if (spacerDiv) {
-                        spacerDiv.style.display = ''; 
+                        spacerDiv.style.display = '';
                     }
                     
                     const iconDiv = el.querySelector('.z-20');
