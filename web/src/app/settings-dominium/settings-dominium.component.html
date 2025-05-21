@@ -8,8 +8,7 @@
     <div>
       <mat-form-field appearance="fill">
         <mat-label>Generator of</mat-label>
-        <mat-error *ngIf="errorGenerator">Error</mat-error>
-        <input matInput name="dominiumValue" [(ngModel)]="dominiumValue" minlength="5" maxlength="13"
+        <input matInput name="dominiumValue" [(ngModel)]="dominiumValue" minlength="4" maxlength="13"
           placeholder="Enter up to 13 characters." [disabled]="isSettingDominium">
       </mat-form-field>
       <button mat-raised-button color="primary" (keyup.enter)="setDominium()" (click)="setDominium()"

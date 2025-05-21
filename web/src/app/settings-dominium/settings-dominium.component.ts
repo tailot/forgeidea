@@ -35,7 +35,6 @@ import { StorageService } from '../services/storage.service';
 export class SettingsDominiumComponent implements OnInit, OnDestroy {
   @Output() dominiumOn = new EventEmitter<boolean>();
 
-  errorGenerator = false;
   isSettingDominium = false
   dominiumValue: string | undefined;
   private setDominiumSubscription: Subscription | undefined;
@@ -66,6 +65,7 @@ export class SettingsDominiumComponent implements OnInit, OnDestroy {
   }
 
   setDominium(): void {
+    console.log("ddd")
     this.isSettingDominium = true;
     if (!this.dominiumValue || this.dominiumValue.trim() === '') {
       console.warn('Dominium value is empty. Cannot set dominium.');
@@ -106,7 +106,6 @@ export class SettingsDominiumComponent implements OnInit, OnDestroy {
       }),
       catchError(error => {
         this.setDefaultValue()
-        this.errorGenerator = true;
         console.error('Error during setDominium operations chain (_idea or _category):', error);
         return EMPTY;
       }),
@@ -124,7 +123,6 @@ export class SettingsDominiumComponent implements OnInit, OnDestroy {
         console.error('Unhandled error in setDominium subscription:', err);
       },
       complete: () => {
-        this.errorGenerator = false;
         console.log('setDominium subscription stream completed.');
       }
     });
