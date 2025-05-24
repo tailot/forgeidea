@@ -1,18 +1,25 @@
-# forgeIDEA
+# forgeIDEA Web Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.9.
+This project is the Angular-based web frontend for forgeIDEA. It was generated using [Angular CLI](https://github.com/angular/angular-cli).
 
-## Development server
+## Development Setup
 
-To start a local development server, run:
+To set up the development environment and start a local development server, follow these steps:
 
-```bash
-ng serve
-```
+1.  **Install Dependencies:**
+    Navigate to the `web` directory and install the necessary Node.js packages:
+    ```bash
+    npm install
+    ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+2.  **Run the Development Server:**
+    To start the local development server, run:
+    ```bash
+    ng serve
+    ```
+    Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-## Code scaffolding
+## Code Scaffolding
 
 Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
 
@@ -26,7 +33,7 @@ For a complete list of available schematics (such as `components`, `directives`,
 ng generate --help
 ```
 
-## Building
+## Building the Project
 
 To build the project run:
 
@@ -36,23 +43,29 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
-## Running unit tests
+## Running Tests
+
+This project uses Karma for unit tests and supports end-to-end (e2e) testing.
+
+### Running Unit Tests
 
 To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
 
 ```bash
+npm test
+```
+Alternatively, you can use the Angular CLI command:
+```bash
 ng test
 ```
 
-## Running end-to-end tests
+### Running End-to-End Tests
 
 For end-to-end (e2e) testing, run:
-
 ```bash
 ng e2e
 ```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Note: Angular CLI does not come with an end-to-end testing framework by default. You will need to choose and configure one that suits your project's needs (e.g., Cypress, Protractor).
 
 ## Additional Resources
 
