@@ -14,8 +14,8 @@ The project is divided into three main components:
 
 To get started with ForgeIDEA, refer to the README files within each component's directory:
 
-- [Genkit README](./genkit/README.md) (Note: This file doesn't exist yet)
-- [Socket.io README](./socket.io/README.md) (Note: This file doesn't exist yet)
+- [Genkit README](./genkit/README.md)
+- [Socket.io README](./socket.io/README.md)
 - [Web README](./web/README.md)
 
 ## Running the Project with Docker
@@ -73,16 +73,16 @@ To contribute to forgeIDEA, you'll need to set up the development environment fo
 
 3.  **Component-Specific Setup:**
     Detailed instructions for setting up the development environment for each component can be found in their respective README files:
-    *   **Genkit:** See [genkit/README.md](./genkit/README.md) (Note: This file needs to be created/updated with setup instructions).
-    *   **Socket.io:** See [socket.io/README.md](./socket.io/README.md) (Note: This file needs to be created/updated with setup instructions).
+    *   **Genkit:** See [genkit/README.md](./genkit/README.md).
+    *   **Socket.io:** See [socket.io/README.md](./socket.io/README.md).
     *   **Web (Angular):** See [web/README.md](./web/README.md) for instructions on setting up the Angular development environment. Typically, this involves navigating to the `web` directory and running `npm install`.
 
 ### Running Tests
 
 It's important to run tests to ensure your changes don't break existing functionality.
 
-*   **Genkit:** Instructions for running tests can be found in [genkit/README.md](./genkit/README.md) (Note: This file needs to be created/updated with test instructions).
-*   **Socket.io:** Instructions for running tests can be found in [socket.io/README.md](./socket.io/README.md) (Note: This file needs to be created/updated with test instructions).
+*   **Genkit:** Instructions for running tests can be found in [genkit/README.md](./genkit/README.md).
+*   **Socket.io:** Instructions for running tests can be found in [socket.io/README.md](./socket.io/README.md).
 *   **Web (Angular):** Navigate to the `web` directory and run `npm test` to execute unit tests using Karma and Jasmine. For end-to-end tests, refer to the instructions in [web/README.md](./web/README.md).
 
 ### Submitting Pull Requests
