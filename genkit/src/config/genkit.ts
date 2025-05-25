@@ -1,3 +1,9 @@
+/**
+ * @fileoverview This file configures the Genkit framework.
+ * It initializes plugins based on environment variables, allowing for flexible deployment
+ * across different AI model providers (Google AI, Ollama, Groq).
+ * It also provides a utility function to select a model dynamically.
+ */
 import * as dotenv from 'dotenv';
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/googleai';
@@ -6,11 +12,22 @@ import { groq } from 'genkitx-groq';
 
 dotenv.config();
 
+/**
+ * The main Genkit configuration object.
+ * It is initialized with plugins loaded by `getArrayConf()` and sets the prompt directory.
+ */
 export const ai = genkit({
   plugins: getArrayConf(),
   promptDir: './prompts',
 });
 
+/**
+ * Dynamically constructs an array of Genkit plugins based on environment variables.
+ * It checks for API keys and configurations for Google AI, Ollama, and Groq,
+ * and adds the corresponding plugin if the necessary environment variables are set.
+ *
+ * @returns {Array<any>} An array of configured Genkit plugins.
+ */
 function getArrayConf(){
   let arrayConf = []
   if (process.env.GEMINI_API_KEY){

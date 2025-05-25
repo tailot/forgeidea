@@ -1,3 +1,13 @@
+/**
+ * @fileoverview This file serves as the entry point for starting a Genkit Flow Server
+ * dedicated to data mining operations.
+ *
+ * It configures and launches an Express server that exposes Genkit flows,
+ * specifically the `miningFlow` (imported from `../mining/ideaProcessingFlow`).
+ * The server is configured to listen on port 4001 and includes CORS (Cross-Origin Resource Sharing)
+ * settings derived from environment variables, allowing requests from specified origins
+ * and with specified methods and headers.
+ */
 import { startFlowServer } from '@genkit-ai/express';
 import { miningFlow } from '../mining/ideaProcessingFlow';
 
