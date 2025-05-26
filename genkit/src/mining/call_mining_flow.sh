@@ -1,9 +1,15 @@
 #!/bin/zsh
 
 # Usage:
+# For batch mode:
 # ./call_mining_flow.sh <context> <language> <count> 
 # Example:
 # ./call_mining_flow.sh "tech startups" "english" 5
+#
+# For interactive mode:
+# ./call_mining_flow.sh <language>
+# Example:
+# ./call_mining_flow.sh "english"
 
 MINING_FLOW_URL="http://localhost:4001/miningFlow"
 
