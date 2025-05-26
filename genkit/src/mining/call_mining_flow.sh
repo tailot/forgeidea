@@ -2,14 +2,18 @@
 
 # Usage:
 # For batch mode:
-# ./call_mining_flow.sh <context> <language> <count> 
-# Example:
-# ./call_mining_flow.sh "tech startups" "english" 5
+# ./call_mining_flow.sh <context> <language> <count> [-save]
+# Example (saves to CSV):
+# ./call_mining_flow.sh "tech startups" "english" 5 -save
+# Example (no CSV save):
+# ./call_mining_flow.sh "more tech" "english" 2
 #
 # For interactive mode:
-# ./call_mining_flow.sh <language>
-# Example:
-# ./call_mining_flow.sh "english"
+# ./call_mining_flow.sh <language> [-save]
+# Example (saves to CSV):
+# ./call_mining_flow.sh "english" -save
+# Example (no CSV save):
+# ./call_mining_flow.sh "french"
 
 MINING_FLOW_URL="http://localhost:4001/miningFlow"
 
@@ -30,8 +34,17 @@ main() {
   local header_written=false # Default to false
 
   # If CSV file already exists and has content, assume header is written
+  # This pre-check for header_written is only relevant if we intend to save.
+  # We'll refine this later if needed, for now, it initializes based on file state.
   if [[ -s "$CSV_FILE" ]]; then
     header_written=true
+  fi
+
+  local save_to_csv=false
+  # Check if the last argument is -save. Ensure there's at least one argument before checking.
+  if [[ $# -gt 0 && "${@: -1}" == "-save" ]]; then
+    save_to_csv=true
+    set -- "${@:1:($#-1)}" # Remove -save from arguments
   fi
 
   # Function to write data to CSV (defined within main to access its scope)
@@ -46,8 +59,8 @@ main() {
 
     # Check if header needs to be written (only if header_written is currently false)
     if [[ "$header_written" == false ]]; then
-      # Attempt to write header
-      if echo "$json_data_to_write" | jq -r 'keys_unsorted | @csv' > "$CSV_FILE"; then
+      # Attempt to write fixed header
+      if echo '"idea","score","competitors"' > "$CSV_FILE"; then
         header_written=true # Mark header as written
       else
         echo "Error: Failed to write CSV header to $CSV_FILE. Data for this entry will not be written." >&2
@@ -57,10 +70,10 @@ main() {
       fi
     fi
 
-    # Append data row. This is reached if header_written was already true, or became true just now.
-    # This assumes that if the file existed and header_written was set to true initially,
-    # the new data's structure is compatible with the existing header.
-    if ! echo "$json_data_to_write" | jq -r '. | @csv' >> "$CSV_FILE"; then
+    # Append data row with specific fields.
+    # If json_data_to_write is not an object, jq will produce `["","",""] | @csv` which is '"""""","""""",""""""\n'
+    # This is acceptable as per instructions (empty strings for missing fields).
+    if ! echo "$json_data_to_write" | jq -r '[.idea // "", .score // "", .competitors // ""] | @csv' >> "$CSV_FILE"; then
       echo "Error: Failed to append data to $CSV_FILE." >&2
     fi
   }
@@ -126,9 +139,28 @@ main() {
           continue
       fi
       
-      write_to_csv "$inner_json_string"
-      # echo "$response" # Removed: Do not print raw response to stdout in interactive mode
-      echo "Successfully processed context '$context' and saved to CSV." >&2
+      # Extract data for elegant output
+      local idea_val
+      local score_val
+      local competitors_val
+
+      idea_val=$(echo "$inner_json_string" | jq -r '.idea // "N/A"')
+      score_val=$(echo "$inner_json_string" | jq -r '.score // "N/A"')
+      competitors_val=$(echo "$inner_json_string" | jq -r '.competitors // "N/A"')
+
+      # Print extracted data to stderr
+      echo "Idea: $idea_val" >&2
+      echo "Score: $score_val" >&2
+      echo "Competitors: $competitors_val" >&2
+      echo "---" >&2
+      
+      if [[ "$save_to_csv" == true ]]; then
+        write_to_csv "$inner_json_string" # This part remains for CSV saving
+        echo "Data saved to CSV." >&2
+      else
+        echo "Data not saved to CSV." >&2
+      fi
+      # echo "$response" # Remains commented: Do not print raw response to stdout in interactive mode
 
     done
     exit 0
@@ -180,7 +212,9 @@ main() {
           continue
       fi
       
-      write_to_csv "$inner_json_string"
+      if [[ "$save_to_csv" == true ]]; then
+        write_to_csv "$inner_json_string"
+      fi
 
       all_results=$(echo "$all_results" | jq --argjson item "$inner_json_string" '. + [$item]')
       if [[ $? -ne 0 ]]; then
@@ -193,10 +227,14 @@ main() {
     echo "Processing complete." >&2
     echo "$all_results" | jq .
   else
-    echo "Usage: $0 <language>" >&2
-    echo "   or: $0 <context> <language> <count>" >&2
-    echo "Example (interactive): $0 english" >&2
-    echo "Example (batch): $0 \"tech startups\" \"english\" 5" >&2
+    echo "Usage:" >&2
+    echo "  For batch mode: $0 <context> <language> <count> [-save]" >&2
+    echo "  Example: $0 \"tech startups\" \"english\" 5 -save" >&2
+    echo "           $0 \"web3 ideas\" \"spanish\" 10" >&2
+    echo "" >&2
+    echo "  For interactive mode: $0 <language> [-save]" >&2
+    echo "  Example: $0 \"english\" -save" >&2
+    echo "           $0 \"french\"" >&2
     exit 1
   fi
 }
