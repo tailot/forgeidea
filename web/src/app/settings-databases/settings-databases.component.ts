@@ -28,23 +28,49 @@ interface KeyValueItem {
   templateUrl: './settings-databases.component.html',
   styleUrl: './settings-databases.component.sass'
 })
+/**
+ * Component responsible for managing database-related settings.
+ * It allows users to view, create, switch between, delete, backup, and restore
+ * application databases (IndexedDB instances managed via StorageService).
+ */
 export class SettingsDatabasesComponent implements OnInit {
+  /** Flag to indicate if a database backup operation is currently in progress. */
   isBackingUp = false;
+  /** Flag to indicate if a database restore operation is currently in progress. */
   isRestoring = false;
 
+  /** Array of names for all databases initialized or known by the StorageService. */
   initializedDbNames: string[] = [];
+  /** The name of the currently active database. */
   currentDbName: string = '';
+  /** Flag to indicate if a database switch operation is currently in progress. */
   isSwitchingDb: boolean = false;
+  /** Flag to indicate if a database creation operation is currently in progress. */
   isCreatingDb: boolean = false;
 
+  /**
+   * Emits an event when a significant change to the database setup occurs,
+   * such as switching, creating, deleting, or restoring a database.
+   * Parent components can listen to this event to refresh their state if necessary.
+   */
   @Output() change: EventEmitter<void> = new EventEmitter<void>();
+  /** Reference to the hidden file input element used for triggering database restore file selection. */
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
+  /**
+   * Constructs the SettingsDatabasesComponent.
+   * @param storageService Service for interacting with IndexedDB storage.
+   * @param dialogService Service for displaying modal dialogs.
+   */
   constructor(
     private storageService: StorageService,
     private dialogService: DialogService
   ) { }
 
+  /**
+   * Displays a modal dialog with the provided data.
+   * @param data Configuration object for the dialog (title, message, button text).
+   */
   showAlert(data: DialogData): void {
     const dialogRef = this.dialogService.openDialog({
       title: data.title,
@@ -56,6 +82,12 @@ export class SettingsDatabasesComponent implements OnInit {
       console.log('Dialog closed', result);
     });
   }
+
+  /**
+   * Initializes the component.
+   * Waits for the StorageService to be ready and then loads the initial database state
+   * (list of initialized databases and the currently active one).
+   */
   async ngOnInit(): Promise<void> {
     console.log('SettingsDatabasesComponent: ngOnInit started. Waiting for StorageService to be ready...');
     await this.storageService.whenReady();
@@ -63,12 +95,24 @@ export class SettingsDatabasesComponent implements OnInit {
     await this.loadDatabaseState();
   }
 
+  /**
+   * Loads the current list of initialized database names and the active database name
+   * from the StorageService and updates the component's state.
+   * @private
+   */
   private async loadDatabaseState(): Promise<void> {
     this.initializedDbNames = this.storageService.getInitializedDatabaseNames();
     this.currentDbName = this.storageService.getCurrentDatabaseName();
     console.log('SettingsDatabasesComponent: Loaded database state - Current DB:', this.currentDbName, 'Initialized DBs:', this.initializedDbNames.join(', '));
   }
 
+  /**
+   * Handles the selection of a new database from the UI.
+   * If the selected database is different from the current one, it switches
+   * to the new database using StorageService, updates the local state,
+   * sets the new database as the default for all collections, and emits the `change` event.
+   * @param newDbName The name of the database selected by the user.
+   */
   async onDatabaseSelected(newDbName: string): Promise<void> {
     const previouslyActiveDb = this.storageService.getCurrentDatabaseName();
     if (newDbName === previouslyActiveDb) {
@@ -94,6 +138,12 @@ export class SettingsDatabasesComponent implements OnInit {
     }
   }
 
+  /**
+   * Clears all data from the currently active database.
+   * Displays success or error notifications to the user.
+   * After clearing, it re-applies the current database name as the default setting for all collections
+   * and emits the `change` event.
+   */
   async reinitializeDatabase(): Promise<void> {
     const currentDbToClear = this.storageService.getCurrentDatabaseName();
     if (!currentDbToClear) {
@@ -118,6 +168,13 @@ export class SettingsDatabasesComponent implements OnInit {
     }
   }
 
+  /**
+   * Deletes the currently active database.
+   * It confirms the action, then uses StorageService to delete the database.
+   * After deletion, it reloads the database state, sets the new current database
+   * (if any) as the default for all collections, and emits the `change` event.
+   * Displays success or error notifications.
+   */
   async removeSelectedDatabase() {
     const dbNameToDelete = this.currentDbName;
     if (!dbNameToDelete) {
@@ -150,6 +207,12 @@ export class SettingsDatabasesComponent implements OnInit {
     }
   }
 
+  /**
+   * Backs up the data from the currently active database.
+   * Retrieves all data from StorageService, converts it to a JSON string,
+   * and triggers a download of this JSON file for the user.
+   * Displays status notifications (info, success, error).
+   */
   async backupDatabase(): Promise<void> {
     this.isBackingUp = true;
     try {
@@ -187,13 +250,24 @@ export class SettingsDatabasesComponent implements OnInit {
     }
   }
 
+  /**
+   * Programmatically clicks the hidden file input element to open the
+   * browser's file selection dialog, allowing the user to choose a backup file to restore.
+   */
   triggerRestore(): void {
     if (this.fileInput) {
-      this.fileInput.nativeElement.value = '';
+      this.fileInput.nativeElement.value = ''; // Clear previous selection to ensure 'change' event fires
     }
     this.fileInput.nativeElement.click();
   }
 
+  /**
+   * Handles the file input change event when a user selects a backup file for restore.
+   * It reads the selected JSON file, parses its content, and uses StorageService
+   * to restore the database. Validates file type and content structure.
+   * Displays status notifications and updates component state upon completion.
+   * @param event The file input change event.
+   */
   async handleRestoreFile(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) {
@@ -263,6 +337,12 @@ export class SettingsDatabasesComponent implements OnInit {
     reader.readAsText(file);
   }
 
+  /**
+   * Creates a new database with a unique, timestamp-based name.
+   * After creation, it switches to the new database, updates the local state,
+   * sets this new database as the default for all collections, and emits the `change` event.
+   * Displays status and error notifications.
+   */
   async newCollection(): Promise<void> {
     const timestamp = new Date().getTime();
     const databaseName = `forgeIDEA_${timestamp}`;
@@ -290,6 +370,15 @@ export class SettingsDatabasesComponent implements OnInit {
     }
   }
 
+  /**
+   * Sets a preferred default database setting across all initialized databases.
+   * It iterates through each known database, switches to it, and stores a key-value pair
+   * (using `StorageService.DEFAULT_DB_STORAGE_KEY`) indicating `defaultDbValue` as the preferred default.
+   * Finally, it ensures that `defaultDbValue` is the currently active database.
+   * This mechanism allows the application to remember and automatically switch to a
+   * user-chosen default database on startup.
+   * @param defaultDbValue The name of the database to be set as the default.
+   */
   public async setDefaultDbForAll(defaultDbValue: string): Promise<void> {
     const keyToSet = this.storageService.DEFAULT_DB_STORAGE_KEY;
     let originalDbName: string;
