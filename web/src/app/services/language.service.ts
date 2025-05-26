@@ -206,11 +206,22 @@ const LANGUAGE_STORAGE_KEY = 'app_language_code';
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * Service responsible for managing the application's language settings.
+ * It handles language detection, selection, and persistence, providing
+ * observables for language changes.
+ */
 export class LanguageService {
 
   private currentLanguageCodeSubject: BehaviorSubject<string>;
+  /** Observable that emits the current language code whenever it changes. */
   public currentLanguageCode$: Observable<string>;
 
+  /**
+   * Initializes the LanguageService.
+   * Determines the initial language based on browser settings, local storage,
+   * or a default value, and sets up the language change observable.
+   */
   constructor() {
     const initialLanguageCode = this.determineInitialLanguage();
 
@@ -220,6 +231,17 @@ export class LanguageService {
     console.log(`LanguageService initialized. Initial language determined as: ${initialLanguageCode}. Backend name: ${this.getCurrentLanguageBackendName()}`);
   }
 
+  /**
+   * Determines the initial language for the application.
+   * It prioritizes:
+   * 1. Best supported browser language.
+   * 2. Language code stored in localStorage.
+   * 3. Default language code (`DEFAULT_LANGUAGE_CODE`).
+   * 4. The first language in the `SUPPORTED_LANGUAGE_CODES` list if the default is invalid.
+   * 5. Falls back to 'en' if no supported languages are defined (should not happen in normal operation).
+   * @returns The determined initial language code (e.g., 'en', 'es').
+   * @private
+   */
   private determineInitialLanguage(): string {
     const browserLangCode = this.getBestSupportedBrowserLanguage();
     if (browserLangCode) {
@@ -264,6 +286,12 @@ export class LanguageService {
     return null;
   }
 
+  /**
+   * Sets the application's current language.
+   * If the provided language code is supported and different from the current language,
+   * it updates the language, stores it in localStorage, and notifies subscribers.
+   * @param languageCode The ISO 639-1 code of the language to set (e.g., 'en', 'es').
+   */
   setLanguage(languageCode: string): void {
     if (SUPPORTED_LANGUAGE_CODES.includes(languageCode)) {
       if (languageCode !== this.getCurrentLanguageCode()) {
@@ -276,32 +304,65 @@ export class LanguageService {
     }
   }
 
+  /**
+   * Gets the currently active language code.
+   * @returns The ISO 639-1 code of the current language (e.g., 'en', 'es').
+   */
   getCurrentLanguageCode(): string {
     return this.currentLanguageCodeSubject.getValue();
   }
 
+  /**
+   * Gets the backend-specific name for the current language.
+   * This is often an uppercase version of the language code or a specific enum name
+   * used in API requests.
+   * @returns The backend name for the current language (e.g., 'ENGLISH', 'SPANISH').
+   *          Falls back to the uppercase language code if no specific backend name is defined.
+   */
   getCurrentLanguageBackendName(): string {
     const currentCode = this.getCurrentLanguageCode();
     const definition = SUPPORTED_LANGUAGES_MAP[currentCode];
     return definition ? definition.backendName : currentCode.toUpperCase();
   }
 
+  /**
+   * Gets the display name for the current language.
+   * This is a human-readable name, often in the language itself.
+   * @returns The display name for the current language (e.g., 'English', 'Español').
+   *          Falls back to the language code if no display name is defined.
+   */
   getCurrentLanguageDisplayName(): string {
     const currentCode = this.getCurrentLanguageCode();
     const definition = SUPPORTED_LANGUAGES_MAP[currentCode];
     return definition ? definition.displayName : currentCode;
   }
 
+  /**
+   * Gets the BCP47 language tag for the current language.
+   * This tag is typically used for internationalization purposes (e.g., setting `lang` attribute in HTML).
+   * @returns The BCP47 tag for the current language (e.g., 'en-US', 'es-ES').
+   *          Falls back to the language code if no BCP47 tag is defined.
+   */
   getCurrentLanguageBcp47Tag(): string {
     const currentCode = this.getCurrentLanguageCode();
     const definition = SUPPORTED_LANGUAGES_MAP[currentCode];
     return definition ? definition.bcp47Tag : currentCode; // Fallback to code if not found
   }
 
+  /**
+   * Gets a list of all supported language definitions.
+   * @returns An array of `LanguageDefinition` objects, each representing a supported language.
+   *          The returned array is a copy to prevent direct modification of the source.
+   */
   getSupportedLanguages(): LanguageDefinition[] {
     return [...SUPPORTED_LANGUAGES];
   }
 
+  /**
+   * Retrieves the language definition for a specific language code.
+   * @param languageCode The ISO 639-1 code of the language (e.g., 'en', 'es').
+   * @returns The `LanguageDefinition` object for the given code, or `undefined` if the code is not supported.
+   */
   getLanguageDefinition(languageCode: string): LanguageDefinition | undefined {
     return SUPPORTED_LANGUAGES_MAP[languageCode];
   }
