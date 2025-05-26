@@ -227,14 +227,16 @@ main() {
     echo "Processing complete." >&2
     echo "$all_results" | jq .
   else
+    local script_name
+    script_name=$(basename "$0")
     echo "Usage:" >&2
-    echo "  For batch mode: $0 <context> <language> <count> [-save]" >&2
-    echo "  Example: $0 \"tech startups\" \"english\" 5 -save" >&2
-    echo "           $0 \"web3 ideas\" \"spanish\" 10" >&2
+    echo "  For batch mode: $script_name <context> <language> <count> [-save]" >&2
+    echo "  Example: $script_name \"tech startups\" \"english\" 5 -save" >&2
+    echo "           $script_name \"web3 ideas\" \"spanish\" 10" >&2
     echo "" >&2
-    echo "  For interactive mode: $0 <language> [-save]" >&2
-    echo "  Example: $0 \"english\" -save" >&2
-    echo "           $0 \"french\"" >&2
+    echo "  For interactive mode: $script_name <language> [-save]" >&2
+    echo "  Example: $script_name \"english\" -save" >&2
+    echo "           $script_name \"french\"" >&2
     exit 1
   fi
 }
