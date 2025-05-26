@@ -7,8 +7,8 @@ input:
   default:
     language: english
 ---
-Generate {{count}} categories for classifying ideas related to: {{context}} (general brainstorming or project concepts).
+Generate a list of {{count}} categories suitable for classifying ideas related to the following context: {{context}} related to general brainstorming or project concepts." 
 
-Output a comma-separated string of category names only (e.g., Category One, Category Two, Category Three). No numbering, introductions, or explanations.
+Please provide the list as a simple comma-separated string, containing only the category names, without numbering, introductions, or explanations. Example: Category One, Category Two, Category Three
 
-Language: {{language}}
+Write the categories in the language: {{language}}
