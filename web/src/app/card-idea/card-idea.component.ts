@@ -333,9 +333,8 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
               this.isGeneratingTasks = false;
             });
         },
-        error: (error) // Added error parameter
-        ) => {
-          console.error('Error generating tasks:', error); // Log the error
+        error: (error) => { // Corrected syntax for error callback
+          console.error('Error generating tasks:', error);
           this.isGeneratingTasks = false;
         }
       });
