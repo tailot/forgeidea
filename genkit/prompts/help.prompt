@@ -7,14 +7,13 @@ input:
   default:
     language: english
 ---
-My idea:
+My idea is:
 {{idea}}
 
-Help me develop these goals:
+#Help me develop the following goals
 {{task}}
 
-#Instructions
-    - Draft a complete, detailed, and insightful document.
-    - Write professionally, without comments or introductions.
-    - Language: {{language}}.
----
+#INSTRUCTIONS
+    - Draft a complete document full of details and insights.
+    - Adhere to drafting the document professionally, avoiding adding comments or introductions.
+    - Write the response in the {{language}} language.

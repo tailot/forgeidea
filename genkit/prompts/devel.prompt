@@ -6,11 +6,12 @@ input:
   default:
     language: english
 ---
-Write a bulleted list of steps to realize:
+Write a bulleted list of the steps to take to realize:
 {{text}}
 
-#Output
-    - Only the bulleted list.
-    - No considerations before or after the list.
+#Warnings
+    - the response must contain only the bulleted list.
+    - the response must not contain considerations before or after the bulleted list
 
-Language: {{language}}
+
+Write the response in the {{language}} language
