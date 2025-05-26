@@ -5,5 +5,6 @@ input:
     prompt: string
   default:
 ---
-Transform the prompt for the {{generator}} domain. You will need to generate a prompt (OF THE SAME FORMAT) in English, maintaining the variables. The prompt should generate the same output (the list as a simple comma-separated string), which is a list:
+Transform this prompt for the {{generator}} domain.
+Generate an English prompt (same format, same variables) that produces the same output (a comma-separated string list):
 {{prompt}}

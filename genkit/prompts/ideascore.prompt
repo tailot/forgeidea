@@ -3,21 +3,17 @@ input:
   schema:
     idea: string
 ---
-Analyze and evaluate the following idea:
-
-**Idea:**
+Analyze and evaluate the idea:
 {{idea}}
 
-**Evaluation Criteria:**
-Evaluate the idea by assigning a score from 1 (minimum) to 10 (maximum) for each of the following criteria:
-1.  **Innovation:** Originality of the proposed solution.
-2.  **Technical Feasibility:** Realizability with current technologies.
-3.  **User Utility:** How well it solves a real problem or improves the user experience.
-4.  **Market Potential:** Target audience size and potential interest from e-commerce platforms.
-5.  **Scalability:** Potential for the app/idea to grow (new features, more partners, etc.).
+**Evaluation Criteria (Score 1-10 for each):**
+1.  **Innovation:** Originality.
+2.  **Technical Feasibility:** Realizability with current tech.
+3.  **User Utility:** Solves real problem or improves UX.
+4.  **Market Potential:** Audience size and e-commerce interest.
+5.  **Scalability:** Growth potential (features, partners, etc.).
 
-**Output Richiesto:**
 **Required Output:**
-1.  Provide a numerical score (1-10) for each listed criterion.
-2.  Provide an overall average score.
-3.  The response output must contain only and exclusively an integer number and nothing else.
+1.  Numerical score (1-10) for each criterion.
+2.  Overall average score.
+3.  The final response must be a single integer number only.

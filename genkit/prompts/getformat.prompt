@@ -3,5 +3,5 @@ input:
   schema:
     promptfile: string
 ---
-What format does the following prompt output? I answer with the format without adding comments or considerations:
+Describe the output format of the following prompt. Respond only with the format, no comments or considerations:
 {{promptfile}}
