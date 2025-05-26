@@ -197,8 +197,7 @@ export class NotesComponent implements OnInit {
       note: noteForDialog,
       index: effectiveDialogIndex,
       isFirst: effectiveDialogIndex === 0,
-      // For a new note, 'isLast' should be true as it's conceptually at the end.
-      isLast: effectiveDialogIndex >= this.notes.length - (isCreatingNewNote ? 0 : 1),
+      isLast: effectiveDialogIndex >= this.notes.length
     };
 
     this.activeDialogRef = this.dialog.open<NoteDialogComponent, NoteDialogData, string | undefined>(
