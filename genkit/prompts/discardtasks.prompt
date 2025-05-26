@@ -8,21 +8,18 @@ input:
   default:
     language: english
 ---
-Given the following steps to take:
+Original idea: {{text}}
+Initial steps:
 {{tasks}}
 
-I would like to exclude the following:
+Exclude these steps:
 {{tasksdiscard}}
 
-To realize the idea:
-{{text}}
+#Task
+Reformulate and rework the remaining steps into an efficient bulleted list to realize the idea.
 
-#Operations to perform
-    - reformulate the bulleted list, trying to rework the steps to realize the idea. Efficiently reorganize the points to propose.
+#Output
+    - Only the bulleted list.
+    - No considerations before or after.
 
-#Warnings
-    - the response must contain only the bulleted list.
-    - the response must not contain considerations before or after the bulleted list
-
-
-Write the response in the {{language}} language
+Language: {{language}}
