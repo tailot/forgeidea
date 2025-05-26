@@ -9,6 +9,14 @@
  */
 import { ai, getModelToUse } from '../config/genkit';
 import { z } from 'zod';
+
+// Define the output schema for the miningFlow
+const MiningFlowOutputSchema = z.object({
+  idea: z.string(),
+  score: z.string(),
+  competitors: z.string(),
+});
+
 import { generateIdeaFlow } from '../flows/generateIdea';
 import { scoreIdeaFlow } from '../flows/scoreidea';
 
@@ -48,7 +56,7 @@ export const miningFlow = ai.defineFlow(
             context: z.string().describe("Context"),
             language: z.string().describe("The language in which the model should respond.")
         }),
-        outputSchema: z.string().describe("JSON string")
+        outputSchema: MiningFlowOutputSchema
     },
     async (params) => {
         try {
@@ -65,7 +73,7 @@ export const miningFlow = ai.defineFlow(
             const competitorsResponse = await competitorsPrompt({idea: idea }, {model: modelToUse});
             const competitorsText = competitorsResponse.text;
 
-            return JSON.stringify({idea: idea, score: score, competitors: competitorsText});
+            return {idea: idea, score: score, competitors: competitorsText};
 
         } catch (error) {
             throw new Error(`miningFlow failed: ${error instanceof Error ? error.message : String(error)}`);
