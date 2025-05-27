@@ -1,4 +1,5 @@
 # forgeIDEA
+![forgeIDEA icon](web/src/static-assets/icons/icon-128x128.png)
 
 forgeIDEA is a web application that helps users generate and manage ideas.
 
