@@ -1,0 +1,62 @@
+name: Node.js CI Multi-Project
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_and_test: # Rinominato il job per chiarezza
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: |
+          genkit/package-lock.json
+          socket.io/package-lock.json
+          web/package-lock.json
+
+    # Install dependencies for each project
+    - name: Install Genkit dependencies
+      run: npm ci
+      working-directory: ./genkit
+
+    - name: Install Socket.IO dependencies
+      run: npm ci
+      working-directory: ./socket.io
+
+    - name: Install Web dependencies
+      run: npm ci
+      working-directory: ./web
+
+    # Build each project
+    - name: Build Genkit project
+      run: npm run build --if-present
+      working-directory: ./genkit
+
+    - name: Build Socket.IO project
+      run: npm run build --if-present
+      working-directory: ./socket.io
+
+    - name: Build Web project
+      run: npm run build --if-present
+      working-directory: ./web
+
+    # Run tests for the Web project
+    - name: Run Web project tests
+      run: npm test
+      working-directory: ./web
