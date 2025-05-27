@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "npx tsc setenv.ts && node setenv.js && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
+    "test": "ng test --no-watch --browsers=ChromeHeadless",
     "tar": "tar -czvf ../forgeIdeaFront.tar.gz --exclude='node_modules' --exclude='.angular/cache' --exclude='dist' --exclude='.vscode'  .[^.]* *"
   },
   "private": true,
