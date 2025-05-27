@@ -68,8 +68,8 @@ main() {
         continue
       fi
 
-      echo "$response" # Simply print the raw response to stdout
-
+      printf "%s" "$response" | tr -dc '[:print:]\t\n\r' | jq '.'
+    
     done
     exit 0
 
@@ -107,7 +107,7 @@ main() {
         continue # Skip to next attempt
       fi
 
-      echo "$response" # Simply print the raw response to stdout
+    printf "%s" "$response" | tr -dc '[:print:]\t\n\r' | jq '.'
 
     done
 
