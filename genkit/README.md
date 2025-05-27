@@ -78,3 +78,61 @@ The `prompts/` directory contains various `.prompt` files that are used by the f
 *   (And many others like `devel.prompt`, `discardtasks.prompt`, `getformat.prompt`, `help.prompt`, `meta_categories.prompt`, `meta_idea.prompt`, `operationidea.prompt`, `subjects.prompt`, `zoomtask.prompt`.)
 
 These flows and prompts work together to provide the AI-driven features of forgeIDEA. Refer to the specific source files for more details on their implementation.
+
+### Using the `miningFlow` for Idea Generation and Competitor Analysis
+
+The `miningFlow` (defined in `src/mining/ideaProcessingFlow.ts`) orchestrates a sequence of tasks: it first generates a new idea based on a given context, then scores this idea, and finally identifies potential competitors for the generated idea using the `competitors.prompt`.
+
+This flow can be invoked using the `call_mining_flow.sh` script located in the `src/mining/` directory.
+
+**Prerequisites for the script:**
+Before running the script, ensure you have `curl` and `jq` installed on your system. These are used by the script to make requests to the `miningFlow` endpoint and process JSON responses.
+
+**How to run `call_mining_flow.sh`:**
+
+The script can be run in two modes:
+
+1.  **Batch Mode:** To generate a specific number of ideas and their competitor analyses for a given context.
+    *   **Usage:** `./src/mining/call_mining_flow.sh "<context>" "<language>" <count>`
+    *   **`<context>`:** A string describing the domain or area for idea generation (e.g., "wearable technology for pets").
+    *   **`<language>`:** The language for the AI's responses (e.g., "english", "italian").
+    *   **`<count>`:** The number of times to run the flow.
+    *   **Example:**
+        ```bash
+        ./src/mining/call_mining_flow.sh "sustainable urban farming solutions" "english" 3
+        ```
+
+2.  **Interactive Mode:** To provide contexts one by one through the command line.
+    *   **Usage:** `./src/mining/call_mining_flow.sh "<language>"`
+    *   **`<language>`:** The language for the AI's responses.
+    *   The script will then prompt you to "Enter context (or type 'exit' or 'quit' to finish):".
+    *   **Example:**
+        ```bash
+        ./src/mining/call_mining_flow.sh "english"
+        ```
+        Then, when prompted:
+        ```
+        Enter context (or type 'exit' or 'quit' to finish): innovative educational toys
+        ```
+
+**Script Output:**
+
+In both modes, for each successful run, the script will print a JSON object to the standard output. This JSON object contains:
+*   `idea`: The generated idea (string).
+*   `score`: The score assigned to the idea (string).
+*   `competitors`: An array of objects, where each object represents a potential competitor and contains:
+    *   `name`: The name of the competitor company (string).
+    *   `website`: The website of the competitor (string).
+
+Example of a single JSON output:
+```json
+{
+  "idea": "A smart hydroponic system for small apartments, optimized for herbs and leafy greens, with an app for monitoring and automated nutrient delivery.",
+  "score": "85/100",
+  "competitors": [
+    { "name": "competitor name", "website": "www.・・・・・・・" },
+    { "name": "another competitor name", "website": "www.・・・・・・・" }
+  ]
+}
+```
+(Note: The actual competitors listed will be placeholders if real ones are generated, as per the `competitors.prompt` design to avoid citing real companies directly in its own template if it were to generate examples itself. The example above is for structure illustration.)
