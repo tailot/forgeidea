@@ -1,0 +1,57 @@
+diff --git a/web/package.json b/web/package.json
+index aff5847..c9a7a34 100644
+--- a/web/package.json
++++ b/web/package.json
+@@ -24,6 +24,7 @@
+     "@angular/service-worker": "^19.2.10",
+     "dexie": "^4.0.11",
+     "rxjs": "~7.8.0",
++    "socket.io-client": "^4.8.1",
+     "tslib": "^2.3.0",
+     "zone.js": "~0.15.0"
+   },
+diff --git a/web/src/app/app.routes.ts b/web/src/app/app.routes.ts
+index ff2fad4..7470c58 100644
+--- a/web/src/app/app.routes.ts
++++ b/web/src/app/app.routes.ts
+@@ -100,6 +100,11 @@ export const routes: Routes = [
+         loadComponent: () => import('./settings/settings.component').then(m => m.SettingsComponent),
+         title: 'forge IDEA'
+     },
++    {
++        path: 'shared',
++        loadComponent: () => import('./sharedidea/sharedidea.component').then(m => m.SharedIdeaComponent),
++        title: 'forge IDEA'
++    },
+     {
+         path: 'privacy-policy',
+         loadComponent: () => import('./privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent),
+diff --git a/web/src/app/bottom-nav/bottom-nav.component.html b/web/src/app/bottom-nav/bottom-nav.component.html
+index e1bdbca..fa64c99 100644
+--- a/web/src/app/bottom-nav/bottom-nav.component.html
++++ b/web/src/app/bottom-nav/bottom-nav.component.html
+@@ -21,6 +21,12 @@
+       <span>Category</span>
+     </div>
+   </button>
++  <button class="nav-button" aria-label="View ideas shared by others in real time." *ngIf="isOnline$ | async" mat-icon-button routerLink="/shared" routerLinkActive="active-nav-link" aria-label="New idea">
++    <div>
++      <mat-icon>groups_2</mat-icon>
++      <span>Share</span>
++    </div>
++  </button>
+   <button class="nav-button" aria-label="List of ideas" mat-icon-button routerLink="/list" routerLinkActive="active-nav-link" aria-label="IDEAS">
+     <div>
+       <mat-icon>apps</mat-icon>
+diff --git a/web/src/app/idea-list/idea-list.component.html b/web/src/app/idea-list/idea-list.component.html
+index d161774..2aec285 100644
+--- a/web/src/app/idea-list/idea-list.component.html
++++ b/web/src/app/idea-list/idea-list.component.html
+@@ -37,6 +37,7 @@
+            <app-card-idea
+              [idea]="idea"
+              [showActions]="false"
++             [sharedButton]="ifIsOnline"
+              [fusionButton]="ifIsOnline"
+              [trashButton]="true"
+              (isDeleted)="updateCardIdea($event)"
