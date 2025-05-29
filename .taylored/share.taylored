@@ -65,3 +65,50 @@ index 37a2552..850825f 100644
          @if (documentsButton) {
            <button aria-label="Archive the current document" mat-icon-button color="primary"
              (click)="documentsEmiter(idea);">
+diff --git a/web/src/app/card-idea/card-idea.component.ts b/web/src/app/card-idea/card-idea.component.ts
+index 1d60a6f..1c45524 100644
+--- a/web/src/app/card-idea/card-idea.component.ts
++++ b/web/src/app/card-idea/card-idea.component.ts
+@@ -32,6 +32,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
+ import { MatTooltipModule } from '@angular/material/tooltip';
+ 
+ // Third-party Libraries
++import { io, Socket as SocketIoClientSocket } from 'socket.io-client';
+ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+ 
+ // Application-specific Services and Models
+@@ -156,6 +157,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
+   _addIdeaButtonActive = signal(false);
+ 
+   /** Private instance of the Socket.IO client for real-time communication (e.g., sharing). */
++  private socket: SocketIoClientSocket;
+   private destroyRef = inject(DestroyRef);
+ 
+   /**
+@@ -172,6 +174,9 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
+     private genkitService: GenkitService,
+     private languageService: LanguageService,
+   ) {
++    this.socket = io(environment.socketAddr, {
++      transports: ['websocket']
++    });
+   }
+ 
+   /**
+@@ -273,6 +278,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
+ 
+     if (cardIdea && cardIdea.text) {
+       const payload = { text: cardIdea.text };
++      this.socket.emit('idea', payload);
+     } else {
+       console.warn('No text to share.');
+     }
+@@ -542,5 +548,8 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
+    * Disconnects the Socket.IO client to prevent memory leaks and lingering connections.
+    */
+   ngOnDestroy(): void {
++    if (this.socket) {
++      this.socket.disconnect();
++    }
+   }
+ }
