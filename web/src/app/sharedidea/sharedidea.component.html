@@ -1,17 +1,22 @@
-<div *ngIf="ideasQueue.length > 0" class="upcoming-ideas-section">
-  <div *ngFor="let queuedItem of ideasQueue.slice(0, 5)" class="idea-container">
-    <div class="idea-content">
-      <app-card-idea [addIdeaButton]="true" [idea]="queuedItem.idea" [showActions]="false"></app-card-idea>
-    </div>
-    <div class="progress-bar-container">
-      <div class="progress-bar" [style.width.%]="(queuedItem.timeLeftMs / IDEA_DISPLAY_DURATION_MS) * 100">
+@if (ideasQueue.length > 0) {
+  <div class="upcoming-ideas-section">
+    @for (queuedItem of ideasQueue.slice(0, 5); track queuedItem) {
+      <div class="idea-container">
+        <div class="idea-content">
+          <app-card-idea [addIdeaButton]="true" [idea]="queuedItem.idea" [showActions]="false"></app-card-idea>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" [style.width.%]="(queuedItem.timeLeftMs / IDEA_DISPLAY_DURATION_MS) * 100">
+          </div>
+        </div>
       </div>
-    </div>
+    }
   </div>
-</div>
-<div *ngIf="ideasQueue.length === 0" class="status-message">
-  <mat-icon aria-label="Users are not sharing ideas.">web_asset_off</mat-icon>
-</div>
+} @else {
+  <div class="status-message">
+    <mat-icon aria-label="Users are not sharing ideas.">web_asset_off</mat-icon>
+  </div>
+}
 
 <div class="queue-status">
   <p aria-label="the maximum number of ideas you can view in real time.">{{ this.ideasQueue.length }} / {{ MAX_QUEUE_SIZE_FOR_TEMPLATE }}</p>

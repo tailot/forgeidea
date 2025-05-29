@@ -7,22 +7,32 @@
 
     <mat-card-content>
         <div class="database-selection-group section">
-            <div *ngIf="isSwitchingDb || isCreatingDb" class="loading-indicator">
-                <mat-progress-spinner mode="indeterminate" diameter="20"></mat-progress-spinner>
-                <span *ngIf="isSwitchingDb">Switching database...</span>
-                <span *ngIf="isCreatingDb">Preparing new database...</span>
-            </div>
+            @if (isSwitchingDb || isCreatingDb) {
+              <div class="loading-indicator">
+                  <mat-progress-spinner mode="indeterminate" diameter="20"></mat-progress-spinner>
+                  @if (isSwitchingDb) {
+                    <span>Switching database...</span>
+                  }
+                  @if (isCreatingDb) {
+                    <span>Preparing new database...</span>
+                  }
+              </div>
+            }
             <mat-radio-group aria-label="Contains the list of databases. The service data changes according to the selected database." [(ngModel)]="currentDbName" (ngModelChange)="onDatabaseSelected($event)"
                 [disabled]="isSwitchingDb || isCreatingDb" aria-labelledby="database-select-label"
                 class="database-radio-group">
                 <label id="database-select-label" class="sr-only">Select active database</label>
-                <mat-radio-button *ngFor="let dbName of initializedDbNames" [value]="dbName" class="db-radio-button">
-                    {{ dbName }}
-                </mat-radio-button>
+                @for (dbName of initializedDbNames; track dbName) {
+                  <mat-radio-button [value]="dbName" class="db-radio-button">
+                      {{ dbName }}
+                  </mat-radio-button>
+                }
             </mat-radio-group>
-            <div aria-label="Databases not found" *ngIf="!isSwitchingDb && !isCreatingDb && initializedDbNames.length === 0" class="no-db-message">
-                <p>No databases found. You can create one using the button below.</p>
-            </div>
+            @if (!isSwitchingDb && !isCreatingDb && initializedDbNames.length === 0) {
+              <div aria-label="Databases not found" class="no-db-message">
+                  <p>No databases found. You can create one using the button below.</p>
+              </div>
+            }
         </div>
 
         <mat-divider></mat-divider>
@@ -32,8 +42,12 @@
             <button aria-label="Create a new database." mat-stroked-button color="primary" (click)="newCollection()"
                 [disabled]="isCreatingDb || isSwitchingDb" class="action-button">
                 <mat-icon>add_circle_outline</mat-icon>
-                <span *ngIf="!isCreatingDb">Create New Database</span>
-                <span *ngIf="isCreatingDb">Creating...</span>
+                @if (!isCreatingDb) {
+                  <span>Create New Database</span>
+                }
+                @if (isCreatingDb) {
+                  <span>Creating...</span>
+                }
             </button>
             <button aria-label="Clear the current database." mat-stroked-button color="warn" (click)="reinitializeDatabase()"
                 [disabled]="isSwitchingDb || isCreatingDb" class="action-button">
@@ -42,24 +56,34 @@
             <button aria-label="Backup the current database." mat-stroked-button (click)="backupDatabase()"
                 [disabled]="isBackingUp || isSwitchingDb || isCreatingDb" class="action-button">
                 <mat-icon>backup</mat-icon>
-                <span *ngIf="!isBackingUp">Backup Current Database</span>
-                <span *ngIf="isBackingUp">Backing up... <mat-progress-spinner mode="indeterminate" diameter="20"
-                        class="inline-spinner"></mat-progress-spinner></span>
+                @if (!isBackingUp) {
+                  <span>Backup Current Database</span>
+                }
+                @if (isBackingUp) {
+                  <span>Backing up... <mat-progress-spinner mode="indeterminate" diameter="20"
+                          class="inline-spinner"></mat-progress-spinner></span>
+                }
             </button>
             <input aria-label="input allows you to upload the file to restore the current database." type="file" #fileInput hidden (change)="handleRestoreFile($event)" accept=".json">
             <button aria-label="Restore the current database" mat-stroked-button (click)="triggerRestore()"
                 [disabled]="isRestoring || isSwitchingDb || isCreatingDb" class="action-button">
                 <mat-icon>restore</mat-icon>
-                <span *ngIf="!isRestoring">Restore to Current Database</span>
-                <span *ngIf="isRestoring">Restoring... <mat-progress-spinner mode="indeterminate" diameter="20"
-                        class="inline-spinner"></mat-progress-spinner></span>
+                @if (!isRestoring) {
+                  <span>Restore to Current Database</span>
+                }
+                @if (isRestoring) {
+                  <span>Restoring... <mat-progress-spinner mode="indeterminate" diameter="20"
+                          class="inline-spinner"></mat-progress-spinner></span>
+                }
             </button>
-            <button aria-label="Delete the current database." *ngIf="initializedDbNames.length > 1" mat-stroked-button color="warn"
-                (click)="removeSelectedDatabase()" [disabled]="isSwitchingDb || isCreatingDb || !currentDbName"
-                class="action-button">
-                <mat-icon>delete_forever</mat-icon>
-                <span>Delete to Current Database</span>
-            </button>
+            @if (initializedDbNames.length > 1) {
+              <button aria-label="Delete the current database." mat-stroked-button color="warn"
+                  (click)="removeSelectedDatabase()" [disabled]="isSwitchingDb || isCreatingDb || !currentDbName"
+                  class="action-button">
+                  <mat-icon>delete_forever</mat-icon>
+                  <span>Delete to Current Database</span>
+              </button>
+            }
         </div>
     </mat-card-content>
 </mat-card>

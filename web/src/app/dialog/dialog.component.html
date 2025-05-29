@@ -1,4 +1,6 @@
-<h1 mat-dialog-title *ngIf="data.title">{{ data.title }}</h1>
+@if (data.title) {
+  <h1 mat-dialog-title>{{ data.title }}</h1>
+}
 <div mat-dialog-content
      [style.height]="data.height"
      [style.width]="data.width"

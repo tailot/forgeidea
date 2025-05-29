@@ -1,5 +1,5 @@
 export const environment = {
-  production: true,
+  production: undefined,
   genkitApiUrl: undefined,
   socketAddr: undefined,
   nameANDsurname: undefined,

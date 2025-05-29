@@ -7,20 +7,24 @@
            placeholder="Search through saved ideas"
            [(ngModel)]="searchTerm"
            (ngModelChange)="onSearchChange()">
-    <button mat-icon-button matSuffix *ngIf="searchTerm" (click)="clearSearch()" aria-label="Clear search">
-      <mat-icon>close</mat-icon>
-    </button>
+    @if (searchTerm) {
+      <button mat-icon-button matSuffix (click)="clearSearch()" aria-label="Clear search">
+        <mat-icon>close</mat-icon>
+      </button>
+    }
   </mat-form-field>
 </div>
 
 
 <div class="idea-list-container">
 
-  <div *ngIf="isLoading" class="loading-indicator">
-    <mat-spinner diameter="50"></mat-spinner>
-    <p>...</p>
-  </div>
-  <div *ngIf="!isLoading && errorMessage" class="error-message">
+  @if (isLoading) {
+    <div class="loading-indicator">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>...</p>
+    </div>
+  } @else if (errorMessage) {
+    <div class="error-message">
      <mat-card appearance="outlined">
        <mat-card-content>
          <mat-icon color="warn">error_outline</mat-icon>
@@ -28,42 +32,49 @@
          <button mat-raised-button color="primary" (click)="loadValidIdeas()">Riprova</button>
        </mat-card-content>
      </mat-card>
-  </div>
-  <div *ngIf="!isLoading && !errorMessage">
-
-    <div *ngIf="filteredIdeas.length > 0; else noIdeasFound">
-      <div class="idea-cards-grid">
-        <div *ngFor="let idea of displayedIdeas" class="idea-summary-card">
-           <app-card-idea
-             [idea]="idea"
-             [showActions]="false"
-             [sharedButton]="ifIsOnline"
-             [fusionButton]="ifIsOnline"
-             [trashButton]="true"
-             (isDeleted)="updateCardIdea($event)"
-             (click)="viewIdeaDetails(idea.id)"
-             matRipple>
-           </app-card-idea>
-        </div>
-      </div>
     </div>
-    <ng-template #noIdeasFound>
-      <div class="no-ideas">
-        <mat-icon role="status" aria-label="No ideas found">lightbulb_outline</mat-icon>
-        <p *ngIf="allIdeas.length === 0">...</p>
-        <p *ngIf="allIdeas.length > 0 && filteredIdeas.length === 0">
-          <small>{{ searchTerm }}</small>
-        </p>
-      </div>
-    </ng-template>
-  </div>
+  } @else {
+    <div>
+      @if (filteredIdeas.length > 0) {
+        <div class="idea-cards-grid">
+          @for (idea of displayedIdeas; track idea.id) {
+            <div class="idea-summary-card">
+               <app-card-idea
+                 [idea]="idea"
+                 [showActions]="false"
+                 [sharedButton]="ifIsOnline"
+                 [fusionButton]="ifIsOnline"
+                 [trashButton]="true"
+                 (isDeleted)="updateCardIdea($event)"
+                 (click)="viewIdeaDetails(idea.id)"
+                 matRipple>
+               </app-card-idea>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="no-ideas">
+          <mat-icon role="status" aria-label="No ideas found">lightbulb_outline</mat-icon>
+          @if (allIdeas.length === 0) {
+            <p>...</p>
+          }
+          @if (allIdeas.length > 0 && filteredIdeas.length === 0) {
+            <p>
+              <small>{{ searchTerm }}</small>
+            </p>
+          }
+        </div>
+      }
+    </div>
+  }
 </div>
 
-<mat-paginator #paginator
-               *ngIf="!isLoading && !errorMessage && filteredIdeas.length > 0"
-               [length]="totalIdeas"
-               [pageSize]="pageSize"
-               [pageSizeOptions]="[5, 10, 20, 50]"
-               (page)="handlePageEvent($event)"
-               aria-label="Select page of results of found ideas.">
-</mat-paginator>
+@if (!isLoading && !errorMessage && filteredIdeas.length > 0) {
+  <mat-paginator #paginator
+                 [length]="totalIdeas"
+                 [pageSize]="pageSize"
+                 [pageSizeOptions]="[5, 10, 20, 50]"
+                 (page)="handlePageEvent($event)"
+                 aria-label="Select page of results of found ideas.">
+  </mat-paginator>
+}
