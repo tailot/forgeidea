@@ -102,7 +102,6 @@ export class SettingsDominiumComponent implements OnInit, OnDestroy {
    * Updates `isSettingDominium` to reflect the operation's status.
    */
   setDominium(): void {
-    console.log("ddd")
     this.isSettingDominium = true;
     if (!this.dominiumValue || this.dominiumValue.trim() === '') {
       console.warn('Dominium value is empty. Cannot set dominium.');
