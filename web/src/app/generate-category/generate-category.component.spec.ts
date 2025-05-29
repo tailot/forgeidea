@@ -11,6 +11,7 @@
  */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { GenerateCategoryComponent } from './generate-category.component';
 
 /**
@@ -49,7 +50,8 @@ describe('GenerateCategoryComponent', () => {
       imports: [
         GenerateCategoryComponent, // Assuming GenerateCategoryComponent is standalone
         HttpClientTestingModule,
-      ]
+      ],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 

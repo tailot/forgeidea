@@ -8,6 +8,7 @@
  * implementation grows.
  */
 import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 import { ConsoleOverrideService } from './consoleoverride.service';
 
@@ -34,7 +35,9 @@ describe('ConsoleOverrideService', () => {
    * making it available for each test.
    */
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()]
+    });
     service = TestBed.inject(ConsoleOverrideService);
   });
 

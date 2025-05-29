@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { provideZonelessChangeDetection } from '@angular/core';
 import { SettingsDatabasesComponent } from './settings-databases.component';
 
 describe('SettingsDatabasesComponent', () => {
@@ -8,7 +9,8 @@ describe('SettingsDatabasesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SettingsDatabasesComponent]
+      imports: [SettingsDatabasesComponent],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 

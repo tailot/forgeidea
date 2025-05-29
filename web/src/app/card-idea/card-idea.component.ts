@@ -17,9 +17,9 @@
  * and navigation (`Router`). It also utilizes Angular Material components for its UI.
  * The component's behavior and displayed actions can be customized through its input properties.
  * It emits events to notify parent components of actions like task generation or deletion.
- */
+ */ 
 // Angular Core and Common
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy, ChangeDetectionStrategy, signal, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -33,6 +33,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Third-party Libraries
 import { io, Socket as SocketIoClientSocket } from 'socket.io-client';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // Application-specific Services and Models
 import { GenkitService, Idea, GenerateTasksRequestData, ScoreIdeaRequestData, OperationRequestData } from '../services/genkit.service';
@@ -89,8 +90,8 @@ export interface CardIdeaEmitData {
  *  - `OnDestroy`: Lifecycle hook for cleanup logic.
  */
 @Component({
-  selector: 'app-card-idea',
   standalone: true,
+  selector: 'app-card-idea',
   imports: [
     CommonModule,
     MatCardModule,
@@ -101,7 +102,8 @@ export interface CardIdeaEmitData {
     MatTooltipModule
   ],
   templateUrl: './card-idea.component.html',
-  styleUrls: ['./card-idea.component.sass']
+  styleUrls: ['./card-idea.component.sass'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
 
@@ -132,24 +134,31 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
   @Output() documentsOn = new EventEmitter<Idea>();
   /** Emits the UUID of the idea when it is deleted. */
   @Output() isDeleted = new EventEmitter<string>();
-
+  
+  // Signals for internal state
   /** Stores the numerical score of the idea after evaluation. Null if not scored. */
-  ideaScore: number | null = null;
+  ideaScore = signal<number | null>(null);
   /** Flag indicating if the idea scoring process is currently active. */
-  isScoring: boolean = false;
+  isScoring = signal(false);
   /** Flag indicating if the component is currently loading initial idea data. */
-  isLoading: boolean = true;
+  isLoading = signal(true);
   /** Flag indicating if task generation for the idea is currently in progress. */
-  isGeneratingTasks: boolean = false;
+  isGeneratingTasks = signal(false);
   /** Flag indicating if an idea operation (e.g., combining) is in progress. */
-  isOperating: boolean = false;
+  isOperating = signal(false);
   /** Stores data for an ongoing operation, typically the first idea selected for a two-idea operation. */
   operationData: Idea | null = null;
   /** Flag indicating if the current idea is mergiable with an idea stored for operation. True if no operation is pending or if the stored idea is different. */
-  mergiable: boolean = true;
+  mergiable = signal(true);
+
+  /** Internal state for the shared button's active status, initialized by input. */
+  _sharedButtonActive = signal(false);
+  /** Internal state for the add idea button's active status, initialized by input. */
+  _addIdeaButtonActive = signal(false);
 
   /** Private instance of the Socket.IO client for real-time communication (e.g., sharing). */
   private socket: SocketIoClientSocket;
+  private destroyRef = inject(DestroyRef);
 
   /**
    * Constructs the CardIdeaComponent.
@@ -184,7 +193,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
       const operationKey = 'operation';
       const existingOperationData = await this.storageService.getItem<Idea>(operationKey);
       if (existingOperationData && existingOperationData.id === this.idea.id) {
-        this.mergiable = false;
+        this.mergiable.set(false);
       }
     } catch (error) {
       console.error(`CardIdeaComponent: Error checking operation state in storage:`, error);
@@ -198,7 +207,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
    */
   async clearOperation(): Promise<void> {
     this.storageService.removeItem('operation');
-    this.mergiable = true;
+    this.mergiable.set(true);
   }
 
   /**
@@ -216,14 +225,14 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     const operationKey = 'operation';
-    this.isOperating = true;
+    this.isOperating.set(true);
 
     try {
       const existingOperationData = await this.storageService.getItem<Idea>(operationKey);
 
       if (!existingOperationData) {
         await this.storageService.setItem(operationKey, this.idea);
-        this.mergiable = false;
+        this.mergiable.set(false);
       } else if (existingOperationData && existingOperationData.id && existingOperationData.id !== this.idea.id) {
         const requestData : OperationRequestData = {
           idea1: existingOperationData.text,
@@ -232,25 +241,27 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
           language: this.languageService.getCurrentLanguageBackendName()
         };
 
-        this.genkitService.callOperation(requestData, true).subscribe({
-          next: async (newIdeaText: string) => {
-            const newIdeaUuid = crypto.randomUUID();
-            const newIdea = await this.createIdea(newIdeaUuid,newIdeaText,requestData.language);
-            await this.storageService.setItem(newIdeaUuid, newIdea);
-            await this.storageService.removeItem(operationKey);
-            this.router.navigate(['/jobcard', newIdeaUuid]);
-          },
-          error: (error) => {
-            console.error('Error during idea operation:', error);
-            this.isOperating = false;
-          }
-        });
+        this.genkitService.callOperation(requestData, true)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: async (newIdeaText: string) => {
+              const newIdeaUuid = crypto.randomUUID();
+              const newIdea = await this.createIdea(newIdeaUuid,newIdeaText,requestData.language);
+              await this.storageService.setItem(newIdeaUuid, newIdea);
+              await this.storageService.removeItem(operationKey);
+              this.router.navigate(['/jobcard', newIdeaUuid]);
+            },
+            error: (error) => {
+              console.error('Error during idea operation:', error);
+              this.isOperating.set(false);
+            }
+          });
       } else { // existingOperationData.id === this.idea.id
-        this.mergiable = false; // Already stored for operation, do nothing further
+        this.mergiable.set(false); // Already stored for operation, do nothing further
       }
     } catch (error) {
       console.error(`Error accessing or setting storage for key '${operationKey}':`, error);
-      this.isOperating = false; // Ensure loading state is reset on error
+      this.isOperating.set(false); // Ensure loading state is reset on error
     }
     // Note: isOperating might need to be reset in the next block for non-Combine scenarios or if mergiable becomes false.
     // For now, it's reset on error and implicitly after navigation in the success case.
@@ -263,7 +274,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
    * @async
    */
   async shareCurrentIdea(cardIdea: Idea): Promise<void> {
-    this.sharedButton = false; // Intended to disable button after click? Or UI feedback?
+    this._sharedButtonActive.set(false);
 
     if (cardIdea && cardIdea.text) {
       const payload = { text: cardIdea.text };
@@ -292,7 +303,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
    * @async
    */
   async tasksEmiter(idea: Idea): Promise<void> {
-    if (this.isOperating) {
+    if (this.isOperating()) {
       console.log("Operation in progress, tasks generation skipped.");
       return;
     }
@@ -316,35 +327,37 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
         return;
       }
 
-      this.isGeneratingTasks = true;
+      this.isGeneratingTasks.set(true);
       const language = this.languageService.getCurrentLanguageBackendName();
       const requestData: GenerateTasksRequestData = { idea: idea.text, language: language };
-      this.genkitService.callGenerateTasks(requestData, false).subscribe({
-        next: (tasksResult: any) => { // tasksResult is expected to be string[]
-          const tasksToStore = { text: tasksResult as string[] };
-          this.storageService.setItem(tasksKey, tasksToStore)
-            .then(() => {
-              this.tasksOn.emit({ tasks: tasksToStore, idea: idea });
-            })
-            .catch(saveError => {
-              console.error(`Error saving generated tasks with key ${tasksKey}:`, saveError);
-            })
-            .finally(() => {
-              this.isGeneratingTasks = false;
-            });
-        },
-        error: (error) => { // Corrected syntax for error callback
-          console.error('Error generating tasks:', error);
-          this.isGeneratingTasks = false;
-        }
-      });
+      this.genkitService.callGenerateTasks(requestData, false)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (tasksResult: any) => { // tasksResult is expected to be string[]
+            const tasksToStore = { text: tasksResult as string[] };
+            this.storageService.setItem(tasksKey, tasksToStore)
+              .then(() => {
+                this.tasksOn.emit({ tasks: tasksToStore, idea: idea });
+              })
+              .catch(saveError => {
+                console.error(`Error saving generated tasks with key ${tasksKey}:`, saveError);
+              })
+              .finally(() => {
+                this.isGeneratingTasks.set(false);
+              });
+          },
+          error: (error) => { // Corrected syntax for error callback
+            console.error('Error generating tasks:', error);
+            this.isGeneratingTasks.set(false);
+          }
+        });
 
     } catch (storageError) {
       console.error(`Error accessing storage for key ${tasksKey}:`, storageError);
-      this.isGeneratingTasks = false;
+      this.isGeneratingTasks.set(false);
     }
   }
-
+  
   /**
    * Creates an `Idea` object.
    * @param {string} uuid - The unique identifier for the idea.
@@ -395,7 +408,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
   addIdea(idea: Idea){
     const newIdeaUuid = crypto.randomUUID();
     this.storageService.setItem(newIdeaUuid, idea);
-    this.addIdeaButton = false;
+    this._addIdeaButtonActive.set(false);
   }
 
   /**
@@ -404,6 +417,12 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
    * @param {SimpleChanges} changes - An object describing which input properties have changed.
    */
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['sharedButton']) {
+      this._sharedButtonActive.set(this.sharedButton);
+    }
+    if (changes['addIdeaButton']) {
+      this._addIdeaButtonActive.set(this.addIdeaButton ?? false);
+    }
     if (changes['evaluateScore'] && changes['evaluateScore'].currentValue === true && this.idea) {
       this.evaluateIdeaScore(this.idea);
     }
@@ -416,10 +435,13 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
    * If only `ideaUuid` is provided, it attempts to load the idea data.
    */
   ngOnInit(): void {
-    this.isLoading = true; // Initial assumption
+    this.isLoading.set(true); // Initial assumption
+    this._sharedButtonActive.set(this.sharedButton);
+    this._addIdeaButtonActive.set(this.addIdeaButton ?? false);
+
 
     if (this.idea) {
-      this.isLoading = false; // Idea already provided
+      this.isLoading.set(false); // Idea already provided
       if (this.evaluateScore) {
         this.evaluateIdeaScore(this.idea);
       }
@@ -430,7 +452,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
     if (this.ideaUuid) {
       this.loadIdeaData(this.ideaUuid);
     } else {
-      this.isLoading = false; // No idea or UUID to load
+      this.isLoading.set(false); // No idea or UUID to load
     }
   }
 
@@ -443,7 +465,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
    * @async
    */
   private async loadIdeaData(uuid: string): Promise<void> {
-    this.isLoading = true;
+    this.isLoading.set(true);
     try {
       const ideaFromStorage = await this.storageService.getItem<Idea>(uuid); // Changed variable name
       if(ideaFromStorage){ // Check if ideaFromStorage is not null
@@ -462,7 +484,7 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
         console.error(`Error loading idea data for UUID ${uuid}:`, error);
         this.idea = null; // Ensure idea is null on error
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 
@@ -478,26 +500,28 @@ export class CardIdeaComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    this.isScoring = true;
-    this.ideaScore = null;
+    this.isScoring.set(true);
+    this.ideaScore.set(null);
     const requestData: ScoreIdeaRequestData = { idea: idea.text };
 
-    this.genkitService.callScoreIdea(requestData, false, true).subscribe({
-      next: (scoreResult: number) => {
-        if (scoreResult && typeof scoreResult === 'number') { // Check if scoreResult is a valid number
-          this.ideaScore = scoreResult;
-        } else {
-          // console.warn('Received invalid score result:', scoreResult); // Log unexpected result
-          this.ideaScore = null; // Set to null if not valid
+    this.genkitService.callScoreIdea(requestData, false, true)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (scoreResult: number) => {
+          if (scoreResult && typeof scoreResult === 'number') { // Check if scoreResult is a valid number
+            this.ideaScore.set(scoreResult);
+          } else {
+            // console.warn('Received invalid score result:', scoreResult); // Log unexpected result
+            this.ideaScore.set(null); // Set to null if not valid
+          }
+          this.isScoring.set(false);
+        },
+        error: (error) => { // Added error parameter
+          console.error('Error scoring idea:', error); // Log the error
+          this.isScoring.set(false);
+          this.ideaScore.set(null); // Ensure score is null on error
         }
-        this.isScoring = false;
-      },
-      error: (error) => { // Added error parameter
-        console.error('Error scoring idea:', error); // Log the error
-        this.isScoring = false;
-        this.ideaScore = null; // Ensure score is null on error
-      }
-    });
+      });
   }
 
   /**

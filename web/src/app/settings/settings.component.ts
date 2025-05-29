@@ -1,6 +1,6 @@
 // Angular Core and Common
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 
 // Application-specific Components
 import { SettingsDatabasesComponent } from '../settings-databases/settings-databases.component';
@@ -17,6 +17,7 @@ import { SettingsScoreComponent } from '../settings-score/settings-score.compone
     SettingsDominiumComponent,
     CommonModule
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.sass']
 })
@@ -25,6 +26,9 @@ import { SettingsScoreComponent } from '../settings-score/settings-score.compone
  * It orchestrates the display of different settings components like databases, score, and dominium.
  */
 export class SettingsComponent {
+  // Inietta ChangeDetectorRef
+  private cdr = inject(ChangeDetectorRef);
+
   /**
    * A flag used to control the refresh mechanism for child components,
    * particularly for `SettingsDatabasesComponent`. Setting it to `false` then `true`
@@ -45,7 +49,10 @@ export class SettingsComponent {
    * @param isDominium A boolean value indicating the new state for the `dominium` property.
    */
   dominiumIs(isDominium: boolean){
+    console.log(`dominiumIs chiamata. Nuovo valore: ${isDominium}, valore precedente: ${this.dominium}`);
     this.dominium = isDominium;
+    this.cdr.markForCheck(); // changed is now
+    console.log('markForCheck() chiamata dopo dominiumIs.');
   }
 
   /**
@@ -56,10 +63,16 @@ export class SettingsComponent {
    * state needs to be reset or reloaded due to external changes (e.g. database change).
    */
   databaseIsChanged() {
+    console.log(`databaseIsChanged chiamata. Valore di refresh prima: ${this.refresh}`);
     this.refresh = false;
+    this.cdr.markForCheck(); // refresh is true
+    console.log(`refresh impostato a false, markForCheck() chiamata.`);
 
     setTimeout(() => {
+      console.log(`Dentro setTimeout, prima di impostare refresh a true. Valore attuale: ${this.refresh}`);
       this.refresh = true;
-    });
+      this.cdr.markForCheck(); // refresh is true
+      console.log(`refresh impostato a true, markForCheck() chiamata.`);
+    }, 0);
   }
 }

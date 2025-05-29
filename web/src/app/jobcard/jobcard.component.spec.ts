@@ -14,6 +14,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
+
 import { JobcardComponent } from './jobcard.component';
 
 /**
@@ -56,10 +58,8 @@ describe('JobcardComponent', () => {
         JobcardComponent, // Assuming JobcardComponent is standalone
         RouterTestingModule,
         HttpClientTestingModule
-      ]
-      // providers: [
-      //   { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ uuid: 'test-uuid' }) } } }
-      // ] // Example of how ActivatedRoute might be mocked
+      ],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 

@@ -9,7 +9,7 @@
  * calls, verifying specific log messages under certain conditions.
  */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PLATFORM_ID } from '@angular/core';
+import { PLATFORM_ID, provideZonelessChangeDetection } from '@angular/core';
 
 import { LandingComponent } from './landing.component';
 
@@ -54,7 +54,10 @@ describe('LandingComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LandingComponent], // Assuming LandingComponent is standalone
-      providers: [{ provide: PLATFORM_ID, useValue: 'server' }] // Simulates a non-browser platform
+      providers: [
+        { provide: PLATFORM_ID, useValue: 'server' }, // Simulates a non-browser platform
+        provideZonelessChangeDetection()
+      ]
     })
     .compileComponents();
 

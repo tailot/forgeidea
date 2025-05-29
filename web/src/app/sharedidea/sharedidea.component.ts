@@ -1,9 +1,10 @@
 // Angular Core and Common
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy, signal, inject, DestroyRef } from '@angular/core';
 
 // Angular Material
 import { MatIconModule } from '@angular/material/icon';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // Third-party Libraries
 import { Subscription, interval } from 'rxjs';
@@ -25,7 +26,8 @@ interface IdeaSocketResponse {
   selector: 'app-shared-idea',
   templateUrl: './sharedidea.component.html',
   styleUrls: ['./sharedidea.component.sass'],
-  standalone: true, imports: [CommonModule, MatIconModule, CardIdeaComponent]
+  standalone: true, imports: [CommonModule, MatIconModule, CardIdeaComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush
 
 })
 /**
@@ -37,13 +39,14 @@ interface IdeaSocketResponse {
 export class SharedIdeaComponent implements OnInit, OnDestroy {
   /** @private The Socket.IO client instance for real-time communication. */
   private socket: Socket;
+  private destroyRef = inject(DestroyRef);
 
   /**
    * The queue of ideas to be displayed. Each item in the array is an object
    * containing the `Idea` data and `timeLeftMs`, which is the remaining display
    * time in milliseconds for that idea.
    */
-  ideasQueue: { idea: Idea, timeLeftMs: number }[] = [];
+  ideasQueue = signal<{ idea: Idea, timeLeftMs: number }[]>([]);
 
   /** @private Maximum number of ideas that can be held in the `ideasQueue`. */
   private readonly MAX_QUEUE_SIZE = 5;
@@ -102,11 +105,14 @@ export class SharedIdeaComponent implements OnInit, OnDestroy {
    * @private
    */
   private handleNewIdea(ideaSR: IdeaSocketResponse): void {
-    if (this.ideasQueue.length < this.MAX_QUEUE_SIZE) {
-      const idea: Idea = { id: ideaSR.id, text: ideaSR.result };
-      this.ideasQueue.push({ idea, timeLeftMs: this.IDEA_DISPLAY_DURATION_MS });
-      this.ensureMasterCountdownIsRunning(); // Ensure countdown starts/continues
-    }
+    const newIdea: Idea = { id: ideaSR.id, text: ideaSR.result };
+    this.ideasQueue.update(queue => {
+      if (queue.length < this.MAX_QUEUE_SIZE) {
+        return [...queue, { idea: newIdea, timeLeftMs: this.IDEA_DISPLAY_DURATION_MS }];
+      }
+      return queue; // No change if queue is full
+    });
+    this.ensureMasterCountdownIsRunning(); // Ensure countdown starts/continues
   }
 
   /**
@@ -119,56 +125,50 @@ export class SharedIdeaComponent implements OnInit, OnDestroy {
    * @private
    */
   private ensureMasterCountdownIsRunning(): void {
-    if (this.ideasQueue.length > 0) {
+    if (this.ideasQueue().length > 0) {
       if (!this.countdownSubscription || this.countdownSubscription.closed) {
-        this.countdownSubscription = interval(this.MASTER_TICK_INTERVAL_MS).subscribe(() => {
-          if (this.ideasQueue.length === 0) {
-            this.countdownSubscription?.unsubscribe();
-            this.countdownSubscription = null;
-            return;
-          }
-          for (const queuedItem of this.ideasQueue) {
-            if (queuedItem.timeLeftMs > 0) {
-              queuedItem.timeLeftMs -= this.MASTER_TICK_INTERVAL_MS;
-              if (queuedItem.timeLeftMs < 0) {
-                queuedItem.timeLeftMs = 0;
+        this.countdownSubscription = interval(this.MASTER_TICK_INTERVAL_MS)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(() => {
+            this.ideasQueue.update(queue => {
+              if (queue.length === 0) {
+                return []; // Should not happen if subscription is managed correctly
               }
+              const updatedQueue = queue.map(item => ({
+                ...item,
+                timeLeftMs: Math.max(0, item.timeLeftMs - this.MASTER_TICK_INTERVAL_MS)
+              }));
+              return updatedQueue.filter(item => item.timeLeftMs > 0);
+            });
+
+            if (this.ideasQueue().length === 0) {
+              this.stopCountdown(); // Stop if queue becomes empty
             }
-          }
-
-          while (this.ideasQueue.length > 0 && this.ideasQueue[0].timeLeftMs <= 0) {
-            this.ideasQueue.shift();
-          }
-
-          if (this.ideasQueue.length === 0) {
-            this.countdownSubscription?.unsubscribe();
-            this.countdownSubscription = null;
-          }
-        });
+          });
       }
     } else {
-      if (this.countdownSubscription && !this.countdownSubscription.closed) {
-        this.countdownSubscription.unsubscribe();
-        this.countdownSubscription = null;
-      }
+      this.stopCountdown(); // Stop if queue is or becomes empty
     }
   }
 
   /**
    * Clears (unsubscribes from) the master countdown timer subscription.
+   * This method is primarily for explicitly stopping the timer when the queue is empty.
+   * `takeUntilDestroyed` handles unsubscription on component destruction.
    * @private
    */
-  private clearTimers(): void {
-    this.countdownSubscription?.unsubscribe();
+  private stopCountdown(): void {
+    if (this.countdownSubscription && !this.countdownSubscription.closed) {
+      this.countdownSubscription.unsubscribe();
+    }
     this.countdownSubscription = null;
   }
 
   /**
    * Performs cleanup when the component is destroyed.
-   * Clears any active timers/subscriptions and disconnects the Socket.IO client.
+   * Disconnects the Socket.IO client. `takeUntilDestroyed` handles the countdown subscription.
    */
   ngOnDestroy(): void {
-    this.clearTimers();
     this.socket?.disconnect();
   }
 
@@ -178,8 +178,9 @@ export class SharedIdeaComponent implements OnInit, OnDestroy {
    * @returns The remaining time in seconds, rounded up. Returns 0 if the queue is empty.
    */
   get timeLeftSeconds(): number {
-    if (this.ideasQueue.length > 0) {
-      return Math.ceil(this.ideasQueue[0].timeLeftMs / 1000);
+    const currentQueue = this.ideasQueue();
+    if (currentQueue.length > 0) {
+      return Math.ceil(currentQueue[0].timeLeftMs / 1000);
     }
     return 0;
   }

@@ -1,6 +1,6 @@
-@if (ideasQueue.length > 0) {
+@if (ideasQueue().length > 0) {
   <div class="upcoming-ideas-section">
-    @for (queuedItem of ideasQueue.slice(0, 5); track queuedItem) {
+    @for (queuedItem of ideasQueue().slice(0, MAX_QUEUE_SIZE_FOR_TEMPLATE); track queuedItem.idea.id) {
       <div class="idea-container">
         <div class="idea-content">
           <app-card-idea [addIdeaButton]="true" [idea]="queuedItem.idea" [showActions]="false"></app-card-idea>
@@ -19,5 +19,5 @@
 }
 
 <div class="queue-status">
-  <p aria-label="the maximum number of ideas you can view in real time.">{{ this.ideasQueue.length }} / {{ MAX_QUEUE_SIZE_FOR_TEMPLATE }}</p>
+  <p aria-label="the maximum number of ideas you can view in real time.">{{ ideasQueue().length }} / {{ MAX_QUEUE_SIZE_FOR_TEMPLATE }}</p>
 </div>

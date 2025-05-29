@@ -8,8 +8,9 @@
  * `BottomNavComponent` might interact with (e.g., through `routerLink` directives).
  */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing'; // <-- Import RouterTestingModule
+import { RouterTestingModule } from '@angular/router/testing';
 import { BottomNavComponent } from './bottom-nav.component';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 /**
  * Test suite for the `BottomNavComponent`.
@@ -46,7 +47,8 @@ describe('BottomNavComponent', () => {
       imports: [
         BottomNavComponent,
         RouterTestingModule
-      ]
+      ],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 

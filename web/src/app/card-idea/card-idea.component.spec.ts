@@ -14,6 +14,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { CardIdeaComponent } from './card-idea.component';
 
 /**
@@ -55,7 +56,8 @@ describe('CardIdeaComponent', () => {
         RouterTestingModule,
         HttpClientTestingModule,
         NoopAnimationsModule
-      ]
+      ],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 

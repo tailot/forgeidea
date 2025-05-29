@@ -5,9 +5,9 @@
            matInput
            type="text"
            placeholder="Search through saved ideas"
-           [(ngModel)]="searchTerm"
-           (ngModelChange)="onSearchChange()">
-    @if (searchTerm) {
+           [ngModel]="searchTerm()"
+           (ngModelChange)="onSearchChange($event)">
+    @if (searchTerm()) {
       <button mat-icon-button matSuffix (click)="clearSearch()" aria-label="Clear search">
         <mat-icon>close</mat-icon>
       </button>
@@ -18,32 +18,32 @@
 
 <div class="idea-list-container">
 
-  @if (isLoading) {
+  @if (isLoading()) {
     <div class="loading-indicator">
       <mat-spinner diameter="50"></mat-spinner>
       <p>...</p>
     </div>
-  } @else if (errorMessage) {
+  } @else if (errorMessage()) {
     <div class="error-message">
      <mat-card appearance="outlined">
        <mat-card-content>
          <mat-icon color="warn">error_outline</mat-icon>
-         <p>{{ errorMessage }}</p>
+         <p>{{ errorMessage() }}</p>
          <button mat-raised-button color="primary" (click)="loadValidIdeas()">Riprova</button>
        </mat-card-content>
      </mat-card>
     </div>
   } @else {
     <div>
-      @if (filteredIdeas.length > 0) {
+      @if (filteredIdeas().length > 0) {
         <div class="idea-cards-grid">
-          @for (idea of displayedIdeas; track idea.id) {
+          @for (idea of displayedIdeas(); track idea.id) {
             <div class="idea-summary-card">
                <app-card-idea
                  [idea]="idea"
                  [showActions]="false"
-                 [sharedButton]="ifIsOnline"
-                 [fusionButton]="ifIsOnline"
+                 [sharedButton]="isOnline()"
+                 [fusionButton]="isOnline()"
                  [trashButton]="true"
                  (isDeleted)="updateCardIdea($event)"
                  (click)="viewIdeaDetails(idea.id)"
@@ -55,12 +55,12 @@
       } @else {
         <div class="no-ideas">
           <mat-icon role="status" aria-label="No ideas found">lightbulb_outline</mat-icon>
-          @if (allIdeas.length === 0) {
+          @if (allIdeas().length === 0) {
             <p>...</p>
           }
-          @if (allIdeas.length > 0 && filteredIdeas.length === 0) {
+          @if (allIdeas().length > 0 && filteredIdeas().length === 0) {
             <p>
-              <small>{{ searchTerm }}</small>
+              <small>{{ searchTerm() }}</small>
             </p>
           }
         </div>
@@ -69,11 +69,12 @@
   }
 </div>
 
-@if (!isLoading && !errorMessage && filteredIdeas.length > 0) {
+@if (!isLoading() && !errorMessage() && filteredIdeas().length > 0) {
   <mat-paginator #paginator
-                 [length]="totalIdeas"
-                 [pageSize]="pageSize"
+                 [length]="totalIdeas()"
+                 [pageSize]="pageSize()"
                  [pageSizeOptions]="[5, 10, 20, 50]"
+                 [pageIndex]="currentPage()"
                  (page)="handlePageEvent($event)"
                  aria-label="Select page of results of found ideas.">
   </mat-paginator>

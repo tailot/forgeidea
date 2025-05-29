@@ -26,8 +26,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { inject, DestroyRef, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { OnlineStatusService } from '../services/onlinestatus.service';
 import { StorageService } from '../services/storage.service';
@@ -84,41 +84,61 @@ import { CardIdeaComponent } from '../card-idea/card-idea.component';
     FormsModule
   ],
   templateUrl: './idea-list.component.html',
-  styleUrls: ['./idea-list.component.sass']
+  styleUrls: ['./idea-list.component.sass'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class IdeaListComponent implements OnInit, OnDestroy {
+export class IdeaListComponent implements OnInit {
 
+  private onlineStatusService = inject(OnlineStatusService);
+  private storageService = inject(StorageService);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+
+  // Signals for component state
   /** Array holding all ideas retrieved from storage, before any filtering or pagination. */
-  allIdeas: Idea[] = [];
-  /** Array holding ideas after filtering based on the search term. */
-  filteredIdeas: Idea[] = [];
-  /** Array holding the subset of ideas currently displayed on the active page. */
-  displayedIdeas: Idea[] = [];
+  allIdeas = signal<Idea[]>([]);
   /** Boolean flag indicating the current online status of the application. */
-  ifIsOnline: boolean = false;
+  isOnline = signal(false);
   /** Boolean flag to indicate if data is currently being loaded (e.g., from storage). */
-  isLoading = true;
+  isLoading = signal(true);
   /** Stores an error message string if an error occurs during data loading or processing. Null otherwise. */
-  errorMessage: string | null = null;
+  errorMessage = signal<string | null>(null);
 
-  /** The total number of ideas after filtering, used by the paginator. */
-  totalIdeas = 0;
   /** The number of ideas to display per page. */
-  pageSize = 10;
+  pageSize = signal(10);
   /** The current page index (0-based) for pagination. */
-  currentPage = 0;
-
+  currentPage = signal(0);
   /** The search term entered by the user for filtering ideas. */
-  searchTerm: string = '';
+  searchTerm = signal('');
 
   /** Reference to the MatPaginator component instance in the template. Used to control pagination. */
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   /** Regular expression used to validate if a storage key is a UUID. */
   private uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
-  /** Subject used to manage the teardown of observable subscriptions when the component is destroyed. */
-  private destroy$ = new Subject<void>();
 
+  /** Computed signal for ideas filtered by the search term. */
+  filteredIdeas = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+    const ideas = this.allIdeas();
+    if (!term) {
+      return ideas;
+    }
+    return ideas.filter(idea => idea.text && idea.text.toLowerCase().includes(term));
+  });
+
+  /** Computed signal for the total number of ideas after filtering, used by the paginator. */
+  totalIdeas = computed(() => this.filteredIdeas().length);
+
+  /** Computed signal for the subset of ideas currently displayed on the active page. */
+  displayedIdeas = computed(() => {
+    const ideas = this.filteredIdeas();
+    const pageIndex = this.currentPage();
+    const size = this.pageSize();
+    const startIndex = pageIndex * size;
+    const endIndex = startIndex + size;
+    return ideas.slice(startIndex, endIndex);
+  });
 
   /**
    * Constructs the IdeaListComponent.
@@ -127,35 +147,20 @@ export class IdeaListComponent implements OnInit, OnDestroy {
    * @param {StorageService} storageService - Service to interact with local storage for ideas.
    * @param {Router} router - Angular's Router service for navigation.
    */
-  constructor(
-    private onlineStatusService: OnlineStatusService,
-    private storageService: StorageService,
-    private router: Router
-  ) { }
+  constructor() { }
 
   /**
    * Angular lifecycle hook called after component initialization.
    * It triggers the loading of valid ideas from storage and subscribes to online status updates.
-   * The subscription to online status is managed using `takeUntil(this.destroy$)` to prevent memory leaks.
+   * The subscription to online status is managed using `takeUntilDestroyed` to prevent memory leaks.
    */
   ngOnInit(): void {
     this.loadValidIdeas();
     this.onlineStatusService.isOnline$
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((isOnline) => {
-        this.ifIsOnline = isOnline;
+        this.isOnline.set(isOnline);
       });
-  }
-
-  /**
-   * Angular lifecycle hook called just before the component is destroyed.
-   * It completes the `destroy$` subject, which triggers the unsubscription
-   * from any observables that were piped with `takeUntil(this.destroy$)`,
-   * preventing memory leaks.
-   */
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   /**
@@ -176,9 +181,9 @@ export class IdeaListComponent implements OnInit, OnDestroy {
    * @async
    */
   async loadValidIdeas(): Promise<void> {
-    this.isLoading = true;
-    this.errorMessage = null;
-    this.allIdeas = []; // Reset before loading
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+    this.allIdeas.set([]); // Reset before loading
 
     try {
       const allKeys = await this.storageService.getAllKeys();
@@ -202,53 +207,32 @@ export class IdeaListComponent implements OnInit, OnDestroy {
       });
 
       const resolvedIdeas = await Promise.all(ideaPromises);
-      this.allIdeas = resolvedIdeas.filter((idea): idea is Idea => idea !== null);
-      this.applyFilterAndPaginate(); // Apply filter and pagination after loading all ideas
+      this.allIdeas.set(resolvedIdeas.filter((idea): idea is Idea => idea !== null));
+      // Reset to first page if current page becomes invalid, though usually fine on initial load
+      this.currentPage.set(0);
+      if (this.paginator) {
+        this.paginator.pageIndex = 0;
+      }
 
     } catch (error) {
       console.error('Error loading keys or ideas:', error);
-      this.errorMessage = `Unable to load the list of ideas. ${error instanceof Error ? error.message : String(error)}`;
-      this.allIdeas = []; // Ensure lists are empty on error
-      this.filteredIdeas = [];
-      this.totalIdeas = 0;
+      this.errorMessage.set(`Unable to load the list of ideas. ${error instanceof Error ? error.message : String(error)}`);
+      this.allIdeas.set([]); // Ensure lists are empty on error
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
-  }
-
-  /**
-   * Applies the current search term to filter `allIdeas` and then updates pagination.
-   * If the search term is empty, `filteredIdeas` becomes a copy of `allIdeas`.
-   * Otherwise, `filteredIdeas` contains only ideas whose text (case-insensitive) includes the search term.
-   * Resets pagination to the first page and updates the `displayedIdeas`.
-   */
-  applyFilterAndPaginate(): void {
-    const filterValue = this.searchTerm.trim().toLowerCase();
-
-    if (!filterValue) {
-      this.filteredIdeas = [...this.allIdeas]; // Use a copy for filtering
-    } else {
-      this.filteredIdeas = this.allIdeas.filter(idea =>
-        idea.text.toLowerCase().includes(filterValue)
-      );
-    }
-
-    this.totalIdeas = this.filteredIdeas.length;
-    this.currentPage = 0; // Reset to first page after filtering
-
-    if (this.paginator) {
-      this.paginator.firstPage(); // Reset paginator to the first page
-    }
-
-    this.updateDisplayedIdeas();
   }
 
   /**
    * Called when the search input value changes.
-   * Triggers the filtering and pagination update.
+   * Updates the search term signal and resets pagination to the first page.
    */
-  onSearchChange(): void {
-    this.applyFilterAndPaginate();
+  onSearchChange(newSearchTerm: string): void {
+    this.searchTerm.set(newSearchTerm);
+    this.currentPage.set(0);
+    if (this.paginator) {
+      this.paginator.pageIndex = 0; // Or this.paginator.firstPage();
+    }
   }
 
   /**
@@ -256,19 +240,7 @@ export class IdeaListComponent implements OnInit, OnDestroy {
    * effectively showing all ideas again (or the first page of all ideas).
    */
   clearSearch(): void {
-    this.searchTerm = '';
-    this.applyFilterAndPaginate();
-  }
-
-  /**
-   * Updates the `displayedIdeas` array based on the current page and page size.
-   * This method slices the `filteredIdeas` array to get the subset for the current view.
-   */
-  updateDisplayedIdeas(): void {
-    if (!this.filteredIdeas) return; // Guard against undefined filteredIdeas
-    const startIndex = this.currentPage * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.displayedIdeas = this.filteredIdeas.slice(startIndex, endIndex);
+    this.onSearchChange(''); // This will set searchTerm and reset pagination
   }
 
   /**
@@ -277,9 +249,8 @@ export class IdeaListComponent implements OnInit, OnDestroy {
    * @param {PageEvent} event - The page event object from `MatPaginator`.
    */
   handlePageEvent(event: PageEvent): void {
-    this.currentPage = event.pageIndex;
-    this.pageSize = event.pageSize;
-    this.updateDisplayedIdeas();
+    this.currentPage.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
   }
 
   /**
@@ -306,16 +277,19 @@ export class IdeaListComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const initialCount = this.allIdeas.length;
-    this.allIdeas = this.allIdeas.filter(idea => idea.id !== deletedIdeaId);
+    this.allIdeas.update(ideas => ideas.filter(idea => idea.id !== deletedIdeaId));
 
-    if (this.allIdeas.length === initialCount) {
-      // console.warn(`Idea with ID ${deletedIdeaId} not found in allIdeas. List not updated.`);
-      // This might happen if the list was already updated or the ID was incorrect.
-      // Depending on requirements, this might not be an issue, or could indicate a sync problem.
-      // For now, just proceed to re-filter and paginate.
+    // Adjust current page if it becomes invalid after deletion
+    const totalPages = Math.ceil(this.totalIdeas() / this.pageSize());
+    if (this.currentPage() >= totalPages && totalPages > 0) {
+      this.currentPage.set(totalPages - 1);
+    } else if (totalPages === 0 && this.currentPage() !== 0) { // Handles case where list becomes empty
+      this.currentPage.set(0);
     }
 
-    this.applyFilterAndPaginate();
+    // Ensure paginator reflects the change if current page was adjusted
+    if (this.paginator && this.paginator.pageIndex !== this.currentPage()) {
+      this.paginator.pageIndex = this.currentPage();
+    }
   }
 }

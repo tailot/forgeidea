@@ -1,13 +1,13 @@
 <div class="search-bar-container">
     <mat-form-field appearance="outline" class="search-input">
-        <input aria-label="Search for a category that interests you." matInput type="text" [(ngModel)]="searchTerm" placeholder="Search categories" (keyup.enter)="loadCategories(searchTerm)">
-        @if (searchTerm) {
-          <button aria-label="Clear the search field." mat-icon-button matSuffix (click)="searchTerm = ''">
+        <input aria-label="Search for a category that interests you." matInput type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="Search categories" (keyup.enter)="loadCategories(searchTerm())">
+        @if (searchTerm()) {
+          <button aria-label="Clear the search field." mat-icon-button matSuffix (click)="searchTerm.set('')">
               <mat-icon>close</mat-icon>
           </button>
         }
-        @if (searchTerm) {
-          <button aria-label="Start a search." mat-icon-button matSuffix (click)="loadCategories(searchTerm)">
+        @if (searchTerm()) {
+          <button aria-label="Start a search." mat-icon-button matSuffix (click)="loadCategories(searchTerm())" [disabled]="isGenerating()">
               <mat-icon>search</mat-icon>
           </button>
         }
@@ -16,30 +16,31 @@
 </div>
 <div class="category-container">
 
-    @if (errorMessage) {
+    @if (errorMessage()) {
       <div class="error-message">
-          <p>Error: {{ errorMessage }}</p>
-          <button mat-button color="warn" (click)="loadCategories()">Retry</button>
+          <p>Error: {{ errorMessage() }}</p>
+          <button mat-button color="warn" (click)="loadCategories()" [disabled]="isGenerating()">Retry</button>
       </div>
     } @else {
       <div>
           <mat-chip-listbox aria-label="Select the category for which you want to generate the idea." (change)="onCategorySelectionChange($event.value)"
-              [(ngModel)]="selectedCategory" class="mat-mdc-chip-set-stacked">
-              @if (categories$ | async; as categories) {
-                  @for (category of categories; track category) {
-                    <mat-chip-option [value]="category">
+              [ngModel]="selectedCategory()" (ngModelChange)="onCategorySelectionChange($event)" class="mat-mdc-chip-set-stacked" [disabled]="isGenerating()">
+              @if (categories().length > 0) {
+                  @for (category of categories(); track category) {
+                    <mat-chip-option [value]="category" [disabled]="isGenerating()">
                         {{ category }}
                     </mat-chip-option>
                   }
               } @else {
                   <!-- Content of #loadingOrNoData template -->
-                  @if ((categories$ | async)?.length === 0 && !errorMessage) {
+                  @if (categories().length === 0 && !errorMessage() && !isGenerating()) {
                     <p>
                         No categories found or still loading...
                     </p>
                   }
               }
           </mat-chip-listbox>
+          @if(isGenerating()){ <mat-spinner diameter="30" style="margin-top: 10px;"></mat-spinner> }
       </div>
     }
 </div>

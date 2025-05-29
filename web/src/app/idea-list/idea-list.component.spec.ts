@@ -9,6 +9,7 @@
  * data display, event handling, and other component-specific logic.
  */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 import { IdeaListComponent } from './idea-list.component';
 
@@ -43,7 +44,8 @@ describe('IdeaListComponent', () => {
    */
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [IdeaListComponent] // Assuming IdeaListComponent is standalone
+      imports: [IdeaListComponent],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 

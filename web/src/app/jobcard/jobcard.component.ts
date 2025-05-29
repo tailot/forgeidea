@@ -18,7 +18,7 @@
  *    tasks, and documents.
  *  - Subscribing to online status updates via `OnlineStatusService`.
  *  - Handling UI states for loading, errors, and interactions.
- */
+ */ 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, ViewportScroller } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -33,6 +33,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
+import { signal } from '@angular/core';
 // Application-specific Components
 import { CardIdeaComponent, CardIdeaEmitData } from '../card-idea/card-idea.component';
 
@@ -106,20 +107,20 @@ export class JobcardComponent implements OnInit, OnDestroy {
   // Observables
   /** Observable that emits the current online status of the application. Readonly for template binding. */
   public readonly isOnline$: Observable<boolean>;
-
+  
   // Component State
   /** The UUID of the current idea/job card, retrieved from route parameters. */
   public ideaid: string | null = null;
   /** The current idea object being displayed and interacted with. */
-  public currentIdea: Idea | null = null;
+  public currentIdea = signal<Idea | null>(null);
   /** Array of task strings associated with the `currentIdea`. */
-  public tasks: string[] | null = null;
+  public tasks = signal<string[] | null>(null);
   /** Array of tasks currently selected by the user, typically for actions like 'discard' or 'help'. */
-  public selectedTasks: string[] = [];
+  public selectedTasks = signal<string[]>([]);
   /** Array of documents associated with the `currentIdea`. */
-  public documents: IdeaDocument[] | null = [];
+  public documents = signal<IdeaDocument[] | null>([]);
   /** Stores the result of a "zoomed-in" or "helped" task, ready for display or saving. */
-  public zoomedTaskResult: TaskDisplayDocument | null = null;
+  public zoomedTaskResult = signal<TaskDisplayDocument | null>(null);
 
   // UI State
   /** Flag indicating if the "discard tasks" operation is currently in progress. */
@@ -187,10 +188,10 @@ export class JobcardComponent implements OnInit, OnDestroy {
    */
   public showDocuments(idea: Idea): void {
     // console.log('Received an idea from CardIdeaComponent (showDocuments)');
-    if (idea) {
-      this.currentIdea = idea;
-      this.documents = idea.documents || [];
-    }
+    if (idea) { 
+      this.currentIdea.set(idea);
+      this.documents.set(idea.documents || []);
+    } 
   }
 
   /**
@@ -201,16 +202,16 @@ export class JobcardComponent implements OnInit, OnDestroy {
    */
   public showTasks(tasksAndIdea: CardIdeaEmitData): void {
     // console.log('Received data in Jobcard (showTasks):', tasksAndIdea);
-    this.errorMessage = null;
-    this.currentIdea = tasksAndIdea.idea;
-    this.documents = this.currentIdea?.documents || [];
+    this.errorMessage = null; // This can remain a direct property if only used for one-time display
+    this.currentIdea.set(tasksAndIdea.idea);
+    this.documents.set(this.currentIdea()?.documents || []);
 
     if (tasksAndIdea.tasks && Array.isArray(tasksAndIdea.tasks.text)) {
-      this.tasks = tasksAndIdea.tasks.text;
+      this.tasks.set(tasksAndIdea.tasks.text);
       // console.log('Tasks updated:', this.tasks);
     } else {
       // console.warn('Received tasks data is not in the expected format { text: string[] } or is missing. Data:', tasksAndIdea.tasks);
-      this.tasks = null;
+      this.tasks.set(null);
     }
   }
 
@@ -221,22 +222,25 @@ export class JobcardComponent implements OnInit, OnDestroy {
    * @param {string} taskToDiscard - The task string to be moved to the discard list.
    */
   public addTaskToDiscard(taskToDiscard: string): void {
-    if (this.tasks && this.tasks.includes(taskToDiscard)) {
-      this.tasks = this.tasks.filter(task => task !== taskToDiscard);
-      if (!this.selectedTasks.includes(taskToDiscard)) {
-        this.selectedTasks.push(taskToDiscard);
-      }
+    const currentTasks = this.tasks();
+    if (currentTasks && currentTasks.includes(taskToDiscard)) {
+      this.tasks.set(currentTasks.filter(task => task !== taskToDiscard));
+      this.selectedTasks.update(currentSelected => {
+        if (!currentSelected.includes(taskToDiscard)) {
+          return [...currentSelected, taskToDiscard];
+        }
+        return currentSelected;
+      });
       // console.log('Task moved to discard:', taskToDiscard);
       // console.log('Current tasks:', this.tasks);
       // console.log('Discarded tasks:', this.selectedTasks);
     }
   }
-
   /**
    * Clears all tasks from the `selectedTasks` list.
    */
   public deselectAllTasks(): void {
-    this.selectedTasks = [];
+    this.selectedTasks.set([]);
     // console.log('All tasks deselected.');
   }
 
@@ -247,22 +251,24 @@ export class JobcardComponent implements OnInit, OnDestroy {
    * Handles cases with few or no tasks.
    */
   public selectNextTask(): void {
-    if (!this.tasks || this.tasks.length < 1) {
+    const currentTasks = this.tasks();
+    if (!currentTasks || currentTasks.length < 1) {
       // console.warn("Cannot select next task: Not enough tasks available or tasks not loaded.");
       return;
     }
     // If only one task and it's already selected (or becomes selected), re-trigger help for it.
-    if (this.tasks.length === 1) {
-        this.selectedTasks = [this.tasks[0]];
+    if (currentTasks.length === 1) {
+        this.selectedTasks.set([currentTasks[0]]);
         this.helpTask();
         return;
     }
 
-    const currentTask = this.selectedTasks.length > 0 ? this.selectedTasks[0] : null;
-    const currentIndex = currentTask ? this.tasks.indexOf(currentTask) : -1; // Start before first if none selected
-    const nextIndex = (currentIndex + 1) % this.tasks.length;
+    const currentSelected = this.selectedTasks();
+    const currentTask = currentSelected.length > 0 ? currentSelected[0] : null;
+    const currentIndex = currentTask ? currentTasks.indexOf(currentTask) : -1; // Start before first if none selected
+    const nextIndex = (currentIndex + 1) % currentTasks.length;
 
-    this.selectedTasks = [this.tasks[nextIndex]];
+    this.selectedTasks.set([currentTasks[nextIndex]]);
     // console.log("Selected next task:", this.selectedTasks[0]);
     this.helpTask();
   }
@@ -274,22 +280,24 @@ export class JobcardComponent implements OnInit, OnDestroy {
    * Handles cases with few or no tasks.
    */
   public selectPreviousTask(): void {
-    if (!this.tasks || this.tasks.length < 1) {
+    const currentTasks = this.tasks();
+    if (!currentTasks || currentTasks.length < 1) {
       // console.warn("Cannot select previous task: Not enough tasks available or tasks not loaded.");
       return;
     }
     // If only one task and it's already selected (or becomes selected), re-trigger help for it.
-    if (this.tasks.length === 1) {
-        this.selectedTasks = [this.tasks[0]];
+    if (currentTasks.length === 1) {
+        this.selectedTasks.set([currentTasks[0]]);
         this.helpTask();
         return;
     }
 
-    const currentTask = this.selectedTasks.length > 0 ? this.selectedTasks[0] : null;
-    const currentIndex = currentTask ? this.tasks.indexOf(currentTask) : 0; // Default to 0 to cycle correctly
-    const previousIndex = (currentIndex - 1 + this.tasks.length) % this.tasks.length;
+    const currentSelected = this.selectedTasks();
+    const currentTask = currentSelected.length > 0 ? currentSelected[0] : null;
+    const currentIndex = currentTask ? currentTasks.indexOf(currentTask) : 0; // Default to 0 to cycle correctly
+    const previousIndex = (currentIndex - 1 + currentTasks.length) % currentTasks.length;
 
-    this.selectedTasks = [this.tasks[previousIndex]];
+    this.selectedTasks.set([currentTasks[previousIndex]]);
     // console.log("Selected previous task:", this.selectedTasks[0]);
     this.helpTask();
   }
@@ -302,37 +310,35 @@ export class JobcardComponent implements OnInit, OnDestroy {
    * Manages error state via `errorMessage`.
    */
   public helpTask(): void {
-    this.errorMessage = null;
-    this.zoomedTaskResult = null;
+    this.errorMessage = null; // Can remain direct property
+    this.zoomedTaskResult.set(null);
 
-    if (!this.currentIdea?.text) {
+    const idea = this.currentIdea();
+    if (!idea?.text) {
       this.errorMessage = 'Idea information is missing.';
       // console.error(this.errorMessage);
       return;
     }
-    if (this.selectedTasks.length === 0) {
+    const currentSelectedTasks = this.selectedTasks();
+    if (currentSelectedTasks.length === 0) {
       this.errorMessage = 'No task selected to get help for.';
       // console.warn(this.errorMessage);
       return;
     }
 
-    const taskToZoom = this.selectedTasks[0];
+    const taskToZoom = currentSelectedTasks[0];
     const language = this.languageService.getCurrentLanguageBackendName();
 
     const requestData: HelpTaskRequestData = {
-      idea: this.currentIdea.text,
+      idea: idea.text,
       task: taskToZoom,
       language: language
     };
 
     // console.log('Calling callHelpTask with data:', requestData);
     this.genkitService.callHelpTask(requestData, false).subscribe({
-      next: (result: string) => {
-        // console.log('Received zoomed task result.');
-        this.zoomedTaskResult = {
-          title: taskToZoom,
-          text: result
-        };
+      next: (result: string) => { 
+        this.zoomedTaskResult.set({ title: taskToZoom, text: result });
         this.scrollToDocumentAnchor();
       },
       error: (error) => {
@@ -350,40 +356,42 @@ export class JobcardComponent implements OnInit, OnDestroy {
    * Manages `isDiscarding` and `errorMessage` states.
    */
   public discardTask(): void {
-    this.errorMessage = null;
-    if (!this.currentIdea?.text) {
+    this.errorMessage = null; // Can remain direct property
+    const idea = this.currentIdea();
+    if (!idea?.text) {
       this.errorMessage = 'Idea information is missing.';
       // console.error(this.errorMessage);
       return;
     }
-    if (!this.tasks) { // Check if tasks is null or empty
+    const currentTasks = this.tasks();
+    if (!currentTasks) { // Check if tasks is null or empty
       this.errorMessage = 'Current tasks list is missing or empty.';
       // console.error(this.errorMessage);
       return;
     }
-    if (this.selectedTasks.length === 0) {
+    const currentSelectedTasks = this.selectedTasks();
+    if (currentSelectedTasks.length === 0) {
       this.errorMessage = 'No tasks selected for discarding.';
       // console.warn(this.errorMessage);
       return;
     }
 
-    this.isDiscarding = true;
+    this.isDiscarding = true; // Can remain direct property if only for template *ngIf
     const language = this.languageService.getCurrentLanguageBackendName();
 
     const requestData: DiscardTasksRequestData = {
-      idea: this.currentIdea.text,
-      tasks: this.tasks.join('\n'),
-      tasksdiscard: this.selectedTasks.join('\n'),
+      idea: idea.text,
+      tasks: currentTasks.join('\n'),
+      tasksdiscard: currentSelectedTasks.join('\n'),
       language: language
     };
 
     // console.log('Calling callDiscardTasks with data:', requestData);
     this.genkitService.callDiscardTasks(requestData).subscribe({
       next: (updatedTasks: string[]) => {
-        // console.log('Received updated tasks:', updatedTasks);
-        this.tasks = updatedTasks;
-        this.selectedTasks = [];
-        this.zoomedTaskResult = null;
+        this.tasks.set(updatedTasks);
+        this.selectedTasks.set([]);
+        this.zoomedTaskResult.set(null);
 
         const storageKey = `tasks_${this.ideaid}`;
         // console.log(`Attempting to save updated tasks to storage with key: ${storageKey}`);
@@ -412,23 +420,24 @@ export class JobcardComponent implements OnInit, OnDestroy {
    * @async
    */
   public async saveDocument(): Promise<void> {
-    this.errorMessage = null;
+    this.errorMessage = null; // Can remain direct property
     if (!this.ideaid) {
       this.errorMessage = 'Error: Idea ID missing. Cannot save document.';
       // console.error(this.errorMessage);
       return;
     }
-    if (!this.zoomedTaskResult?.text) {
+    const currentZoomedResult = this.zoomedTaskResult();
+    if (!currentZoomedResult?.text) {
       this.errorMessage = 'Error: No content to save from the helped task.';
       // console.error(this.errorMessage);
       return;
     }
-    if (!this.selectedTasks || this.selectedTasks.length !== 1 || !this.zoomedTaskResult.title) {
+    const currentSelectedTasks = this.selectedTasks();
+    if (!currentSelectedTasks || currentSelectedTasks.length !== 1 || !currentZoomedResult.title) {
       this.errorMessage = 'Error: A single task must be selected and its help result available to save as a document.';
       // console.error(this.errorMessage, 'Selected tasks:', this.selectedTasks, 'Zoomed title:', this.zoomedTaskResult.title);
       return;
     }
-
     try {
       let idea = await this.storageService.getItem<Idea>(this.ideaid);
 
@@ -442,16 +451,16 @@ export class JobcardComponent implements OnInit, OnDestroy {
 
       const newDocument: IdeaDocument = {
         key: crypto.randomUUID(),
-        name: this.zoomedTaskResult.title,
-        content: this.zoomedTaskResult.text,
+        name: currentZoomedResult.title, // Use title from zoomedTaskResult
+        content: currentZoomedResult.text,
         createdAt: Date.now()
       };
 
       idea.documents.push(newDocument);
       await this.storageService.setItem(this.ideaid, idea);
 
-      this.currentIdea = idea;
-      this.documents = idea.documents;
+      this.currentIdea.set(idea);
+      this.documents.set(idea.documents);
       // console.log('Document saved successfully!', newDocument);
       this.errorMessage = null;
 
@@ -468,18 +477,21 @@ export class JobcardComponent implements OnInit, OnDestroy {
    * @async
    */
   public async deleteDocument(docToDelete: IdeaDocument): Promise<void> {
-    this.errorMessage = null;
-    if (!this.currentIdea || !this.currentIdea.documents || !this.ideaid) {
+    this.errorMessage = null; // Can remain direct property
+    const idea = this.currentIdea();
+    if (!idea || !idea.documents || !this.ideaid) {
       this.errorMessage = 'Cannot delete document: Current idea, documents, or idea ID is missing.';
       // console.error(this.errorMessage, 'Current Idea:', this.currentIdea, 'Idea ID:', this.ideaid);
       return;
     }
 
     try {
-      this.currentIdea.documents = this.currentIdea.documents.filter(doc => doc.key !== docToDelete.key);
-      await this.storageService.setItem(this.ideaid, this.currentIdea);
+      const updatedDocuments = idea.documents.filter(doc => doc.key !== docToDelete.key);
+      const updatedIdea = { ...idea, documents: updatedDocuments };
+      await this.storageService.setItem(this.ideaid, updatedIdea);
 
-      this.documents = this.currentIdea.documents;
+      this.currentIdea.set(updatedIdea);
+      this.documents.set(updatedDocuments);
       // console.log(`Document with key ${docToDelete.key} deleted successfully.`);
       this.errorMessage = null;
     } catch (error) {

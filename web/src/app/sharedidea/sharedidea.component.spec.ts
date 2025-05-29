@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideZonelessChangeDetection } from '@angular/core';
 import { SharedIdeaComponent } from './sharedidea.component';
 
 describe('SharedideaComponent', () => {
@@ -8,7 +8,8 @@ describe('SharedideaComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SharedIdeaComponent]
+      imports: [SharedIdeaComponent],
+      providers: [provideZonelessChangeDetection()],
     })
     .compileComponents();
 

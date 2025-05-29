@@ -10,6 +10,8 @@
  * data display, event handling, and other component-specific logic.
  */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { NotesComponent } from './notes.component';
 
@@ -44,7 +46,11 @@ describe('NotesComponent', () => {
    */
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NotesComponent] // Assuming NotesComponent is standalone
+      imports: [
+        NotesComponent, // NotesComponent is standalone
+        NoopAnimationsModule // Added for MatDialog interactions
+      ],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 

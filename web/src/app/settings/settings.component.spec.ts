@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 import { SettingsComponent } from './settings.component';
 
@@ -9,7 +10,8 @@ describe('SettingsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SettingsComponent, HttpClientTestingModule]
+      imports: [SettingsComponent, HttpClientTestingModule],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 

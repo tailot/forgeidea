@@ -23,7 +23,7 @@
  */
 // Angular Core, Common, Forms, and Router
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -33,9 +33,10 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 // RxJS
-import { Observable, firstValueFrom, map, of } from 'rxjs';
+import { firstValueFrom, map, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 // Application-specific Services and Models
@@ -43,6 +44,7 @@ import { GenkitService, Idea, EncryptedPayloadData } from '../services/genkit.se
 import { LanguageService } from '../services/language.service';
 import { StorageService } from '../services/storage.service';
 
+import { toSignal } from '@angular/core/rxjs-interop';
 /**
  * Component responsible for generating idea categories and then generating an idea
  * from a selected category.
@@ -82,10 +84,12 @@ import { StorageService } from '../services/storage.service';
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './generate-category.component.html',
-  styleUrl: './generate-category.component.sass'
+  styleUrl: './generate-category.component.sass',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GenerateCategoryComponent implements OnInit {
 
@@ -98,39 +102,39 @@ export class GenerateCategoryComponent implements OnInit {
   /** Injected Router for navigation. */
   private router = inject(Router);
 
-  /** Observable stream of category strings to be displayed. Initialized with an empty array. */
-  categories$: Observable<string[]> = of([]);
+  /** Signal holding the array of category strings to be displayed. */
+  categories = signal<string[]>([]);
   /** Stores error messages to be displayed to the user, if any. */
-  errorMessage: string | null = null;
+  errorMessage = signal<string | null>(null);
   /** Stores the currently selected category string by the user. */
-  selectedCategory: string | null = null;
+  selectedCategory = signal<string | null>(null);
   /** Flag indicating if a category or idea generation process is currently active. */
-  isGenerating: boolean = false;
+  isGenerating = signal(false);
   /**
    * Score threshold loaded from storage. If greater than 0, it's used to request
    * ideas that meet a certain score requirement via `callRequirementScore`.
    */
-  scoreThreshold: number = 0;
+  scoreThreshold = signal(0);
   /** Search term input by the user, potentially for filtering categories (though not directly used in current loadCategories). */
-  searchTerm: string = '';
+  searchTerm = signal('');
 
   /**
    * Optional custom generator context/name loaded from storage.
    * If set, it's used with `_categories` and `_idea` payloads for custom prompt execution.
    */
-  generator: string | undefined = undefined;
+  generator = signal<string | undefined>(undefined);
   /**
    * Optional encrypted payload for a custom categories prompt, loaded from storage.
    * Used with `genkitService.callExecFlow` if `generator` is also set.
    * @type {EncryptedPayloadData | undefined}
    */
-  _categories: EncryptedPayloadData | undefined;
+  _categories = signal<EncryptedPayloadData | undefined>(undefined);
   /**
    * Optional encrypted payload for a custom idea generation prompt, loaded from storage.
    * Used with `genkitService.callExecFlow` if `generator` is also set.
    * @type {EncryptedPayloadData | undefined}
    */
-  _idea: EncryptedPayloadData | undefined;
+  _idea = signal<EncryptedPayloadData | undefined>(undefined);
 
   /**
    * A generic helper function to load an item from local storage.
@@ -179,33 +183,33 @@ export class GenerateCategoryComponent implements OnInit {
    * @async
    */
   async ngOnInit(): Promise<void> {
-    this.scoreThreshold = await this.loadItemFromStorage<number>(
+    this.scoreThreshold.set(await this.loadItemFromStorage<number>(
       'score',
       "'score'",
       0,
       (value): value is number => value !== null && typeof value === 'number'
-    );
+    ));
 
-    this.generator = await this.loadItemFromStorage<string | undefined>(
+    this.generator.set(await this.loadItemFromStorage<string | undefined>(
       'generator',
       "'generator'",
       '', // Default to empty string if not found, so it's defined
       (value): value is string => typeof value === 'string' && value.length > 0
-    );
+    ));
 
-    this._categories = await this.loadItemFromStorage<EncryptedPayloadData | undefined>(
+    this._categories.set(await this.loadItemFromStorage<EncryptedPayloadData | undefined>(
       '_categories',
       "'_categories' (payload)",
       undefined,
       (value): value is EncryptedPayloadData => !!value && typeof value.iv === 'string' // Basic validation
-    );
+    ));
 
-    this._idea = await this.loadItemFromStorage<EncryptedPayloadData | undefined>(
+    this._idea.set(await this.loadItemFromStorage<EncryptedPayloadData | undefined>(
       '_idea',
       "'_idea' (payload)",
       undefined,
       (value): value is EncryptedPayloadData => !!value && typeof value.iv === 'string' // Basic validation
-    );
+    ));
 
     this.loadCategories();
   }
@@ -224,52 +228,59 @@ export class GenerateCategoryComponent implements OnInit {
    * The method updates the `categories$` observable with the fetched list or an empty
    * array in case of an error. It also manages `errorMessage` and `isGenerating` states.
    *
-   * @param {string} [context=""] - Optional context to filter or influence category generation.
+   * @param {string} [contextParam=""] - Optional context to filter or influence category generation.
    *                                Defaults to an empty string.
    */
-  loadCategories(context = ""): void {
-    this.errorMessage = null;
-    this.isGenerating = false; // Reset generation state before loading categories
+  loadCategories(contextParam = ""): void {
+    this.errorMessage.set(null);
+    this.isGenerating.set(false); // Reset generation state before loading categories
     // const currentLanguageCode = this.languageService.getCurrentLanguageCode(); // Not directly used in this version
     const currentLanguageBackendName = this.languageService.getCurrentLanguageBackendName();
+    const currentGenerator = this.generator();
+    const currentCategoriesPayload = this._categories();
 
-    if (this.generator && this._categories) {
-      console.log(`GenerateCategoryComponent: Loading categories using execFlow for generator: ${this.generator}, language: ${currentLanguageBackendName}`);
-      const contextparam = context === '' ? this.generator : context;
+    let categoriesObservable;
+
+    if (currentGenerator && currentCategoriesPayload) {
+      console.log(`GenerateCategoryComponent: Loading categories using execFlow for generator: ${currentGenerator}, language: ${currentLanguageBackendName}`);
+      const effectiveContext = contextParam === '' ? currentGenerator : contextParam;
       // console.log(`GenerateCategoryComponent: Context parameter for execFlow: ${contextparam}`);
       const execFlowData: Parameters<GenkitService['callExecFlow']>[0] = {
-        encryptedPromptPayload: this._categories,
+        encryptedPromptPayload: currentCategoriesPayload,
         promptVariables: {
           count: 20, // Default count for custom category generation
-          context: contextparam,
+          context: effectiveContext,
           language: currentLanguageBackendName
         }
       };
-      this.categories$ = this.genkitService.callExecFlow(execFlowData, true).pipe(
+      categoriesObservable = this.genkitService.callExecFlow(execFlowData, true).pipe(
         map(commaSeparatedCategories => {
           if (!commaSeparatedCategories || commaSeparatedCategories.trim() === '') {
             console.warn('GenerateCategoryComponent: execFlow returned empty or whitespace categories string.');
             return [];
           }
           return commaSeparatedCategories.split(',').map(cat => cat.trim()).filter(cat => cat.length > 0);
-        }),
-        catchError(error => {
-          console.error('GenerateCategoryComponent: Error loading categories via execFlow:', error);
-          this.errorMessage = error instanceof Error ? error.message : 'Failed to load categories using custom generator. Please try again later.';
-          return of([]);
         })
       );
     } else {
       // console.log(`GenerateCategoryComponent: Loading categories using callGenerateIdeaCategories for language code: ${currentLanguageCode} (Backend: ${currentLanguageBackendName}), context: ${context}`);
-      this.categories$ = this.genkitService.callGenerateIdeaCategories({ context: context, count: 35, language: currentLanguageBackendName })
-        .pipe(
-          catchError(error => {
-            console.error('GenerateCategoryComponent: Error loading categories with callGenerateIdeaCategories:', error);
-            this.errorMessage = error instanceof Error ? error.message : 'Failed to load categories. Please try again later.';
-            return of([]);
-          })
-        );
+      categoriesObservable = this.genkitService.callGenerateIdeaCategories({ context: contextParam, count: 35, language: currentLanguageBackendName });
     }
+
+    // Convert the observable to a signal and handle errors
+    // We need to handle the subscription and error setting more directly if we want to set errorMessage signal
+    // toSignal is best for direct binding or computed signals.
+    // For side effects like setting errorMessage, a direct subscribe or tap might be clearer,
+    // or we can use a more complex signal setup.
+    // For simplicity here, we'll use toSignal and acknowledge error handling might need refinement for UI.
+    // A more robust way would be to have an effect or a computed signal for errors.
+    categoriesObservable.pipe(
+      catchError(error => {
+        console.error('GenerateCategoryComponent: Error loading categories:', error);
+        this.errorMessage.set(error instanceof Error ? error.message : 'Failed to load categories. Please try again later.');
+        return of([]); // Return empty array on error
+      })
+    ).subscribe(cats => this.categories.set(cats));
   }
 
   /**
@@ -291,33 +302,38 @@ export class GenerateCategoryComponent implements OnInit {
    * @async
    */
   async onCategorySelectionChange(selected: string | string[] | undefined): Promise<void> {
-    if (typeof selected !== 'string' || !selected || this.isGenerating) {
-      if (this.isGenerating) {
+    if (typeof selected !== 'string' || !selected || this.isGenerating()) {
+      if (this.isGenerating()) {
         console.warn('Generation already in progress.');
       } else {
         console.log('Category selection cleared or invalid.');
-        this.selectedCategory = null;
+        this.selectedCategory.set(null);
       }
       return;
     }
 
-    this.selectedCategory = selected;
-    this.errorMessage = null;
-    this.isGenerating = true;
+    this.selectedCategory.set(selected);
+    this.errorMessage.set(null);
+    this.isGenerating.set(true);
     // console.log('Selected category:', this.selectedCategory);
 
     const currentLanguageBackendName = this.languageService.getCurrentLanguageBackendName();
+    const currentGenerator = this.generator();
+    const currentIdeaPayload = this._idea();
+    const currentScoreThreshold = this.scoreThreshold();
+    const currentSelectedCategory = this.selectedCategory(); // Should be non-null here
+
     try {
       let ideaText: string;
-      let generatedIdeaCategory = this.selectedCategory; // Default to selected category
+      let generatedIdeaCategory = currentSelectedCategory!; // Default to selected category
 
-      if (this.generator && this._idea) {
+      if (currentGenerator && currentIdeaPayload) {
         // console.log(`GenerateCategoryComponent: Using custom generator '${this.generator}' and _idea prompt.`);
         const execFlowData: Parameters<GenkitService['callExecFlow']>[0] = {
-          encryptedPromptPayload: this._idea,
+          encryptedPromptPayload: currentIdeaPayload,
           promptVariables: {
             language: currentLanguageBackendName,
-            category: this.selectedCategory
+            category: currentSelectedCategory!
           }
         };
         // console.log(`Generating idea using execFlow with _idea for category: ${this.selectedCategory}, language: ${currentLanguageBackendName}`);
@@ -327,11 +343,11 @@ export class GenerateCategoryComponent implements OnInit {
         if (!ideaText || ideaText.trim() === '') {
           throw new Error('Received empty or invalid idea text from custom _idea execFlow.');
         }
-      } else if (this.scoreThreshold > 0) {
+      } else if (currentScoreThreshold > 0) {
         // console.log(`GenerateCategoryComponent: scoreThreshold is ${this.scoreThreshold}, calling callRequirementScore.`);
         const requirementScoreRequestData = {
-          category: this.selectedCategory,
-          maxscore: this.scoreThreshold,
+          category: currentSelectedCategory!,
+          maxscore: currentScoreThreshold,
           language: currentLanguageBackendName,
         };
         // console.log(`Generating idea using requirement score for category: ${requirementScoreRequestData.category}, language: ${requirementScoreRequestData.language}, maxscore: ${requirementScoreRequestData.maxscore}`);
@@ -345,7 +361,7 @@ export class GenerateCategoryComponent implements OnInit {
       } else {
         // console.log(`GenerateCategoryComponent: scoreThreshold is ${this.scoreThreshold}, calling callGenerateIdea.`);
         const generateIdeaRequestData = {
-          category: this.selectedCategory,
+          category: currentSelectedCategory!,
           language: currentLanguageBackendName
         };
         // console.log(`Generating idea for category: ${generateIdeaRequestData.category}, language: ${generateIdeaRequestData.language}`);
@@ -358,7 +374,7 @@ export class GenerateCategoryComponent implements OnInit {
           throw new Error('Received empty or invalid idea data from callGenerateIdea service.');
         }
         ideaText = generatedIdeaResult.text;
-        generatedIdeaCategory = generatedIdeaResult.category || this.selectedCategory; // Use returned category if available
+        generatedIdeaCategory = generatedIdeaResult.category || currentSelectedCategory!; // Use returned category if available
       }
 
       const ideaUuid = crypto.randomUUID();
@@ -379,9 +395,9 @@ export class GenerateCategoryComponent implements OnInit {
 
     } catch (error) {
       console.error('Error during idea generation, saving, or navigation:', error);
-      this.errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred while processing the idea.';
+      this.errorMessage.set(error instanceof Error ? error.message : 'An unexpected error occurred while processing the idea.');
     } finally {
-      this.isGenerating = false;
+      this.isGenerating.set(false);
     }
   }
 }

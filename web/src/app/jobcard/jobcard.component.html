@@ -1,8 +1,8 @@
 <div class="jobcard-container">
   <div>
     @if (ideaid) {
-      <app-card-idea [documentsButton]="!currentIdea"
-        [tasksButton]="!tasks && ((isOnline$ | async) ?? false)" [evaluateScore]="true" [ideaUuid]="ideaid"
+      <app-card-idea [documentsButton]="!currentIdea()"
+        [tasksButton]="!tasks() && ((isOnline$ | async) ?? false)" [evaluateScore]="true" [ideaUuid]="ideaid"
         (isDeleted)="updateCardIdea()" (documentsOn)="showDocuments($event)" (tasksOn)="showTasks($event)">
       </app-card-idea>
     }
@@ -12,14 +12,14 @@
   </div>
 
   <div class="tasks-container">
-    @if (selectedTasks && selectedTasks.length > 0) {
+    @if (selectedTasks().length > 0) {
       <div class="confirm-button-container">
         <mat-button-toggle-group #toggleGroup="matButtonToggleGroup">
           <mat-button-toggle aria-label="Remove a task" value="discard" (click)="discardTask()">
             <mat-icon>delete_sweep</mat-icon>
             <span>Remove</span>
           </mat-button-toggle>
-          @if (selectedTasks.length === 1) {
+          @if (selectedTasks().length === 1) {
             <mat-button-toggle aria-label="Download the detail document for the selected task." value="zoom" (click)="helpTask()">
               <mat-icon>info</mat-icon>
               <span>Detail</span>
@@ -32,24 +32,24 @@
         </mat-button-toggle-group>
       </div>
     }
-    @if (tasks && tasks.length > 0) {
+    @if (tasks() && tasks()!.length > 0) {
       <div class="task-list-container">
-        <mat-chip-listbox aria-label="The list of tasks that are useful for completing the idea."  multiple [(ngModel)]="selectedTasks">
-          @for (task of tasks; track task) {
+        <mat-chip-listbox aria-label="The list of tasks that are useful for completing the idea."  multiple [ngModel]="selectedTasks()" (ngModelChange)="selectedTasks.set($event)">
+          @for (task of tasks()!; track task) {
             <mat-chip-option>
-              <span (click)="zoomedTaskResult=null">{{task}}</span>
+              <span (click)="zoomedTaskResult.set(null)">{{task}}</span>
             </mat-chip-option>
           }
         </mat-chip-listbox>
       </div>
     }
-    @if (tasks && tasks.length === 0) {
+    @if (tasks() && tasks()!.length === 0) {
       <p><mat-icon>counter_0</mat-icon></p>
     }
-    @if (zoomedTaskResult) {
+    @if (zoomedTaskResult()) {
       <div class="zoomed-task-result-wrapper">
         <mat-button-toggle-group #zoomedTaskActionsGroup="matButtonToggleGroup">
-          <mat-button-toggle aria-label="Allows you to listen or stop listening to the document." value="play" (click)="playTask(zoomedTaskResult)">
+          <mat-button-toggle aria-label="Allows you to listen or stop listening to the document." value="play" (click)="playTask(zoomedTaskResult()!)">
             <mat-icon>play_arrow</mat-icon>
             <span>Play</span>
           </mat-button-toggle>
@@ -57,21 +57,21 @@
             <mat-icon>archive</mat-icon>
             <span>Save</span>
           </mat-button-toggle>
-          <mat-button-toggle aria-label="Stop viewing this document." value="close" (click)="zoomedTaskResult=null">
+          <mat-button-toggle aria-label="Stop viewing this document." value="close" (click)="zoomedTaskResult.set(null)">
             <mat-icon>close</mat-icon>
             <span>Close</span>
           </mat-button-toggle>
         </mat-button-toggle-group>
-        @if (selectedTasks.length === 1 && tasks && tasks.indexOf(selectedTasks[0]) >= 1) {
+        @if (selectedTasks().length === 1 && tasks() && tasks()!.indexOf(selectedTasks()[0]) >= 1) {
           <button aria-label="Download and view the document related to the previous task." mat-icon-button
             (click)="selectPreviousTask()" class="nav-button left-nav">
             <mat-icon>navigate_before</mat-icon>
           </button>
         }
         <div class="zoomed-task-result" id="document">
-          <pre aria-label="Text of the last downloaded task.">{{ zoomedTaskResult.text }}</pre>
+          <pre aria-label="Text of the last downloaded task.">{{ zoomedTaskResult()!.text }}</pre>
         </div>
-        @if (selectedTasks.length === 1 && tasks && tasks.indexOf(selectedTasks[0]) < tasks.length - 1) {
+        @if (selectedTasks().length === 1 && tasks() && tasks()!.indexOf(selectedTasks()[0]) < tasks()!.length - 1) {
           <button aria-label="Download and view the document related to the previous task." mat-icon-button
             (click)="selectNextTask()" class="nav-button right-nav">
             <mat-icon>navigate_next</mat-icon>
@@ -80,10 +80,10 @@
       </div>
     }
   </div>
-  @if (currentIdea && currentIdea.documents && currentIdea.documents.length > 0) {
+  @if (currentIdea()?.documents && currentIdea()!.documents!.length > 0) {
     <div class="documents-section">
       <mat-accordion multi>
-        @for (doc of currentIdea.documents; track doc.key; let i = $index) {
+        @for (doc of currentIdea()!.documents!; track doc.key; let i = $index) {
           <mat-expansion-panel aria-label="The list of documents saved and available for offline consultation.">
             <mat-expansion-panel-header>
               <mat-panel-title>
@@ -100,7 +100,7 @@
         }
       </mat-accordion>
     </div>
-  } @else if (currentIdea && (!currentIdea.documents || currentIdea.documents.length === 0)) {
+  } @else if (currentIdea() && (!currentIdea()!.documents || currentIdea()!.documents!.length === 0)) {
     <div class="no-documents-placeholder">
       <div aria-label="You have not saved any documents yet." style="display: flex; justify-content: center; align-items: center; flex-direction: column; height: 100%;">
         <mat-icon>folder_off</mat-icon>

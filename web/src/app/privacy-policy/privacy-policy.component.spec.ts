@@ -9,6 +9,7 @@
  * interactions if the component becomes more complex.
  */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 import { PrivacyPolicyComponent } from './privacy-policy.component';
 
@@ -43,7 +44,8 @@ describe('PrivacyPolicyComponent', () => {
    */
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PrivacyPolicyComponent] // Assuming PrivacyPolicyComponent is standalone
+      imports: [PrivacyPolicyComponent], // Assuming PrivacyPolicyComponent is standalone
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 

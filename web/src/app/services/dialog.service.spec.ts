@@ -8,6 +8,7 @@
  * `DialogService` likely wraps, would typically be mocked.
  */
 import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 import { DialogService } from './dialog.service';
 
@@ -35,7 +36,8 @@ describe('DialogService', () => {
    */
   beforeEach(() => {
     TestBed.configureTestingModule({
-      // providers: [DialogService, { provide: MatDialog, useValue: mockMatDialog }] // Example for mocking MatDialog
+      // providers: [DialogService, { provide: MatDialog, useValue: mockMatDialog }, provideZonelessChangeDetection()] // Example for mocking MatDialog
+      providers: [provideZonelessChangeDetection()]
     });
     service = TestBed.inject(DialogService);
   });

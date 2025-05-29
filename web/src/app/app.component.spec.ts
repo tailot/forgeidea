@@ -9,8 +9,10 @@
  * directives or dependencies within the component's template.
  */
 import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
+
+import { AppComponent } from './app.component';
 
 /**
  * Test suite for the AppComponent.
@@ -34,6 +36,7 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent, RouterTestingModule],
+      providers: [provideZonelessChangeDetection()]
     }).compileComponents();
   });
 

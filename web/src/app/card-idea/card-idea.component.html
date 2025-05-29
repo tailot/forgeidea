@@ -1,20 +1,20 @@
 <div class="card-container">
 
-  @if (isLoading) {
+  @if (isLoading()) {
     <div class="loading-indicator">
       <mat-spinner diameter="50" aria-label="Loading data"></mat-spinner>
       <p>...</p>
     </div>
   }
 
-  @if (idea && !isLoading) {
-    <mat-card role="region" class="idea-card" [ngClass]="!isScoring && ideaScore !== null ? getScoreColorClass(ideaScore) : ''"
+  @if (idea && !isLoading()) {
+    <mat-card role="region" class="idea-card" [ngClass]="!isScoring() && ideaScore() !== null ? getScoreColorClass(ideaScore()) : ''"
       matTooltipPosition="above">
       <mat-card-content>
         <p class="idea-text">{{ idea.text }}</p>
       </mat-card-content>
       <mat-card-actions align="end" class="card-actions">
-        @if (addIdeaButton) {
+        @if (_addIdeaButtonActive()) {
           <button aria-label="Save the idea" mat-icon-button color="primary"
             (click)="addIdea(idea);$event.stopPropagation()">
             <div class="button-content">
@@ -23,7 +23,7 @@
             </div>
           </button>
         }
-        @if (sharedButton) {
+        @if (_sharedButtonActive()) {
           <button aria-label="Share the idea" mat-icon-button color="primary"
             (click)="shareCurrentIdea(idea);$event.stopPropagation()">
             <div class="button-content">
@@ -50,7 +50,7 @@
             </div>
           </button>
         }
-        @if (mergiable && fusionButton) {
+        @if (mergiable() && fusionButton) {
           <button aria-label="Merge this idea with the selected one" mat-icon-button color="primary"
             (click)="operation(); $event.stopPropagation()">
             <div class="button-content">
@@ -59,7 +59,7 @@
             </div>
           </button>
         }
-        @if (!mergiable) {
+        @if (!mergiable()) {
           <button aria-label="Select this idea to merge it" class="redoOperation" mat-icon-button color="primary"
             (click)="clearOperation(); $event.stopPropagation()">
             <div class="button-content">

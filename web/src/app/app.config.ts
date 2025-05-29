@@ -8,7 +8,7 @@
  * service worker registration. This centralized configuration approach is common
  * for applications bootstrapped with `bootstrapApplication`.
  */
-import { ApplicationConfig, provideZoneChangeDetection, isDevMode } from '@angular/core';
+import { ApplicationConfig, provideZonelessChangeDetection, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -45,7 +45,7 @@ import { provideServiceWorker } from '@angular/service-worker';
  */
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideZonelessChangeDetection(),
     provideRouter(routes),
     provideAnimations(),
     provideHttpClient(
