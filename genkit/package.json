@@ -9,14 +9,19 @@
     "zod": "^3.24.3"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.15.2",
     "genkit-cli": "^1.9.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.3.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "npx genkit start -- npx tsx --watch src/index.ts",
+    "dev": "genkit start --watch",
+    "build": "genkit build",
+    "compile": "tsc -p .",
+    "test": "jest",
     "devMining": "npx genkit start -- npx tsx --watch src/mining/data_mining.ts",
     "dist": "node dist/index.js",
     "tar": "tar -czvf ../forgeIDEABack.tar.gz --exclude='node_modules' --exclude='dist' --exclude='.genkit' .[^.]* *"

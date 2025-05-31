@@ -32,20 +32,11 @@ To set up the Genkit service for development, follow these steps:
     This will typically start the Genkit developer UI, where you can inspect flows, run them, and see traces. The service usually runs on port 4001 (as configured in `docker-compose.yml`).
 
 ## Running Tests
-
-Currently, this project does not have a dedicated automated test suite or an `npm test` script.
-
-**Manual Testing:**
-Flows can be tested manually using the Genkit Developer UI, which becomes available when you run `npm run dev`. This interface allows you to:
-*   See a list of all registered flows.
-*   Run individual flows with specific input data.
-*   Inspect the execution traces and outputs of the flows.
-
-**Recommendation:**
-For more robust and automated testing, it is highly recommended to:
-1.  Develop unit tests for individual helper functions and utility modules.
-2.  Create integration tests for the Genkit flows.
-3.  Add an `npm test` script to `package.json` that executes these tests using a testing framework like Jest or Mocha.
+This project uses Jest for automated testing. To run the tests, use the following command:
+```bash
+npm test
+```
+This will execute all test files located in the `src/tests` directory.
 
 ## Key Flows and Prompts
 
@@ -86,7 +77,7 @@ The `miningFlow` (defined in `src/mining/ideaProcessingFlow.ts`) orchestrates a 
 This flow can be invoked using the `call_mining_flow.sh` script located in the `src/mining/` directory.
 
 **Prerequisites for the script:**
-Before running the script, ensure you have `curl` and `jq` installed on your system. These are used by the script to make requests to the `miningFlow` endpoint and process JSON responses.
+Before running the script, ensure you have `curl` and `jq` installed on your system, as the script relies on these utilities for making HTTP requests and processing JSON responses. You may need to install them using your system's package manager (e.g., `sudo apt-get install curl jq` on Debian/Ubuntu, `brew install curl jq` on macOS).
 
 **How to run `call_mining_flow.sh`:**
 

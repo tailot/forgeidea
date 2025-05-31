@@ -45,23 +45,11 @@ To set up the Socket.io server for development, follow these steps:
     This will start the server, typically on the port specified in your `.env` file (defaulting to 3001).
 
 ## Running Tests
-
-The `package.json` file includes a test script:
+This project uses Jest for automated testing. To run the tests, use the following command:
 ```bash
 npm test
 ```
-However, as of the current version, this script is a placeholder and will output: `"Error: no test specified" && exit 1`.
-
-**Manual Testing:**
-To test the server's functionality:
-1.  Ensure the Genkit backend service is running and accessible at the `GENKIT_BASE_URL` configured in the `.env` file.
-2.  Run the Socket.io server using `npm run dev`.
-3.  Use a Socket.io client (e.g., a simple test script, a tool like Postman for WebSockets, or the forgeIDEA web frontend itself) to connect to the server and emit events.
-
-**Recommendation:**
-For robust testing, it is highly recommended to:
-1.  Develop a suite of automated tests using a testing framework like Jest or Mocha, along with `socket.io-client` for simulating client interactions.
-2.  Update the `npm test` script in `package.json` to execute these tests.
+This will execute all test files located in the `src/tests` directory. Ensure that any required environment variables (like `GENKIT_BASE_URL`, `ORIGIN`, `PORT`) are appropriately set or mocked for the test environment if your server logic depends on them at startup.
 
 ## Key Socket.io Events
 
