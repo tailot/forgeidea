@@ -79,8 +79,6 @@ export interface Note {
 export class NotesComponent implements OnInit {
   /** Array holding all the notes currently managed by the component. */
   notes: Note[] = [];
-  /** Boolean flag to indicate if notes are currently being loaded (e.g., from storage). */
-  isLoading: boolean = true;
   /** The key used for storing and retrieving notes from local storage. */
   private readonly NOTES_STORAGE_KEY = 'notes';
   /** The index of the note currently being viewed or edited in the dialog. */
@@ -383,11 +381,9 @@ export class NotesComponent implements OnInit {
 
   /**
    * Asynchronously loads notes from local storage using `StorageService`.
-   * Updates the `notes` array and sets `isLoading` state.
    * @async
    */
   async loadNotes(): Promise<void> {
-    this.isLoading = true;
     try {
       const storedNotes = await this.storageService.getItem<Note[]>(this.NOTES_STORAGE_KEY);
       if (storedNotes) {
@@ -398,8 +394,6 @@ export class NotesComponent implements OnInit {
     } catch (error) {
       console.error('Error loading notes from storage:', error);
       this.notes = []; // Default to empty array on error
-    } finally {
-      this.isLoading = false;
     }
   }
 
