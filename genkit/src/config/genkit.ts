@@ -8,7 +8,11 @@ import * as dotenv from 'dotenv';
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/googleai';
 import { ollama } from 'genkitx-ollama';
+/* 
+Confusion in future imports
+see https://github.com/BloomLabsInc/genkit-plugins/blob/main/plugins/groq/README.md
 import { groq } from 'genkitx-groq';
+*/
 
 dotenv.config();
 
@@ -39,8 +43,12 @@ function getArrayConf(){
     console.log("Configuration ollama is pushed")
   }
   if (process.env.GROQ_API_KEY) {
-    arrayConf.push(groq({ apiKey: process.env.GROQ_API_KEY }));
-    console.log("Configuration Groq is pushed");
+    /*
+     arrayConf.push(groq({ apiKey: process.env.GROQ_API_KEY }));
+     console.log("Configuration Groq is pushed");
+    */
+    console.log("Groq is disabled for now");
+
   }
   return arrayConf;
 }
