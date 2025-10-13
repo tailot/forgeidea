@@ -19,7 +19,7 @@
  * - Error handling for Redis connections and Genkit flow calls.
  * - Server listening on a port defined by the `PORT` environment variable or defaulting to 3001.
  */
-import express, { Express, Request, Response } from 'express';
+import express from 'express';
 import http from 'http';
 import { Server, Socket } from 'socket.io';
 import axios from 'axios';
@@ -30,7 +30,7 @@ import { createClient } from "redis";
 dotenv.config();
 
 /** The Express application instance. */
-const app: Express = express();
+const app: express.Express = express();
 /** The HTTP server instance, created from the Express app. */
 const server: http.Server = http.createServer(app);
 /**
@@ -104,7 +104,7 @@ interface IdeaPayload {
  * @param {Request} req - The Express request object.
  * @param {Response} res - The Express response object.
  */
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (req: express.Request, res: express.Response) => {
   res.send('I am the forgeIdea server');
 });
 

@@ -1,18 +1,18 @@
 {
   "dependencies": {
-    "@genkit-ai/express": "^1.9.0",
-    "@genkit-ai/googleai": "^1.9.0",
-    "dotenv": "^16.5.0",
-    "genkit": "^1.9.0",
-    "genkitx-groq": "^0.22.0",
-    "genkitx-ollama": "^1.9.0",
-    "zod": "^3.24.3"
+    "@genkit-ai/express": "^1.21.0",
+    "@genkit-ai/googleai": "^1.21.0",
+    "dotenv": "^17.2.3",
+    "genkit": "^1.21.0",
+    "genkitx-groq": "^0.25.0",
+    "genkitx-ollama": "^1.21.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@types/node": "^22.15.2",
-    "genkit-cli": "^1.9.0",
+    "@types/node": "^24.7.2",
+    "genkit-cli": "^1.21.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   },
   "scripts": {
     "build": "tsc",
