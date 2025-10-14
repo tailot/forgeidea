@@ -6,7 +6,8 @@
     "genkit": "^1.21.0",
     "genkitx-groq": "^0.25.0",
     "genkitx-ollama": "^1.21.0",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "@genkit-ai/mcp": "^1.21.0"
   },
   "devDependencies": {
     "@types/node": "^24.7.2",
@@ -17,6 +18,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "npx genkit start -- npx tsx --watch src/index.ts",
+    "mcp": "npx tsx src/mcp-server.ts",
     "devMining": "npx genkit start -- npx tsx --watch src/mining/data_mining.ts",
     "dist": "node dist/index.js",
     "tar": "tar -czvf ../forgeIDEABack.tar.gz --exclude='node_modules' --exclude='dist' --exclude='.genkit' .[^.]* *"
