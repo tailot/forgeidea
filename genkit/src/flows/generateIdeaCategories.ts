@@ -9,6 +9,13 @@ import { z } from 'zod';
 
 import { getModelToUse } from '../config/genkit';
 
+export const inputSchemaGenerateIdeaCategoriesFlow = z.object({
+      context: z.string().optional().describe("Context or type of ideas (e.g., 'tech startups', 'community projects', 'self-improvement')"),
+      count: z.number().min(20).max(35).optional().default(20).describe("Number of categories to generate"),
+      language: z.string().describe("The language in which the model should respond.")
+    });
+export const outputSchemaGenerateIdeaCategoriesFlow = z.array(z.string()).describe("An array of generated category names.");
+
 /**
  * Defines a Genkit flow named 'generateIdeaCategories'.
  *
@@ -50,12 +57,8 @@ import { getModelToUse } from '../config/genkit';
 export const generateIdeaCategoriesFlow = ai.defineFlow(
   {
     name: 'generateIdeaCategories',
-    inputSchema: z.object({
-      context: z.string().optional().describe("Context or type of ideas (e.g., 'tech startups', 'community projects', 'self-improvement')"),
-      count: z.number().min(20).max(35).optional().default(20).describe("Number of categories to generate"),
-      language: z.string().describe("The language in which the model should respond.")
-    }),
-    outputSchema: z.array(z.string()).describe("An array of generated category names."), // Added a description for clarity
+    inputSchema: inputSchemaGenerateIdeaCategoriesFlow,
+    outputSchema: outputSchemaGenerateIdeaCategoriesFlow
   },
   async (input) => {
     const categoriesFlow = ai.prompt('categories');

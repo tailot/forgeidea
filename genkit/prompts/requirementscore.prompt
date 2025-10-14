@@ -3,7 +3,7 @@ input:
   schema:
     evaluatedideascore: string
     evaluatedpromptidea: string
-    maxscore: number
+    maxscore: string
     language: string
   default:
     language: english

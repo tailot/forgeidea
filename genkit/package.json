@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "@genkit-ai/express": "^1.21.0",
+    "@genkit-ai/google-genai": "^1.21.0",
     "@genkit-ai/googleai": "^1.21.0",
+    "@genkit-ai/mcp": "^1.21.0",
     "dotenv": "^17.2.3",
     "genkit": "^1.21.0",
     "genkitx-groq": "^0.25.0",
@@ -15,9 +17,10 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --outDir dist",
     "dev": "npx genkit start -- npx tsx --watch src/index.ts",
     "devMining": "npx genkit start -- npx tsx --watch src/mining/data_mining.ts",
+    "mcp": "npx @modelcontextprotocol/inspector node dist/mcp.js",
     "dist": "node dist/index.js",
     "tar": "tar -czvf ../forgeIDEABack.tar.gz --exclude='node_modules' --exclude='dist' --exclude='.genkit' .[^.]* *"
   }

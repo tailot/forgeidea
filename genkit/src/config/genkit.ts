@@ -4,17 +4,23 @@
  * across different AI model providers (Google AI, Ollama, Groq).
  * It also provides a utility function to select a model dynamically.
  */
-import * as dotenv from 'dotenv';
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/googleai';
 import { ollama } from 'genkitx-ollama';
+import * as dotenv from 'dotenv';
 /* 
 Confusion in future imports
 see https://github.com/BloomLabsInc/genkit-plugins/blob/main/plugins/groq/README.md
 import { groq } from 'genkitx-groq';
 */
 
-dotenv.config();
+dotenv.config({ quiet: true });
+
+if (process.env.NODE_ENV === 'production') {
+  console.log = () => {};
+  console.warn = () => {};
+  console.error = () => {};
+}
 
 /**
  * The main Genkit configuration object.
@@ -22,7 +28,7 @@ dotenv.config();
  */
 export const ai = genkit({
   plugins: getArrayConf(),
-  promptDir: './prompts',
+  promptDir: __dirname + '/../../prompts',
 });
 
 /**

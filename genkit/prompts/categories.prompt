@@ -1,7 +1,7 @@
 ---
 input:
   schema:
-    count: integer
+    count: string
     context: string
     language: string
   default:

@@ -9,6 +9,15 @@ import { z } from 'zod';
 
 import { getModelToUse } from '../config/genkit';
 
+export const inputSchemaGenerateIdeaFlow = z.object({
+  category: z.string().describe("The category for which to generate the idea"),
+  language: z.string().describe("The language in which the model should respond.")
+});
+
+export const outputSchemaGenerateIdeaFlow = z.string().describe("The generated idea");
+
+
+
 /**
  * Defines a Genkit flow named 'generateIdeaFlow'.
  *
@@ -40,11 +49,8 @@ import { getModelToUse } from '../config/genkit';
 export const generateIdeaFlow = ai.defineFlow(
   {
     name: 'generateIdeaFlow',
-    inputSchema: z.object({
-      category: z.string().describe("The category for which to generate the idea"),
-      language: z.string().describe("The language in which the model should respond.")
-    }),
-    outputSchema: z.string().describe("The generated idea"),
+    inputSchema: inputSchemaGenerateIdeaFlow,
+    outputSchema: outputSchemaGenerateIdeaFlow,
   },
   async (params) => {
     try {
