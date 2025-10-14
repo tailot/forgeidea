@@ -4,6 +4,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { generateIdeaCategoriesFlow, inputSchemaGenerateIdeaCategoriesFlow, outputSchemaGenerateIdeaCategoriesFlow } from './flows/generateIdeaCategories';
 import { generateIdeaFlow, inputSchemaGenerateIdeaFlow, outputSchemaGenerateIdeaFlow } from './flows/generateIdea';
 import { randomIdeaFlow, inputSchemaRandomIdeaFlow, outputSchemaRandomIdeaFlow } from './flows/randomIdea';
+import { miningFlow, inputSchemaMiningFlow, outputSchemaMiningFlow } from './mining/ideaProcessingFlow';
 import { ai } from './config/genkit';
 
 // Load environment variables from .env file
@@ -50,6 +51,18 @@ ai.defineTool(
   },
 );
 
+ai.defineTool(
+  {
+    name: 'mineIdea',
+    description: 'Mines an idea by generating it, scoring it, and finding competitors.',
+    inputSchema: inputSchemaMiningFlow,
+    outputSchema: outputSchemaMiningFlow,
+  },
+  async (input) => {
+    return await miningFlow(input);
+  }
+);
+
 
 // Use createMcpServer
 const server = createMcpServer(ai, {
@@ -62,3 +75,24 @@ server.setup().then(async () => {
   const transport = new StdioServerTransport();
   await server!.server?.connect(transport);
 });
+
+/*
+Example phrases you can invoke:
+- Generate an idea
+- Generate an idea in Spanish
+- Find competitors in the sports category
+*/
+/*mcp config
+{
+  "mcpServers": {
+    "forgeidea_server": {
+      "command": "node",
+      "args": [
+        "/Users/vincenzo/forgeidea/genkit/dist/mcp.js"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}*/

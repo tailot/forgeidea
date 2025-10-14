@@ -14,7 +14,7 @@ see https://github.com/BloomLabsInc/genkit-plugins/blob/main/plugins/groq/README
 import { groq } from 'genkitx-groq';
 */
 
-dotenv.config({ quiet: true });
+dotenv.config({ path: __dirname + '/../../.env', quiet: true });
 
 if (process.env.NODE_ENV === 'production') {
   console.log = () => {};
