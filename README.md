@@ -51,6 +51,28 @@ To run the project using Docker, follow these steps:
 4.  **Access the application:**
     Once the containers are running, you should be able to access the forgeIDEA web application by navigating to `http://localhost` or `http://localhost:80` in your web browser. The Genkit API will be available at `http://localhost:4001` and the Socket.io server at `http://localhost:3001`.
 
+## Using the MCP Server
+
+The latest feature includes the ability to configure an MCP server to query the flows. This allows you to use the project solely for the MCP server without the graphical interface. To do this, you only need to configure the `.env` file and inject the following standard configuration into the client that will query the MCP server:
+
+```json
+{
+  "mcpServers": {
+    "forgeidea_server": {
+      "command": "node",
+      "args": [
+        "/path/to/your/genkit/dist/mcp.js"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
+```
+
+**Note:** Remember to replace `"/path/to/your/genkit/dist/mcp.js"` with the actual path to the `mcp.js` file in your environment.
+
 ## Contributing
 
 We welcome contributions to forgeIDEA! Here's how you can help:
